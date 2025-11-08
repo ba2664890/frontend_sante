@@ -6,7 +6,6 @@ import {
   UsersIcon,
   ChartBarIcon,
   BellIcon,
-  Cog6ToothIcon as CogIcon,
   ArrowRightOnRectangleIcon as LogoutIcon,
   Bars3Icon as MenuIcon,
   XMarkIcon as XIcon,
