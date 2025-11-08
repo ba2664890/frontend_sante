@@ -12,8 +12,8 @@ import { notificationService } from '../services/notificationService.ts';
 
 import LoadingSpinner from '../components/LoadingSpinner.tsx';
 import DataTable from '../components/DataTable.tsx';
-import { formatDistanceToNow } from 'date-fns';
-import { fr } from 'date-fns/locale';
+//import { formatDistanceToNow } from 'date-fns';
+//import { fr } from 'date-fns/locale';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext.tsx';
 

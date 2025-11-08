@@ -116,7 +116,7 @@ const SenegalMap: React.FC<SenegalMapProps> = ({
         mapInstance.current = null;
       }
     };
-  }, [data]);
+  }, [data , regions]);
 
   return (
     <div className={className}>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { patientService } from '../services/patientService.ts';
-import { Patient, PatientFollowUp } from '../types';
+import {  PatientFollowUp } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner.tsx';
 import Modal from '../components/Modal.tsx';
 import PatientForm from '../components/PatientForm.tsx';
