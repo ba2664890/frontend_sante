@@ -5,7 +5,6 @@ import { useAuth } from '../../contexts/AuthContext.tsx';
 import StatCard from '../../components/StatCard.tsx';
 import LoadingSpinner from '../../components/LoadingSpinner.tsx';
 import {
-  UserGroupIcon,
   ClockIcon,
   ChatBubbleLeftIcon,
   DocumentCheckIcon
