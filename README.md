@@ -131,4 +131,4 @@ L'application peut être déployée sur n'importe quel serveur web static ou ser
 
 ## Licence
 
-Propriétaire - CerviCare+ 2024
+Propriétaire - CerviCare+ 2024# frontend_sante

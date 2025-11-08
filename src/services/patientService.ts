@@ -1,0 +1,180 @@
+import api, { buildQueryString, handleApiError } from './api.ts';
+import { Patient, PatientFollowUp, PatientFilters, PaginatedResponse } from '../types';
+
+class PatientService {
+  // ================= PATIENTS =================
+  async getPatients(filters?: PatientFilters, page = 1): Promise<PaginatedResponse<Patient>> {
+    try {
+      const queryParams = { ...filters, page };
+      const queryString = buildQueryString(queryParams);
+      const url = `/patients/patients/${queryString ? `?${queryString}` : ''}`;
+      const response = await api.get(url);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  // CORRECTION: Utiliser record_id comme identifiant principal
+  async getPatient(record_id: number): Promise<Patient> {
+    try {
+      const response = await api.get(`/patients/patients/${record_id}/`);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async createPatient(patientData: Partial<Patient>): Promise<Patient> {
+    try {
+      const response = await api.post('/patients/patients/', patientData);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  // CORRECTION: Utiliser user_id au lieu de id_patient
+  async updatePatient(user_id: number, patientData: Partial<Patient>): Promise<Patient> {
+    try {
+      const response = await api.patch(`/patients/patients/${user_id}/`, patientData);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async getPatientByUserId(user_id: number): Promise<Patient> {
+    try {
+      const response = await api.get(`/patients/patients/by-user/${user_id}/`);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+
+  // CORRECTION: Utiliser user_id au lieu de id_patient
+  async deletePatient(user_id: number): Promise<void> {
+    try {
+      await api.delete(`/patients/patients/${user_id}/`);
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async getPatientStats(): Promise<any> {
+    try {
+      const response = await api.get('/patients/patients/stats/');
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async getPatientsNeedingFollowUp(): Promise<Patient[]> {
+    try {
+      const response = await api.get('/patients/patients/needs_follow_up/');
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async exportPatientsData(): Promise<Blob> {
+    try {
+      const response = await api.get('/patients/patients/export_data/', { responseType: 'blob' });
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  // ================= FOLLOW UPS =================
+  async getFollowUps(filters?: { patient?: string | number }, page = 1): Promise<PaginatedResponse<PatientFollowUp>> {
+    try {
+      const queryParams: Record<string, string | number> = { page };
+
+      if (filters?.patient !== undefined && filters.patient !== null) {
+        queryParams.patient = filters.patient;
+      }
+
+      const queryString = buildQueryString(queryParams);
+      const url = `/patients/follow-ups/${queryString ? `?${queryString}` : ''}`;
+      const response = await api.get<PaginatedResponse<PatientFollowUp>>(url);
+
+      return response.data ?? { results: [], count: 0, next: null, previous: null };
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async getFollowUp(id: number): Promise<PatientFollowUp> {
+    try {
+      const response = await api.get(`/patients/follow-ups/${id}/`);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async createFollowUp(followUpData: Partial<PatientFollowUp>): Promise<PatientFollowUp> {
+    try {
+      const response = await api.post('/patients/follow-ups/', followUpData);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async updateFollowUp(id: number, followUpData: Partial<PatientFollowUp>): Promise<PatientFollowUp> {
+    try {
+      const response = await api.patch(`/patients/follow-ups/${id}/`, followUpData);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async deleteFollowUp(id: number): Promise<void> {
+    try {
+      await api.delete(`/patients/follow-ups/${id}/`);
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  // CORRECTION: Utiliser user_id au lieu de id_patient
+  async scheduleFollowUp(user_id: number, followUpData: {
+    follow_up_type: string;
+    scheduled_date: string;
+    notes?: string;
+  }): Promise<PatientFollowUp> {
+    try {
+      const response = await api.post(`/patients/patients/${user_id}/schedule_follow_up/`, followUpData);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async getUpcomingFollowUps(): Promise<PatientFollowUp[]> {
+    try {
+      const response = await api.get('/patients/follow-ups/upcoming/');
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async getOverdueFollowUps(): Promise<PatientFollowUp[]> {
+    try {
+      const response = await api.get('/patients/follow-ups/overdue/');
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+}
+
+export const patientService = new PatientService();
