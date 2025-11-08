@@ -18,7 +18,7 @@ const SenegalMap: React.FC<SenegalMapProps> = ({
   const mapInstance = useRef<L.Map | null>(null);
 
   // Coordonnées des régions du Sénégal
-  const regions = {
+  const regions = React.useMemo(() => ({
     1: { name: 'Thiès', coords: [14.85, -16.9] },
     2: { name: 'Diourbel', coords: [14.65, -16.23] },
     3: { name: 'Fatick', coords: [14.35, -16.58] },
@@ -31,7 +31,8 @@ const SenegalMap: React.FC<SenegalMapProps> = ({
     10: { name: 'Ziguinchor', coords: [12.56, -16.27] },
     11: { name: 'Kédougou', coords: [12.56, -12.18] },
     12: { name: 'Sédhiou', coords: [12.71, -15.56] },
-  };
+  }), []);
+
 
   useEffect(() => {
     if (!mapRef.current) return;
