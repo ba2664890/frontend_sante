@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BellIcon, MoonIcon, SunIcon, UserIcon, Cog6ToothIcon as CogIcon } from '@heroicons/react/24/outline';
+import { BellIcon, MoonIcon, SunIcon,  Cog6ToothIcon as CogIcon } from '@heroicons/react/24/outline';
 import { useQuery } from 'react-query';
 import { useAuth } from '../contexts/AuthContext.tsx';
 import { useTheme } from '../contexts/ThemeContext.tsx';
