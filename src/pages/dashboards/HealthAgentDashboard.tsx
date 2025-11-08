@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from 'react-query';
 import { analyticsService } from '../../services/analyticsService.ts';
 import { DashboardStats } from '../../types/analytics.ts';
-import { StatCardProps, ChartProps, SenegalMapProps, RecentPatientsProps, RecentAlertsProps } from '../../types/components.ts';
+import { StatCardProps } from '../../types/components.ts';
 import StatCard from '../../components/StatCard.tsx';
 import Chart from '../../components/Chart.tsx';
 import LoadingSpinner from '../../components/LoadingSpinner.tsx';
