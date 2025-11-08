@@ -10,7 +10,7 @@ import {
 import { patientService } from '../services/patientService.ts';
 import { analyticsService } from '../services/analyticsService.ts';
 import LoadingSpinner from '../components/LoadingSpinner.tsx';
-import StatCard, { StatCardProps } from '../components/StatCard.tsx';
+import StatCard from '../components/StatCard.tsx';
 import Chart from '../components/Chart.tsx';
 import SenegalMap from '../components/SenegalMap.tsx';
 import DataTable from '../components/DataTable.tsx';
