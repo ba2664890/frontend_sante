@@ -43,14 +43,26 @@ api.interceptors.response.use(
 
 // Gestion des erreurs
 export const handleApiError = (error: any): string => {
+  // si backend renvoie un objet d'erreurs par champ
+  if (error.response?.data && typeof error.response.data === 'object') {
+    // concaténation des messages par champ
+    return Object.entries(error.response.data)
+      .map(([field, msgs]) => {
+        if (Array.isArray(msgs)) return `${field}: ${msgs.join(', ')}`;
+        return `${field}: ${msgs}`;
+      })
+      .join('\n');
+  }
+
   if (error.response?.data?.detail) return error.response.data.detail;
   if (error.response?.data?.message) return error.response.data.message;
   if (error.response?.data?.error) return error.response.data.error;
-  if (error.response?.status === 400) return 'Données invalides.';
+  if (error.response?.status === 400) return error.response.data || 'Requête invalide.';
   if (error.response?.status === 404) return 'Ressource non trouvée.';
   if (error.response?.status === 500) return 'Erreur serveur.';
   return 'Une erreur est survenue.';
 };
+
 
 // Construire une query string
 export const buildQueryString = (params: Record<string, any>): string => {
