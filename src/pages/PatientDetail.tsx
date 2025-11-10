@@ -48,7 +48,7 @@ const PatientDetail: React.FC = () => {
   // 4. Récupérer les suivis avec record_id
   const { data: followUps, refetch: refetchFollowUps } = useQuery(
     ['patient-followups', record_id],
-    () => patientService.getFollowUps({ patient: record_id }),
+    () => patientService.getFollowUps({ patient: id! }),
     { enabled: !!record_id }
   );
 
