@@ -90,10 +90,15 @@ export interface Patient {
 export interface PatientFollowUp {
   id: number;
   patient: Patient;
+  patient_id?: number;
+  patient_name?: string;
+  agent_name?: string;
   follow_up_type: 'screening' | 'follow_up_90' | 'follow_up_180' | 'annual' | 'symptomatic';
   scheduled_date: string;
+  scheduled_time?: string; // Heure du rendez-vous
   completed_date?: string;
   status: 'scheduled' | 'completed' | 'missed' | 'cancelled' | 'rescheduled';
+  location?: string; // Lieu du rendez-vous
   notes?: string;
   result?: string;
   next_follow_up_date?: string;
