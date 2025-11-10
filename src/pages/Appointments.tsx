@@ -35,34 +35,28 @@ const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = ({
   onClose,
   onCancel,
 }) => {
-  if (!appointment) return null;
-
-  const appointmentDate = parseISO(appointment.scheduled_date);
-  const canCancel = isFuture(appointmentDate) && appointment.status === 'scheduled';
-  
-      // 1. Récupérer l'id depuis l'URL
+  // ⚡ Hooks appelés en premier, sans condition
   const { id } = useParams<{ id: string }>();
-
-  // 2. Récupérer le patient par user_id
-  const { data: patientByUser, isLoading: isLoadingByUser } = useQuery(
+  
+  const { data: patientByUser } = useQuery(
     ['patient-by-user', id],
     () => patientService.getPatientByUserId(Number(id)),
     { enabled: !!id }
   );
 
-  // 3. Extraire l'id correct pour les suivis
-  const patientId = patientByUser?.record_id; // <-- C'est l'ID que le backend attend
+  const patientId = patientByUser?.record_id;
 
-  // 4. Récupérer les suivis
-  const { data: followUps, isLoading: isLoadingFollowUps } = useQuery(
+  const { data: followUps } = useQuery(
     ['patient-followups', patientId],
     () => patientService.getFollowUps({ patient: patientId }),
     { enabled: !!patientId }
   );
 
-  if (isLoadingByUser || isLoadingFollowUps) {
-    return <div>Chargement...</div>;
-  }
+  // Ensuite, tu peux faire un return conditionnel
+  if (!appointment) return null;
+
+  const appointmentDate = parseISO(appointment.scheduled_date);
+  const canCancel = isFuture(appointmentDate) && appointment.status === 'scheduled';
 
   const getFollowUpTypeLabel = (type: string) => {
     const types: Record<string, string> = {
