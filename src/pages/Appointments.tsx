@@ -18,6 +18,7 @@ import { fr } from 'date-fns/locale';
 import LoadingSpinner from '../components/LoadingSpinner.tsx';
 import Modal from '../components/Modal.tsx';
 import { toast } from 'react-hot-toast';
+import { useParams } from 'react-router-dom';
 
 // Types
 interface AppointmentDetailsModalProps {
@@ -38,6 +39,30 @@ const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = ({
 
   const appointmentDate = parseISO(appointment.scheduled_date);
   const canCancel = isFuture(appointmentDate) && appointment.status === 'scheduled';
+  
+      // 1. Récupérer l'id depuis l'URL
+  const { id } = useParams<{ id: string }>();
+
+  // 2. Récupérer le patient par user_id
+  const { data: patientByUser, isLoading: isLoadingByUser } = useQuery(
+    ['patient-by-user', id],
+    () => patientService.getPatientByUserId(Number(id)),
+    { enabled: !!id }
+  );
+
+  // 3. Extraire l'id correct pour les suivis
+  const patientId = patientByUser?.record_id; // <-- C'est l'ID que le backend attend
+
+  // 4. Récupérer les suivis
+  const { data: followUps, isLoading: isLoadingFollowUps } = useQuery(
+    ['patient-followups', patientId],
+    () => patientService.getFollowUps({ patient: patientId }),
+    { enabled: !!patientId }
+  );
+
+  if (isLoadingByUser || isLoadingFollowUps) {
+    return <div>Chargement...</div>;
+  }
 
   const getFollowUpTypeLabel = (type: string) => {
     const types: Record<string, string> = {
