@@ -69,7 +69,7 @@ const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = ({
     return types[type] || type;
   };
   console.log(followUps);
-  console.log('AppointmentDetailsModal appointment:', appointment);
+  
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Détails du rendez-vous" size="lg">
