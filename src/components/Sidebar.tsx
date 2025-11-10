@@ -48,7 +48,7 @@ const Sidebar: React.FC = () => {
   // Navigation pour les patients
   const patientNavigation = [
     { name: 'Mon Suivi', href: `/patients/${user?.id}`, icon: HomeIcon },
-    { name: 'Rendez-vous', href: '/appointments', icon: CalendarIcon },
+    { name: 'Rendez-vous', href: `/appointments/${user?.id}`, icon: CalendarIcon },
     { name: 'Messages', href: '/notifications', icon: BellIcon },
   ];
 
