@@ -69,6 +69,10 @@ const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = ({
     return types[type] || type;
   };
 
+  {followUps?.results?.map(f => (
+  <div key={f.id}>{f.follow_up_type}</div>
+    ))}
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Détails du rendez-vous" size="lg">
       <div className="space-y-6">
