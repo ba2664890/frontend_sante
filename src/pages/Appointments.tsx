@@ -37,7 +37,7 @@ const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = ({
 }) => {
   // ⚡ Hooks appelés en premier, sans condition
   const { id } = useParams<{ id: string }>();
-  
+  console.log('AppointmentDetailsModal appointment:', id);
   const { data: patientByUser } = useQuery(
     ['patient-by-user', id],
     () => patientService.getPatientByUserId(Number(id)),
@@ -69,6 +69,7 @@ const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = ({
     return types[type] || type;
   };
   console.log(followUps);
+  console.log('AppointmentDetailsModal appointment:', appointment);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Détails du rendez-vous" size="lg">
