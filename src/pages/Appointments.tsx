@@ -45,7 +45,8 @@ const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = ({
   );
 
   const patientId = patientByUser?.record_id;
-
+  
+  console.log('AppointmentDetailsModal patientId:', patientId);
   const { data: followUps } = useQuery(
     ['patient-followups', patientId],
     () => patientService.getFollowUps({ patient: patientId }),
