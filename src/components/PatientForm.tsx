@@ -338,10 +338,10 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
       resultat_examen: Number(formData.resultat_examen) || 1,
       status: formData.status || 'new',  // doit être une des clés de STATUS_CHOICES
       next_appointment_date: formData.next_appointment_date || null, // null si vide
-      created_by: formData.created_by || 2,
+      created_by: formData.created_by || 1,
       created_at: formData.created_at || new Date().toISOString(),
       updated_at: new Date().toISOString(),
-      examen_depistag: formData.examen_depistag || '',
+      examen_depistag: formData.examen_depistag || 'rien',
     } as Patient;
   }
 
