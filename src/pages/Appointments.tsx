@@ -192,7 +192,6 @@ const AppointmentCard: React.FC<{
   onClick: () => void;
 }> = ({ appointment, onClick }) => {
   const appointmentDate = parseISO(appointment.scheduled_date);
-  const isPastAppointment = isPast(appointmentDate) && !isToday(appointmentDate);
   const isTodayAppointment = isToday(appointmentDate);
 
   const getFollowUpTypeLabel = (type: string) => {
@@ -314,7 +313,6 @@ const Appointments: React.FC = () => {
   }
 
   const appointments = followUpsData?.results || [];
-  const now = new Date();
 
   // Filtrer les rendez-vous
   const filteredAppointments = appointments.filter((apt) => {
