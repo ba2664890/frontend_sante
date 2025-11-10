@@ -45,11 +45,12 @@ const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = ({
   );
 
   const patientId = patientByUser?.record_id;
+  console.log('AppointmentDetailsModal appointment record_id:', patientByUser?.id_patient);
   
   console.log('AppointmentDetailsModal patientId:', patientId);
   const { data: followUps } = useQuery(
     ['patient-followups', patientId],
-    () => patientService.getFollowUps({ patient: patientId }),
+    () => patientService.getFollowUps({ patient: patientByUser?.id_patient }),
     { enabled: !!patientId }
   );
 
