@@ -28,14 +28,14 @@
     --c-border: rgba(139, 92, 246, 0.15);
     --c-border-light: rgba(255, 255, 255, 0.06);
     
-    --c-text: #F8FAFC;
+    --c-text: #131516;
     --c-text-muted: #94A3B8;
     --c-text-dim: #64748B;
   }
 
   [data-theme="light"] {
-    --c-bg: #FAFAFA;
-    --c-bg-light: #FFFFFF;
+    --c-bg: #110909;
+    --c-bg-light: #0e0b0b;
     --c-surface: rgba(139, 92, 246, 0.03);
     --c-surface-hover: rgba(139, 92, 246, 0.08);
     --c-border: rgba(139, 92, 246, 0.12);
