@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext.tsx';
 import { Cog6ToothIcon as CogIcon, UserIcon, BellIcon, ShieldCheckIcon, ServerIcon as DatabaseIcon } from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
+// Settings.tsx (ajout en haut)
+import { useLocation } from 'react-router-dom';
+
+
 
 type Tab = {
   id: string;
@@ -11,8 +15,9 @@ type Tab = {
 
 const Settings: React.FC = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<string>('profile');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState<string>(location.state?.defaultTab || 'profile');
 
   const tabs: Tab[] = [
     { id: 'profile', name: 'Profil', icon: UserIcon },
