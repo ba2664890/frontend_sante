@@ -1,7 +1,7 @@
 // src/pages/ChatbotPage.tsx
 import React, { useState, useRef, useEffect } from 'react';
 import { useQuery } from 'react-query';
-import { patientService } from '../services/patientService';
+import { patientService } from '../services/patientService.ts';
 import { Patient } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Modal from '../components/Modal';
