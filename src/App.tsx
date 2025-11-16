@@ -24,8 +24,7 @@ const App: React.FC = () => (
     <AuthProvider>
       <Routes>
         {/* public route */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/page_garde" element={<Campaigns />} />
+        <Route path="/login" element={<Campaigns />} />
 
         
 
