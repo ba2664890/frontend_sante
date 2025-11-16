@@ -61,6 +61,7 @@ export interface DashboardStats {
 }
 
 export interface Campaign {
+  actual_screenings: ReactNode;
   id: number;
   name: string;
   description: string;

@@ -17,6 +17,7 @@ import Notifications from './pages/Notifications.tsx';
 import ReportsPage from './pages/ReportsPage.tsx';
 import Appointments from './pages/Appointments.tsx';
 import ChatbotPage from './pages/ChatbotPage.tsx';
+import Campaigns from './pages/Campaigns.tsx';
 console.log('Public route - /login')
 const App: React.FC = () => (
   <ThemeProvider>
@@ -24,6 +25,7 @@ const App: React.FC = () => (
       <Routes>
         {/* public route */}
         <Route path="/login" element={<Login />} />
+        <Route path="/page_garde" element={<Campaigns />} />
 
         
 
