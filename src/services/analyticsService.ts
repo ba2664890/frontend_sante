@@ -1,7 +1,72 @@
-import api, { buildQueryString, handleApiError } from './api.ts';
-import { DashboardStats, Report, Campaign, Alert, PatientDashboardData } from '../types/analytics';
+// src/services/analyticsService.ts
+import api, { buildQueryString, handleApiError } from './api';
+import { PaginatedResponse } from '../types';
 
+// Types
+export interface DashboardStats {
+  total_patients: number;
+  active_patients: number;
+  monthly_screenings: number;
+  total_screened: number;
+  abnormal_results: number;
+  pending_followups: number;
+  coverage_rate: number;
+  follow_up_rate: number;
+  screening_trend: any[];
+  age_distribution: any;
+  geographic_data: any[];
+  patients_by_region: any;
+  recent_patients: any[];
+  recent_alerts: any[];
+  active_campaigns: any[];
+  pending_actions: any[];
+  pending_alerts: number;
+}
 
+export interface Report {
+  id: number;
+  title: string;
+  description: string;
+  type: string;
+  status: string;
+  generated_at: string;
+  file_url?: string;
+  filters: any;
+}
+
+export interface Alert {
+  id: number;
+  title: string;
+  message: string;
+  alert_type: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  is_read: boolean;
+  is_resolved: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Campaign {
+  id: number;
+  name: string;
+  description: string;
+  campaign_type: string;
+  status: string;
+  start_date: string;
+  end_date: string;
+  region: string;
+  district?: string;
+  location_details?: string;
+  target_population: number;
+  expected_screenings: number;
+  actual_screenings: number;
+  team_leader: any;
+  team_members: any[];
+  created_by: any;
+  created_at: string;
+  updated_at: string;
+  is_active: boolean;
+}
 
 export interface CampaignFormData {
   name: string;
@@ -19,20 +84,31 @@ export interface CampaignFormData {
   team_members?: number[];
 }
 
+export interface ScreeningResult {
+  id: number;
+  patient: any;
+  campaign: Campaign;
+  screening_date: string;
+  result: 'normal' | 'abnormal' | 'suspicious' | 'positive' | 'negative' | 'inconclusive';
+  notes?: string;
+  performed_by: any;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PatientDashboardData {
+  my_screenings: any[];
+  upcoming_appointments: any[];
+  my_messages: any[];
+}
 
 class AnalyticsService {
   // ================= DASHBOARD =================
   async getDashboardData(): Promise<DashboardStats> {
     try {
-      console.log('AnalyticsService - getDashboardData called');
-      
-      // L'endpoint principal du dashboard qui gère tous les rôles
       const endpoint = '/analytics/dashboard-metrics/dashboard-data/';
-      
       const response = await api.get(endpoint);
       const data = response.data;
-
-      console.log('AnalyticsService - Dashboard data received:', data);
 
       // Normaliser les alertes si elles existent
       if (data.recent_alerts && Array.isArray(data.recent_alerts)) {
@@ -44,7 +120,6 @@ class AnalyticsService {
         }));
       }
 
-      // Normaliser les données manquantes
       return {
         total_patients: data.total_patients || 0,
         active_patients: data.active_patients || 0,
@@ -63,11 +138,8 @@ class AnalyticsService {
         active_campaigns: data.active_campaigns || [],
         pending_actions: data.pending_actions || [],
         pending_alerts: data.pending_alerts || 0,
-        
       };
     } catch (error: any) {
-      console.error('AnalyticsService - getDashboardData error:', error);
-      console.error('Error response:', error.response?.data);
       throw new Error(handleApiError(error));
     }
   }
@@ -77,13 +149,12 @@ class AnalyticsService {
       const response = await api.get('/analytics/dashboard-metrics/patient-dashboard/');
       return response.data;
     } catch (error) {
-      console.error('AnalyticsService - getPatientDashboardData error:', error);
       throw new Error(handleApiError(error));
     }
   }
 
   // ================= REPORTS =================
-  async getReports(filters?: any): Promise<any> {
+  async getReports(filters?: Record<string, any>): Promise<PaginatedResponse<Report>> {
     try {
       const queryString = buildQueryString(filters || {});
       const url = `/analytics/reports/${queryString ? `?${queryString}` : ''}`;
@@ -148,10 +219,10 @@ class AnalyticsService {
     }
   }
 
-
-  async getAlerts(filters?: any): Promise<any> {
+  // ================= ALERTS =================
+  async getAlerts(filters?: Record<string, any>): Promise<PaginatedResponse<Alert>> {
     try {
-      const response = await api.get('analytics/alerts/', { params: filters });
+      const response = await api.get('/analytics/alerts/', { params: filters });
       return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
@@ -160,7 +231,7 @@ class AnalyticsService {
 
   async createAlert(alertData: Partial<Alert>): Promise<Alert> {
     try {
-      const response = await api.post('analytics/alerts/', alertData);
+      const response = await api.post('/analytics/alerts/', alertData);
       return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
@@ -169,7 +240,7 @@ class AnalyticsService {
 
   async acknowledgeAlert(id: number): Promise<void> {
     try {
-      await api.post(`analytics/alerts/${id}/acknowledge/`);
+      await api.post(`/analytics/alerts/${id}/acknowledge/`);
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -177,42 +248,7 @@ class AnalyticsService {
 
   async resolveAlert(id: number): Promise<void> {
     try {
-      await api.post(`analytics/alerts/${id}/resolve/`);
-    } catch (error) {
-      throw new Error(handleApiError(error));
-    }
-  }
-
-  async getCampaigns(filters?: any): Promise<any> {
-    try {
-      const response = await api.get('analytics/campaigns/', { params: filters });
-      return response.data;
-    } catch (error) {
-      throw new Error(handleApiError(error));
-    }
-  }
-
-  async createCampaign(campaignData: Partial<Campaign>): Promise<Campaign> {
-    try {
-      const response = await api.post('analytics/campaigns/', campaignData);
-      return response.data;
-    } catch (error) {
-      throw new Error(handleApiError(error));
-    }
-  }
-
-  async activateCampaign(id: number): Promise<void> {
-    try {
-      await api.post(`analytics/campaigns/${id}/activate/`);
-    } catch (error) {
-      throw new Error(handleApiError(error));
-    }
-  }
-
-  async getActiveCampaigns(): Promise<Campaign[]> {
-    try {
-      const response = await api.get('analytics/campaigns/active/');
-      return response.data;
+      await api.post(`/analytics/alerts/${id}/resolve/`);
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -220,14 +256,45 @@ class AnalyticsService {
 
   async getCriticalAlerts(): Promise<Alert[]> {
     try {
-      const response = await api.get('analytics/alerts/critical/');
+      const response = await api.get('/analytics/alerts/critical/');
       return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
   }
 
-    async updateCampaign(id: number, data: Partial<CampaignFormData>): Promise<Campaign> {
+  // ================= CAMPAIGNS =================
+  async getCampaigns(filters?: Record<string, any>, page = 1): Promise<PaginatedResponse<Campaign>> {
+    try {
+      const queryParams = { ...filters, page };
+      const queryString = buildQueryString(queryParams || {});
+      const url = `/screening/campaigns/${queryString ? `?${queryString}` : ''}`;
+      const response = await api.get(url);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async getCampaign(id: number): Promise<Campaign> {
+    try {
+      const response = await api.get(`/screening/campaigns/${id}/`);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async createCampaign(campaignData: Partial<CampaignFormData>): Promise<Campaign> {
+    try {
+      const response = await api.post('/screening/campaigns/', campaignData);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async updateCampaign(id: number, data: Partial<CampaignFormData>): Promise<Campaign> {
     try {
       const response = await api.patch(`/screening/campaigns/${id}/`, data);
       return response.data;
@@ -244,9 +311,108 @@ class AnalyticsService {
     }
   }
 
-  async getMetrics(filters?: any): Promise<any> {
+  async getCampaignStatistics(id: number): Promise<{
+    total_screenings: number;
+    results_breakdown: any[];
+    completion_rate: number;
+    is_active: boolean;
+    days_remaining: number;
+  }> {
     try {
-      const response = await api.get('analytics/dashboard-metrics/', { params: filters });
+      const response = await api.get(`/screening/campaigns/${id}/statistics/`);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async activateCampaign(id: number): Promise<void> {
+    try {
+      await api.post(`/screening/campaigns/${id}/activate/`);
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async getActiveCampaigns(): Promise<Campaign[]> {
+    try {
+      const response = await api.get('/screening/campaigns/active/');
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  // ================= SCREENING RESULTS =================
+  async getResults(
+    filters?: Record<string, any>,
+    page = 1
+  ): Promise<PaginatedResponse<ScreeningResult>> {
+    try {
+      const queryParams = { ...filters, page };
+      const queryString = buildQueryString(queryParams || {});
+      const url = `/screening/results/${queryString ? `?${queryString}` : ''}`;
+      const response = await api.get(url);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async getResult(id: number): Promise<ScreeningResult> {
+    try {
+      const response = await api.get(`/screening/results/${id}/`);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async createResult(data: Partial<ScreeningResult>): Promise<ScreeningResult> {
+    try {
+      const response = await api.post('/screening/results/', data);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async updateResult(id: number, data: Partial<ScreeningResult>): Promise<ScreeningResult> {
+    try {
+      const response = await api.patch(`/screening/results/${id}/`, data);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async deleteResult(id: number): Promise<void> {
+    try {
+      await api.delete(`/screening/results/${id}/`);
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async getResultsSummary(filters?: Record<string, any>): Promise<{
+    total_screenings: number;
+    results_breakdown: any[];
+    recent_screenings: ScreeningResult[];
+  }> {
+    try {
+      const queryString = buildQueryString(filters || {});
+      const url = `/screening/results/summary/${queryString ? `?${queryString}` : ''}`;
+      const response = await api.get(url);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  // ================= METRICS =================
+  async getMetrics(filters?: Record<string, any>): Promise<any> {
+    try {
+      const response = await api.get('/analytics/dashboard-metrics/', { params: filters });
       return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));

@@ -558,7 +558,8 @@ const Campaigns: React.FC = () => {
               }}
               onDelete={() => handleDelete(campaign)}
             />
-          ))}
+          )) 
+          }
         </div>
       )}
 
