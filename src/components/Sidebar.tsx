@@ -50,6 +50,7 @@ const Sidebar: React.FC = () => {
     { name: 'Mon Suivi', href: `/patients/${user?.id}`, icon: HomeIcon },
     { name: 'Rendez-vous', href: `/appointments/${user?.id}`, icon: CalendarIcon },
     { name: 'Messages', href: '/notifications', icon: BellIcon },
+    { name: 'chatbot', href: '/chatbot', icon: BellIcon },
   ];
 
   // Sélectionner la navigation en fonction du rôle

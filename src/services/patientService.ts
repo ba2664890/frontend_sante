@@ -175,6 +175,58 @@ class PatientService {
       throw new Error(handleApiError(error));
     }
   }
+
+
+
+  // ================= CHATBOT =================
+
+  async sendChatbotMessage(params: {
+    question: string;
+    patient_id?: number;
+    conversation_id?: number;
+  }): Promise<{
+    answer: string;
+    conversation_id: number;
+    message_id: number;
+    detected_language?: string;
+    translated_question?: string;
+  }> {
+    try {
+      const response = await api.post('/conversations/chat/', params);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async getConversations(page = 1): Promise<PaginatedResponse<any>> {
+    try {
+      const queryString = buildQueryString({ page });
+      const url = `/conversations/${queryString ? `?${queryString}` : ''}`;
+      const response = await api.get(url);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async getConversationMessages(conversationId: number): Promise<any[]> {
+    try {
+      const response = await api.get(`/conversations/${conversationId}/messages/`);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async getConversation(conversationId: number): Promise<any> {
+    try {
+      const response = await api.get(`/conversations/${conversationId}/`);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
 }
 
 export const patientService = new PatientService();

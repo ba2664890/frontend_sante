@@ -16,6 +16,7 @@ import Settings from './pages/Settings.tsx';
 import Notifications from './pages/Notifications.tsx';
 import ReportsPage from './pages/ReportsPage.tsx';
 import Appointments from './pages/Appointments.tsx';
+import ChatbotPage from './pages/ChatbotPage.tsx';
 console.log('Public route - /login')
 const App: React.FC = () => (
   <ThemeProvider>
@@ -30,10 +31,11 @@ const App: React.FC = () => (
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
             <Route path="/reports" element={<ReportsPage />} />
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />           
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/patients" element={<Patients />} />
             <Route path="/appointments/:id" element={<Appointments />} />
+            <Route path="/chatbot" element={<ChatbotPage />} />
             <Route path="/admin" element={<AdminRedirect />} />
             <Route path="/patients/:id" element={<PatientDetail />} />
             <Route path="/statistics" element={<Statistics />} />
