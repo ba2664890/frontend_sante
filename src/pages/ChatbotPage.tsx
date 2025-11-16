@@ -4,7 +4,7 @@ import { useQuery } from 'react-query';
 import { patientService } from '../services/patientService.ts';
 import { Patient } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
-import Modal from '../components/Modal';
+import Modal from '../components/Modal.tsx';
 import {
   PaperAirplaneIcon,
   ChatBubbleLeftRightIcon,
