@@ -24,7 +24,7 @@ const App: React.FC = () => (
     <AuthProvider>
       <Routes>
         {/* public route */}
-        <Route path="/login" element={<Campaigns />} />
+        <Route path="/login" element={<Login />} />
 
         
 
@@ -35,6 +35,7 @@ const App: React.FC = () => (
             <Route path="/" element={<Navigate to="/dashboard" replace />} />           
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/patients" element={<Patients />} />
+            <Route path="/accueil" element={<Campaigns />} />
             <Route path="/appointments/:id" element={<Appointments />} />
             <Route path="/chatbot" element={<ChatbotPage />} />
             <Route path="/admin" element={<AdminRedirect />} />

@@ -33,6 +33,7 @@ const Sidebar: React.FC = () => {
           { name: 'Notifications', href: '/notifications', icon: BellIcon },
           { name: 'Administration', href: '/admin', icon: ShieldCheckIcon },
           { name: 'Rapports', href: '/reports', icon: DocumentReportIcon },
+          { name: 'Compagne', href: '/accueil', icon: DocumentReportIcon }
         ];
       case 'supervisor':
         return [
