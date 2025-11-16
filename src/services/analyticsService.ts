@@ -1,5 +1,5 @@
 // src/services/analyticsService.ts
-import api, { buildQueryString, handleApiError } from './api';
+import api, { buildQueryString, handleApiError } from './api.ts';
 import { PaginatedResponse } from '../types';
 
 // Types
