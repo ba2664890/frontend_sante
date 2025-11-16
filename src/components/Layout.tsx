@@ -6,7 +6,7 @@ import Header from './Header.tsx';
 console.log('Layout component rendered');
 const Layout: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center p-6">
       <Sidebar />
       <div className="flex-1 flex flex-col">
         <Header />
