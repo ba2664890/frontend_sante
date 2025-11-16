@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'react-query';
-import { useAuth } from '../contexts/AuthContext';
-import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext.tsx';
+import { useTheme } from '../contexts/ThemeContext.tsx';
 import { notificationService } from '../services/notificationService.ts';
 import {
   BellIcon,
