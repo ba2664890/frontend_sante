@@ -1,156 +1,565 @@
-/* ======  FUTURISTE 2025  ====== */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+/* ====== CERVICARE+ 2025 - DESIGN MÉDICAL FUTURISTE ====== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* PALETTE NEON */
-    --c-primary: #00F0FF;   /* cyan néon */
-    --c-secondary: #FF00F0; /* magenta néon */
-    --c-success: #00FF95;
-    --c-warning: #FFD600;
-    --c-error: #FF003C;
-    --c-bg: #0A0A0B;        /* noir presque absolu */
-    --c-surface: rgba(255,255,255,.04);
-    --c-border: rgba(255,255,255,.08);
-    --c-text: #E4E4E7;
-    --c-text-dim: #A0A0A0;
+    /* PALETTE MÉDICALE MODERNE - Violet/Purple pour sensibilisation cancer */
+    --c-primary: #8B5CF6;        /* Violet moderne */
+    --c-primary-light: #A78BFA;  /* Violet clair */
+    --c-primary-dark: #7C3AED;   /* Violet foncé */
+    
+    --c-secondary: #EC4899;      /* Rose pour santé féminine */
+    --c-accent: #06B6D4;         /* Cyan médical */
+    
+    --c-success: #10B981;        /* Vert succès */
+    --c-warning: #F59E0B;        /* Orange alerte */
+    --c-error: #EF4444;          /* Rouge erreur */
+    --c-info: #3B82F6;           /* Bleu information */
+    
+    /* Backgrounds & Surfaces */
+    --c-bg: #0F0F1A;             /* Fond sombre profond */
+    --c-bg-light: #1A1A2E;       /* Fond secondaire */
+    --c-surface: rgba(139, 92, 246, 0.05);
+    --c-surface-hover: rgba(139, 92, 246, 0.1);
+    
+    /* Borders & Dividers */
+    --c-border: rgba(139, 92, 246, 0.15);
+    --c-border-light: rgba(255, 255, 255, 0.06);
+    
+    /* Text Colors */
+    --c-text: #F8FAFC;
+    --c-text-muted: #94A3B8;
+    --c-text-dim: #64748B;
+    
+    /* Glow Effects */
+    --glow-primary: 0 0 20px rgba(139, 92, 246, 0.4);
+    --glow-secondary: 0 0 20px rgba(236, 72, 153, 0.4);
+    --glow-success: 0 0 20px rgba(16, 185, 129, 0.4);
+    --glow-error: 0 0 20px rgba(239, 68, 68, 0.4);
   }
 
   [data-theme="light"] {
-    --c-bg: #F7F7F8;
-    --c-surface: rgba(255,255,255,.7);
-    --c-border: rgba(0,0,0,.08);
-    --c-text: #18181B;
-    --c-text-dim: #52525B;
+    --c-bg: #FAFAFA;
+    --c-bg-light: #FFFFFF;
+    --c-surface: rgba(139, 92, 246, 0.03);
+    --c-surface-hover: rgba(139, 92, 246, 0.08);
+    --c-border: rgba(139, 92, 246, 0.12);
+    --c-border-light: rgba(0, 0, 0, 0.06);
+    --c-text: #1E293B;
+    --c-text-muted: #475569;
+    --c-text-dim: #64748B;
   }
 
   html {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     scroll-behavior: smooth;
+    overflow-x: hidden;
   }
+
   body {
     background: var(--c-bg);
     color: var(--c-text);
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    position: relative;
+  }
+
+  /* Background Pattern Futuriste */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+      radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 40% 20%, rgba(6, 182, 212, 0.06) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
   }
 }
 
 @layer components {
-  /* ----------- Boutons ----------- */
+  /* ========== BOUTONS FUTURISTES ========== */
   .btn-primary {
-    @apply relative inline-flex items-center justify-center px-5 py-2.5
-    rounded-xl text-sm font-semibold tracking-wide
-    bg-[var(--c-primary)] text-black
-    shadow-[0_0_12px_var(--c-primary)]
-    hover:shadow-[0_0_20px_var(--c-primary)]
-    transform hover:scale-[1.03] active:scale-[0.98]
-    transition-all duration-300;
-  }
-  .btn-secondary {
-    @apply relative inline-flex items-center justify-center px-5 py-2.5
-    rounded-xl text-sm font-semibold tracking-wide
-    bg-[var(--c-surface)] border border-[var(--c-border)]
-    text-[var(--c-text)] backdrop-blur
-    hover:bg-[var(--c-primary)] hover:text-black hover:border-transparent
-    transform hover:scale-[1.03] active:scale-[0.98]
-    transition-all duration-300;
-  }
-  .btn-success {
-    @apply bg-[var(--c-success)] text-black shadow-[0_0_12px_var(--c-success)]
-    hover:shadow-[0_0_20px_var(--c-success)];
-  }
-  .btn-warning {
-    @apply bg-[var(--c-warning)] text-black shadow-[0_0_12px_var(--c-warning)]
-    hover:shadow-[0_0_20px_var(--c-warning)];
-  }
-  .btn-error {
-    @apply bg-[var(--c-error)] text-black shadow-[0_0_12px_var(--c-error)]
-    hover:shadow-[0_0_20px_var(--c-error)];
+    @apply relative inline-flex items-center justify-center gap-2 px-6 py-3
+    rounded-2xl text-sm font-semibold tracking-wide
+    bg-gradient-to-r from-[var(--c-primary)] to-[var(--c-primary-dark)]
+    text-white shadow-lg
+    hover:shadow-[var(--glow-primary)]
+    transform hover:scale-[1.02] hover:-translate-y-0.5
+    active:scale-[0.98] active:translate-y-0
+    transition-all duration-300 ease-out
+    border border-[var(--c-primary-light)]/20
+    overflow-hidden;
   }
 
-  /* ----------- Cartes ----------- */
+  .btn-primary::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent
+    translate-x-[-200%] transition-transform duration-700;
+  }
+
+  .btn-primary:hover::before {
+    @apply translate-x-[200%];
+  }
+
+  .btn-secondary {
+    @apply relative inline-flex items-center justify-center gap-2 px-6 py-3
+    rounded-2xl text-sm font-semibold tracking-wide
+    bg-[var(--c-surface)] border-2 border-[var(--c-border)]
+    text-[var(--c-text)] backdrop-blur-xl
+    hover:bg-[var(--c-surface-hover)] hover:border-[var(--c-primary)]/50
+    hover:shadow-lg hover:shadow-[var(--c-primary)]/10
+    transform hover:scale-[1.02] hover:-translate-y-0.5
+    active:scale-[0.98] active:translate-y-0
+    transition-all duration-300 ease-out;
+  }
+
+  .btn-success {
+    @apply bg-gradient-to-r from-[var(--c-success)] to-emerald-500
+    shadow-[var(--glow-success)] border-[var(--c-success)]/20
+    hover:shadow-[0_0_30px_rgba(16,185,129,0.5)];
+  }
+
+  .btn-warning {
+    @apply bg-gradient-to-r from-[var(--c-warning)] to-amber-500
+    shadow-[0_0_20px_rgba(245,158,11,0.4)]
+    hover:shadow-[0_0_30px_rgba(245,158,11,0.5)]
+    border-[var(--c-warning)]/20;
+  }
+
+  .btn-danger, .btn-error {
+    @apply bg-gradient-to-r from-[var(--c-error)] to-rose-500
+    shadow-[var(--glow-error)] border-[var(--c-error)]/20
+    hover:shadow-[0_0_30px_rgba(239,68,68,0.5)];
+  }
+
+  .btn-info {
+    @apply bg-gradient-to-r from-[var(--c-info)] to-blue-500
+    shadow-[0_0_20px_rgba(59,130,246,0.4)]
+    hover:shadow-[0_0_30px_rgba(59,130,246,0.5)]
+    border-[var(--c-info)]/20;
+  }
+
+  /* ========== CARTES GLASSMORPHISM ========== */
   .card {
     @apply relative bg-[var(--c-surface)] border border-[var(--c-border)]
-    rounded-2xl p-6 backdrop-blur-xl
-    shadow-[0_8px_32px_rgba(0,0,0,.2)]
-    hover:shadow-[0_8px_40px_rgba(0,0,0,.3)]
+    rounded-3xl p-6 backdrop-blur-2xl
+    shadow-[0_8px_32px_rgba(0,0,0,0.12)]
+    hover:shadow-[0_12px_48px_rgba(139,92,246,0.15)]
+    hover:border-[var(--c-primary)]/30
     transform hover:-translate-y-1
-    transition-all duration-300;
+    transition-all duration-500 ease-out
+    overflow-hidden;
   }
 
-  /* ----------- Inputs ----------- */
+  .card::before {
+    content: '';
+    @apply absolute -top-40 -right-40 w-80 h-80
+    bg-gradient-to-br from-[var(--c-primary)]/10 to-transparent
+    rounded-full blur-3xl
+    transition-all duration-700;
+  }
+
+  .card:hover::before {
+    @apply -top-20 -right-20 from-[var(--c-primary)]/15;
+  }
+
+  .card-highlight {
+    @apply border-2 border-[var(--c-primary)]/50
+    shadow-[0_0_30px_rgba(139,92,246,0.2)]
+    bg-gradient-to-br from-[var(--c-primary)]/5 to-transparent;
+  }
+
+  /* ========== INPUTS MODERNES ========== */
   .input-field {
-    @apply w-full px-4 py-3 rounded-xl bg-transparent
-    border border-[var(--c-border)] text-[var(--c-text)]
+    @apply w-full px-5 py-3.5 rounded-2xl
+    bg-[var(--c-surface)] border-2 border-[var(--c-border)]
+    text-[var(--c-text)] text-sm
     placeholder:text-[var(--c-text-dim)]
-    focus:outline-none focus:ring-2 focus:ring-[var(--c-primary)]
-    focus:border-transparent transition duration-300;
+    backdrop-blur-xl
+    focus:outline-none focus:ring-2 focus:ring-[var(--c-primary)]/50
+    focus:border-[var(--c-primary)] focus:bg-[var(--c-surface-hover)]
+    transition-all duration-300 ease-out;
   }
+
+  .input-field:focus {
+    @apply shadow-[0_0_20px_rgba(139,92,246,0.15)];
+  }
+
   .input-error {
-    @apply border-[var(--c-error)] focus:ring-[var(--c-error)];
+    @apply border-[var(--c-error)] focus:ring-[var(--c-error)]/50
+    focus:border-[var(--c-error)];
   }
+
   .form-label {
-    @apply block text-sm font-medium text-[var(--c-text-dim)] mb-2;
+    @apply block text-sm font-semibold text-[var(--c-text)] mb-2
+    tracking-wide;
   }
 
-  /* ----------- Badges ----------- */
+  /* ========== BADGES & STATUS ========== */
   .status-badge {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold;
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5
+    rounded-full text-xs font-bold tracking-wide
+    border backdrop-blur-sm;
   }
-  .status-success { @apply bg-[var(--c-success)]/20 text-[var(--c-success)]; }
-  .status-warning { @apply bg-[var(--c-warning)]/20 text-[var(--c-warning)]; }
-  .status-error   { @apply bg-[var(--c-error)]/20 text-[var(--c-error)]; }
-  .status-info    { @apply bg-[var(--c-primary)]/20 text-[var(--c-primary)]; }
 
-  /* ----------- Loader ----------- */
+  .status-success {
+    @apply bg-[var(--c-success)]/10 text-[var(--c-success)]
+    border-[var(--c-success)]/30
+    shadow-[0_0_12px_rgba(16,185,129,0.2)];
+  }
+
+  .status-warning {
+    @apply bg-[var(--c-warning)]/10 text-[var(--c-warning)]
+    border-[var(--c-warning)]/30
+    shadow-[0_0_12px_rgba(245,158,11,0.2)];
+  }
+
+  .status-error {
+    @apply bg-[var(--c-error)]/10 text-[var(--c-error)]
+    border-[var(--c-error)]/30
+    shadow-[0_0_12px_rgba(239,68,68,0.2)];
+  }
+
+  .status-info {
+    @apply bg-[var(--c-primary)]/10 text-[var(--c-primary)]
+    border-[var(--c-primary)]/30
+    shadow-[0_0_12px_rgba(139,92,246,0.2)];
+  }
+
+  /* ========== LOADING SPINNER ========== */
   .loading-spinner {
-    @apply w-6 h-6 border-2 border-transparent border-t-[var(--c-primary)] rounded-full animate-spin;
+    @apply w-8 h-8 border-[3px] border-transparent
+    border-t-[var(--c-primary)] border-r-[var(--c-primary)]/40
+    rounded-full animate-spin
+    shadow-[0_0_15px_rgba(139,92,246,0.3)];
   }
 
-  /* ----------- Skeleton ----------- */
+  /* ========== SKELETON LOADER ========== */
   .skeleton {
-    @apply bg-[var(--c-border)]/50 rounded-xl animate-pulse;
+    @apply bg-gradient-to-r from-[var(--c-border)]/30 via-[var(--c-border)]/50 to-[var(--c-border)]/30
+    rounded-2xl animate-pulse
+    bg-[length:200%_100%]
+    animate-[shimmer_2s_infinite];
   }
 
-  /* ----------- Bouton flottant ----------- */
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  /* ========== FLOATING ACTION BUTTON ========== */
   .fab {
-    @apply fixed bottom-6 right-6 w-14 h-14 rounded-full
-    bg-[var(--c-primary)] text-black grid place-items-center
-    shadow-[0_0_20px_var(--c-primary)]
-    hover:shadow-[0_0_30px_var(--c-primary)]
-    transform hover:scale-110 active:scale-95
+    @apply fixed bottom-8 right-8 w-16 h-16 rounded-2xl
+    bg-gradient-to-br from-[var(--c-primary)] to-[var(--c-primary-dark)]
+    text-white grid place-items-center
+    shadow-[0_8px_32px_rgba(139,92,246,0.4)]
+    hover:shadow-[0_12px_48px_rgba(139,92,246,0.6)]
+    transform hover:scale-110 hover:rotate-12
+    active:scale-95 active:rotate-0
+    transition-all duration-300 ease-out
+    border border-[var(--c-primary-light)]/30
+    z-50;
+  }
+
+  /* ========== MODALS ========== */
+  .modal-overlay {
+    @apply fixed inset-0 bg-black/60 backdrop-blur-sm z-40
+    animate-[fadeIn_0.3s_ease-out];
+  }
+
+  .modal-content {
+    @apply relative bg-[var(--c-bg-light)] border-2 border-[var(--c-border)]
+    rounded-3xl p-8 backdrop-blur-2xl
+    shadow-[0_24px_64px_rgba(0,0,0,0.4)]
+    max-h-[90vh] overflow-y-auto
+    animate-[slideUp_0.4s_ease-out];
+  }
+
+  /* ========== TABLES ========== */
+  .table-modern {
+    @apply w-full border-collapse;
+  }
+
+  .table-modern thead {
+    @apply bg-gradient-to-r from-[var(--c-primary)]/10 to-[var(--c-secondary)]/10
+    border-b-2 border-[var(--c-border)];
+  }
+
+  .table-modern th {
+    @apply px-6 py-4 text-left text-xs font-bold
+    text-[var(--c-text)] uppercase tracking-wider;
+  }
+
+  .table-modern td {
+    @apply px-6 py-4 text-sm text-[var(--c-text)]
+    border-b border-[var(--c-border-light)];
+  }
+
+  .table-modern tbody tr {
+    @apply transition-all duration-300
+    hover:bg-[var(--c-surface-hover)]
+    hover:shadow-[0_0_20px_rgba(139,92,246,0.1)];
+  }
+
+  /* ========== NAVIGATION ========== */
+  .nav-link {
+    @apply relative flex items-center gap-3 px-4 py-3
+    rounded-2xl text-sm font-medium
+    text-[var(--c-text-muted)]
+    hover:text-[var(--c-text)] hover:bg-[var(--c-surface-hover)]
+    transition-all duration-300
+    group;
+  }
+
+  .nav-link::before {
+    content: '';
+    @apply absolute left-0 top-1/2 -translate-y-1/2
+    w-1 h-0 bg-[var(--c-primary)] rounded-r-full
     transition-all duration-300;
   }
 
-  /* ----------- Animations ----------- */
-  .fade-in {
-    animation: fadeIn .6s ease-out forwards;
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+  .nav-link:hover::before,
+  .nav-link.active::before {
+    @apply h-8;
   }
 
-  .slide-up {
-    animation: slideUp .4s ease-out forwards;
+  .nav-link.active {
+    @apply text-[var(--c-text)] bg-[var(--c-surface-hover)]
+    shadow-[0_0_20px_rgba(139,92,246,0.1)];
   }
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+
+  /* ========== ALERTS ========== */
+  .alert {
+    @apply flex items-start gap-4 p-5 rounded-2xl
+    border-l-4 backdrop-blur-xl
+    animate-[slideRight_0.4s_ease-out];
+  }
+
+  .alert-success {
+    @apply bg-[var(--c-success)]/10 border-[var(--c-success)]
+    shadow-[0_0_20px_rgba(16,185,129,0.1)];
+  }
+
+  .alert-warning {
+    @apply bg-[var(--c-warning)]/10 border-[var(--c-warning)]
+    shadow-[0_0_20px_rgba(245,158,11,0.1)];
+  }
+
+  .alert-error {
+    @apply bg-[var(--c-error)]/10 border-[var(--c-error)]
+    shadow-[0_0_20px_rgba(239,68,68,0.1)];
+  }
+
+  .alert-info {
+    @apply bg-[var(--c-primary)]/10 border-[var(--c-primary)]
+    shadow-[0_0_20px_rgba(139,92,246,0.1)];
+  }
+
+  /* ========== PROGRESS BAR ========== */
+  .progress-bar {
+    @apply relative w-full h-3 bg-[var(--c-border)] rounded-full overflow-hidden;
+  }
+
+  .progress-fill {
+    @apply h-full bg-gradient-to-r from-[var(--c-primary)] to-[var(--c-secondary)]
+    rounded-full relative
+    shadow-[0_0_12px_rgba(139,92,246,0.4)]
+    transition-all duration-500 ease-out;
+  }
+
+  .progress-fill::after {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent
+    animate-[shimmer_2s_infinite];
+  }
+
+  /* ========== TOOLTIPS ========== */
+  .tooltip {
+    @apply absolute z-50 px-3 py-2 text-xs font-medium
+    bg-[var(--c-bg-light)] border border-[var(--c-border)]
+    rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.3)]
+    backdrop-blur-xl pointer-events-none
+    opacity-0 invisible transition-all duration-300;
+  }
+
+  .tooltip.show {
+    @apply opacity-100 visible;
+  }
+
+  /* ========== DIVIDERS ========== */
+  .divider {
+    @apply h-px bg-gradient-to-r from-transparent via-[var(--c-border)] to-transparent my-6;
+  }
+
+  .divider-vertical {
+    @apply w-px bg-gradient-to-b from-transparent via-[var(--c-border)] to-transparent mx-4;
   }
 }
 
 @layer utilities {
-  .text-gradient {
-    @apply bg-gradient-to-r from-[var(--c-primary)] to-[var(--c-secondary)] bg-clip-text text-transparent;
+  /* ========== TEXT GRADIENTS ========== */
+  .text-gradient-primary {
+    @apply bg-gradient-to-r from-[var(--c-primary)] to-[var(--c-primary-light)]
+    bg-clip-text text-transparent;
   }
+
+  .text-gradient-secondary {
+    @apply bg-gradient-to-r from-[var(--c-secondary)] to-pink-400
+    bg-clip-text text-transparent;
+  }
+
+  .text-gradient-success {
+    @apply bg-gradient-to-r from-[var(--c-success)] to-emerald-400
+    bg-clip-text text-transparent;
+  }
+
+  /* ========== BACKGROUND GRADIENTS ========== */
   .bg-gradient-primary {
-    @apply bg-gradient-to-br from-[var(--c-primary)] to-[#00c2cb];
+    @apply bg-gradient-to-br from-[var(--c-primary)] via-[var(--c-primary-dark)] to-purple-700;
   }
+
+  .bg-gradient-secondary {
+    @apply bg-gradient-to-br from-[var(--c-secondary)] via-pink-600 to-rose-600;
+  }
+
+  .bg-gradient-radial {
+    background: radial-gradient(circle at center, var(--c-primary), transparent);
+  }
+
+  /* ========== GLASSMORPHISM ========== */
   .glass {
-    @apply bg-[var(--c-surface)] border border-[var(--c-border)] backdrop-blur-xl;
+    @apply bg-[var(--c-surface)] border border-[var(--c-border)]
+    backdrop-blur-2xl shadow-lg;
   }
+
+  .glass-strong {
+    @apply bg-[var(--c-surface-hover)] border-2 border-[var(--c-border)]
+    backdrop-blur-3xl shadow-2xl;
+  }
+
+  /* ========== GLOW EFFECTS ========== */
+  .glow-primary {
+    box-shadow: var(--glow-primary);
+  }
+
+  .glow-secondary {
+    box-shadow: var(--glow-secondary);
+  }
+
+  .glow-success {
+    box-shadow: var(--glow-success);
+  }
+
+  .glow-error {
+    box-shadow: var(--glow-error);
+  }
+
+  /* ========== ANIMATIONS ========== */
+  .fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  .slide-up {
+    animation: slideUp 0.5s ease-out forwards;
+  }
+
+  .slide-right {
+    animation: slideRight 0.5s ease-out forwards;
+  }
+
+  .scale-in {
+    animation: scaleIn 0.4s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideRight {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  /* ========== SCROLLBAR PERSONNALISÉE ========== */
+  .custom-scrollbar::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-[var(--c-border)]/20 rounded-full;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gradient-to-b from-[var(--c-primary)] to-[var(--c-primary-dark)]
+    rounded-full hover:from-[var(--c-primary-light)] hover:to-[var(--c-primary)]
+    transition-colors duration-300;
+  }
+
+  /* ========== HOVER EFFECTS ========== */
+  .hover-lift {
+    @apply transition-transform duration-300 ease-out
+    hover:-translate-y-2 hover:shadow-2xl;
+  }
+
+  .hover-glow {
+    @apply transition-all duration-300
+    hover:shadow-[0_0_30px_rgba(139,92,246,0.3)];
+  }
+
+  .hover-scale {
+    @apply transition-transform duration-300
+    hover:scale-105;
+  }
+}
+
+/* ========== RESPONSIVE ADJUSTMENTS ========== */
+@media (max-width: 768px) {
+  .card {
+    @apply p-4 rounded-2xl;
+  }
+
+  .btn-primary, .btn-secondary {
+    @apply px-4 py-2.5 text-xs;
+  }
+
+  .modal-content {
+    @apply p-6 rounded-2xl;
+  }
+
+  .fab {
+    @apply bottom-6 right-6 w-14 h-14;
+  }
+}
+
+/* ========== DARK/LIGHT MODE TRANSITIONS ========== */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 300ms;
+  transition-timing-function: ease-in-out;
 }
