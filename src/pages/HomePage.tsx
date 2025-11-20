@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { motion } from 'framer-motion';
-import { analyticsService } from '../services/analyticsService.ts';
+//import { analyticsService } from '../services/analyticsService.ts';
 import { useAuth } from '../contexts/AuthContext.tsx';
 import {
   ShieldCheckIcon,
@@ -569,26 +569,6 @@ const CountUp: React.FC<{ end: number }> = ({ end }) => {
   return <span>{count.toLocaleString('fr-FR')}</span>;
 };
 
-// Main Component
-const HomePage: React.FC = () => {
-  const { data: dashboardData } = useQuery(
-    'dashboard-stats',
-    () => analyticsService.getDashboardData(),
-    {
-      staleTime: 60000,
-    }
-  );
 
-  return (
-    <div className="min-h-screen bg-[var(--c-bg)]">
-      <HeroSection />
-      <StatsSection stats={dashboardData} />
-      <FeaturesSection />
-      <HowItWorksSection />
-      <TestimonialsSection />
-      <CTASection />
-    </div>
-  );
-};
 
 export default HomePage;
