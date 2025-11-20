@@ -18,13 +18,14 @@ import ReportsPage from './pages/ReportsPage.tsx';
 import Appointments from './pages/Appointments.tsx';
 import ChatbotPage from './pages/ChatbotPage.tsx';
 import Campaigns from './pages/Campaigns.tsx';
+import HomePage from './pages/HomePage.tsx';
 console.log('Public route - /login')
 const App: React.FC = () => (
   <ThemeProvider>
     <AuthProvider>
       <Routes>
         {/* public route */}
-        <Route path="/login" element={<LHomePage />} />
+        <Route path="/login" element={<HomePage />} />
 
         
 
