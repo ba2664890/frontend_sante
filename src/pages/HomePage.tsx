@@ -569,6 +569,19 @@ const CountUp: React.FC<{ end: number }> = ({ end }) => {
   return <span>{count.toLocaleString('fr-FR')}</span>;
 };
 
+// Main Component
+const HomePage: React.FC = () => {
 
+
+  return (
+    <div className="min-h-screen bg-[var(--c-bg)]">
+      <HeroSection />
+      <FeaturesSection />
+      <HowItWorksSection />
+      <TestimonialsSection />
+      <CTASection />
+    </div>
+  );
+};
 
 export default HomePage;
