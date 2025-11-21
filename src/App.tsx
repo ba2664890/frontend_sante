@@ -26,6 +26,7 @@ const App: React.FC = () => (
       <Routes>
         {/* public route */}
         <Route path="/login" element={<HomePage />} />
+        <Route path="/registre" element={<Login />} />
 
         
 
