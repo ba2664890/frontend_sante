@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { patientService } from '../services/patientService.ts';
-import {  PatientFollowUp } from '../types';
+import { PatientFollowUp } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner.tsx';
 import Modal from '../components/Modal.tsx';
 import PatientForm from '../components/PatientForm.tsx';
 import FollowUpForm from '../components/FollowUpForm.tsx';
+import { useAuth } from '../contexts/AuthContext.tsx'; // 👈 Ajoutez cette importation
 import { 
   UserIcon, 
   CalendarIcon, 
@@ -24,6 +25,10 @@ const PatientDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [showEditForm, setShowEditForm] = useState(false);
   const [showFollowUpForm, setShowFollowUpForm] = useState(false);
+  
+  // 👈 Vérifiez le rôle de l'utilisateur connecté
+  const { user } = useAuth();
+  const isPatient = user?.role === 'patient';
 
   // 1. Récupérer avec user_id (de l'URL)
   const { data: patientByUser, isLoading: isLoadingByUser } = useQuery(
@@ -31,12 +36,9 @@ const PatientDetail: React.FC = () => {
     () => patientService.getPatientByUserId(Number(id)),
     { enabled: !!id }
   );
-  console.log('Patient by User:', patientByUser);
 
   // 2. Extraire record_id
   const record_id = patientByUser?.record_id;
-
-  console.log('Extracted record_id:', record_id);
 
   // 3. Récupérer détails complets avec record_id
   const { data: patient, isLoading: isLoadingPatient, refetch } = useQuery(
@@ -64,7 +66,6 @@ const PatientDetail: React.FC = () => {
     toast.success('Suivi programmé avec succès !');
   };
 
-  // CORRECTION: Gérer les états de chargement
   const isLoading = isLoadingByUser || isLoadingPatient;
 
   if (isLoading) {
@@ -109,22 +110,26 @@ const PatientDetail: React.FC = () => {
             </p>
           </div>
         </div>
-        <div className="flex items-center space-x-3">
-          <button
-            onClick={() => setShowFollowUpForm(true)}
-            className="btn-secondary"
-          >
-            <PlusIcon className="w-4 h-4 mr-2" />
-            Programmer un suivi
-          </button>
-          <button
-            onClick={() => setShowEditForm(true)}
-            className="btn-primary"
-          >
-            <PencilIcon className="w-4 h-4 mr-2" />
-            Modifier
-          </button>
-        </div>
+        
+        {/* 👈 Condition d'affichage des boutons */}
+        {!isPatient && (
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={() => setShowFollowUpForm(true)}
+              className="btn-secondary"
+            >
+              <PlusIcon className="w-4 h-4 mr-2" />
+              Programmer un suivi
+            </button>
+            <button
+              onClick={() => setShowEditForm(true)}
+              className="btn-primary"
+            >
+              <PencilIcon className="w-4 h-4 mr-2" />
+              Modifier
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Info Cards */}
@@ -326,13 +331,16 @@ const PatientDetail: React.FC = () => {
           <div className="card">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Actions rapides</h3>
             <div className="space-y-3">
-              <button
-                onClick={() => setShowFollowUpForm(true)}
-                className="w-full btn-secondary justify-start"
-              >
-                <PlusIcon className="w-4 h-4 mr-2" />
-                Nouveau suivi
-              </button>
+              {/* 👈 Condition d'affichage du bouton "Nouveau suivi" */}
+              {!isPatient && (
+                <button
+                  onClick={() => setShowFollowUpForm(true)}
+                  className="w-full btn-secondary justify-start"
+                >
+                  <PlusIcon className="w-4 h-4 mr-2" />
+                  Nouveau suivi
+                </button>
+              )}
               <button className="w-full btn-secondary justify-start">
                 <CalendarIcon className="w-4 h-4 mr-2" />
                 Historique complète
@@ -383,7 +391,7 @@ const PatientDetail: React.FC = () => {
         </div>
       </div>
 
-      {/* Modals - CORRECTION: utiliser user_id pour scheduleFollowUp */}
+      {/* Modals */}
       <Modal
         isOpen={showEditForm}
         onClose={() => setShowEditForm(false)}
