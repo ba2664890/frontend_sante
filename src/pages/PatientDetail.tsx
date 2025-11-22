@@ -7,7 +7,7 @@ import LoadingSpinner from '../components/LoadingSpinner.tsx';
 import Modal from '../components/Modal.tsx';
 import PatientForm from '../components/PatientForm.tsx';
 import FollowUpForm from '../components/FollowUpForm.tsx';
-import { useAuth } from '../contexts/AuthContext.tsx'; // 👈 Ajoutez cette importation
+import { useAuth } from '../contexts/AuthContext.tsx';
 import { 
   UserIcon, 
   CalendarIcon, 
@@ -26,47 +26,61 @@ const PatientDetail: React.FC = () => {
   const [showEditForm, setShowEditForm] = useState(false);
   const [showFollowUpForm, setShowFollowUpForm] = useState(false);
   
-  // 👈 Vérifiez le rôle de l'utilisateur connecté
+  // 1. Appeler les hooks INCONDITIONNELLEMENT en premier
   const { user } = useAuth();
+  
+  // Déterminer le rôle et les droits
   const isPatient = user?.role === 'patient';
-
-  // 1. Récupérer avec user_id (de l'URL)
+  const isOwnProfile = isPatient && Number(id) === user?.id;
+  
+  // Pour les non-patients, l'id de l'URL est directement le record_id
+  const recordIdForNonPatient = !isPatient ? Number(id) : undefined;
+  
+  // 2. Requête pour les patients (obtenir record_id depuis user_id)
   const { data: patientByUser, isLoading: isLoadingByUser } = useQuery(
     ['patient-by-user', id],
     () => patientService.getPatientByUserId(Number(id)),
-    { enabled: !!id }
+    { 
+      enabled: !!id && isPatient // Active uniquement pour les patients
+    }
   );
-
-  // 2. Extraire record_id
-  const record_id = patientByUser?.record_id;
-
-  // 3. Récupérer détails complets avec record_id
+  
+  // 3. Déterminer le record_id final selon le rôle
+  const record_id = isPatient ? patientByUser?.record_id : recordIdForNonPatient;
+  
+  // 4. Requête principale (pour tous les rôles)
   const { data: patient, isLoading: isLoadingPatient, refetch } = useQuery(
     ['patient-detail', record_id],
     () => patientService.getPatient(record_id!),
-    { enabled: !!record_id }
+    { 
+      enabled: !!record_id && (isPatient ? !!patientByUser : true) // Attendre les dépendances
+    }
   );
-
-  // 4. Récupérer les suivis avec record_id
+  
+  // 5. Requête des suivis
   const { data: followUps, refetch: refetchFollowUps } = useQuery(
     ['patient-followups', record_id],
-    () => patientService.getFollowUps({ patient: id! }),
-    { enabled: !!record_id }
+    () => patientService.getFollowUps({ patient: String(id) }), // L'API doit accepter user_id ou record_id
+    { 
+      enabled: !!record_id && (isPatient ? !!patientByUser : true)
+    }
   );
-
-  const handlePatientUpdated = () => {
-    setShowEditForm(false);
-    refetch();
-    toast.success('Informations mises à jour avec succès !');
-  };
-
-  const handleFollowUpCreated = () => {
-    setShowFollowUpForm(false);
-    refetchFollowUps();
-    toast.success('Suivi programmé avec succès !');
-  };
-
-  const isLoading = isLoadingByUser || isLoadingPatient;
+  
+  // 6. Vérification de sécurité (APRÈS les hooks)
+  if (isPatient && !isOwnProfile) {
+    return (
+      <div className="text-center py-12">
+        <ExclamationCircleIcon className="w-12 h-12 text-error-600 mx-auto mb-4" />
+        <h2 className="text-xl font-bold text-gray-900 mb-2">Accès refusé</h2>
+        <p className="text-gray-600 mb-4">Vous ne pouvez consulter que votre propre fiche patient.</p>
+        <Link to="/dashboard" className="btn-primary">
+          Retour au tableau de bord
+        </Link>
+      </div>
+    );
+  }
+  
+  const isLoading = (isPatient && isLoadingByUser) || isLoadingPatient;
 
   if (isLoading) {
     return (
@@ -95,6 +109,18 @@ const PatientDetail: React.FC = () => {
     (f: PatientFollowUp) => f.status !== 'scheduled' || new Date(f.scheduled_date) <= new Date()
   ) || [];
 
+  const handlePatientUpdated = () => {
+    setShowEditForm(false);
+    refetch();
+    toast.success('Informations mises à jour avec succès !');
+  };
+
+  const handleFollowUpCreated = () => {
+    setShowFollowUpForm(false);
+    refetchFollowUps();
+    toast.success('Suivi programmé avec succès !');
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -111,7 +137,7 @@ const PatientDetail: React.FC = () => {
           </div>
         </div>
         
-        {/* 👈 Condition d'affichage des boutons */}
+        {/* Boutons visibles UNIQUEMENT pour admin et health_agent */}
         {!isPatient && (
           <div className="flex items-center space-x-3">
             <button
@@ -327,12 +353,11 @@ const PatientDetail: React.FC = () => {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Quick Actions */}
-          <div className="card">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Actions rapides</h3>
-            <div className="space-y-3">
-              {/* 👈 Condition d'affichage du bouton "Nouveau suivi" */}
-              {!isPatient && (
+          {/* 🔒 SECTION ACTIONS RAPIDES CACHÉE POUR LES PATIENTS */}
+          {!isPatient && (
+            <div className="card">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Actions rapides</h3>
+              <div className="space-y-3">
                 <button
                   onClick={() => setShowFollowUpForm(true)}
                   className="w-full btn-secondary justify-start"
@@ -340,17 +365,17 @@ const PatientDetail: React.FC = () => {
                   <PlusIcon className="w-4 h-4 mr-2" />
                   Nouveau suivi
                 </button>
-              )}
-              <button className="w-full btn-secondary justify-start">
-                <CalendarIcon className="w-4 h-4 mr-2" />
-                Historique complète
-              </button>
-              <button className="w-full btn-secondary justify-start">
-                <UserIcon className="w-4 h-4 mr-2" />
-                Contacter la patiente
-              </button>
+                <button className="w-full btn-secondary justify-start">
+                  <CalendarIcon className="w-4 h-4 mr-2" />
+                  Historique complète
+                </button>
+                <button className="w-full btn-secondary justify-start">
+                  <UserIcon className="w-4 h-4 mr-2" />
+                  Contacter la patiente
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Contact Info */}
           <div className="card">
