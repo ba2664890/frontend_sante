@@ -7,7 +7,7 @@ import LoadingSpinner from '../components/LoadingSpinner.tsx';
 import Modal from '../components/Modal.tsx';
 import PatientForm from '../components/PatientForm.tsx';
 import FollowUpForm from '../components/FollowUpForm.tsx';
-import { useAuth } from '../contexts/AuthContext.tsx'; // 👈 Ajoutez cette importation
+import { useAuth } from '../contexts/AuthContext.tsx';
 import { 
   UserIcon, 
   CalendarIcon, 
@@ -26,9 +26,23 @@ const PatientDetail: React.FC = () => {
   const [showEditForm, setShowEditForm] = useState(false);
   const [showFollowUpForm, setShowFollowUpForm] = useState(false);
   
-  // 👈 Vérifiez le rôle de l'utilisateur connecté
+  // Vérification du rôle utilisateur
   const { user } = useAuth();
   const isPatient = user?.role === 'patient';
+  
+  // 🔒 SÉCURITÉ : Vérifier que les patients n'accèdent qu'à leur propre fiche
+  if (isPatient && Number(id) !== user?.id) {
+    return (
+      <div className="text-center py-12">
+        <ExclamationCircleIcon className="w-12 h-12 text-error-600 mx-auto mb-4" />
+        <h2 className="text-xl font-bold text-gray-900 mb-2">Accès refusé</h2>
+        <p className="text-gray-600 mb-4">Vous ne pouvez consulter que votre propre fiche patient.</p>
+        <Link to="/dashboard" className="btn-primary">
+          Retour au tableau de bord
+        </Link>
+      </div>
+    );
+  }
 
   // 1. Récupérer avec user_id (de l'URL)
   const { data: patientByUser, isLoading: isLoadingByUser } = useQuery(
@@ -111,7 +125,7 @@ const PatientDetail: React.FC = () => {
           </div>
         </div>
         
-        {/* 👈 Condition d'affichage des boutons */}
+        {/* 👁️ Boutons visibles UNIQUEMENT pour admin et health_agent */}
         {!isPatient && (
           <div className="flex items-center space-x-3">
             <button
@@ -327,12 +341,11 @@ const PatientDetail: React.FC = () => {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* Quick Actions */}
-          <div className="card">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Actions rapides</h3>
-            <div className="space-y-3">
-              {/* 👈 Condition d'affichage du bouton "Nouveau suivi" */}
-              {!isPatient && (
+          {/* 🔒 SECTION ACTIONS RAPIDES CACHÉE POUR LES PATIENTS */}
+          {!isPatient && (
+            <div className="card">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Actions rapides</h3>
+              <div className="space-y-3">
                 <button
                   onClick={() => setShowFollowUpForm(true)}
                   className="w-full btn-secondary justify-start"
@@ -340,17 +353,17 @@ const PatientDetail: React.FC = () => {
                   <PlusIcon className="w-4 h-4 mr-2" />
                   Nouveau suivi
                 </button>
-              )}
-              <button className="w-full btn-secondary justify-start">
-                <CalendarIcon className="w-4 h-4 mr-2" />
-                Historique complète
-              </button>
-              <button className="w-full btn-secondary justify-start">
-                <UserIcon className="w-4 h-4 mr-2" />
-                Contacter la patiente
-              </button>
+                <button className="w-full btn-secondary justify-start">
+                  <CalendarIcon className="w-4 h-4 mr-2" />
+                  Historique complète
+                </button>
+                <button className="w-full btn-secondary justify-start">
+                  <UserIcon className="w-4 h-4 mr-2" />
+                  Contacter la patiente
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Contact Info */}
           <div className="card">
