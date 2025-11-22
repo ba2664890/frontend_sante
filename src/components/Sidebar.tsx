@@ -33,7 +33,7 @@ const Sidebar: React.FC = () => {
           { name: 'Notifications', href: '/notifications', icon: BellIcon },
           { name: 'Administration', href: '/admin', icon: ShieldCheckIcon },
           { name: 'Rapports', href: '/reports', icon: DocumentReportIcon },
-          { name: 'Compagne', href: '/accueil', icon: DocumentReportIcon }
+          { name: 'Campagne', href: '/accueil', icon: DocumentReportIcon }
         ];
       case 'supervisor':
         return [
@@ -113,12 +113,13 @@ const Sidebar: React.FC = () => {
       <div
         className={`
           fixed inset-y-0 left-0 z-40 w-64
-          glass shadow-neon
+          bg-white shadow-neon
           transform transition-transform duration-500 ease-[cubic-bezier(.4,0,.2,1)]
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0 lg:static lg:inset-0
         `}
       >
+
         {/* Logo */}
         <div className="flex items-center justify-center h-20 px-4 border-b border-white/10">
           <div className="flex items-center gap-2">
