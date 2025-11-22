@@ -26,12 +26,42 @@ const PatientDetail: React.FC = () => {
   const [showEditForm, setShowEditForm] = useState(false);
   const [showFollowUpForm, setShowFollowUpForm] = useState(false);
   
-  // Vérification du rôle utilisateur
+  // 1. Appeler TOUS les hooks EN PREMIER (inconditionnellement)
   const { user } = useAuth();
   const isPatient = user?.role === 'patient';
   
-  // 🔒 SÉCURITÉ : Vérifier que les patients n'accèdent qu'à leur propre fiche
-  if (isPatient && Number(id) !== user?.id) {
+  // Vérification de sécurité (mais pas de return ici)
+  const isAuthorized = !isPatient || (isPatient && Number(id) === user?.id);
+
+  // 2. Appeler useQuery avec l'option `enabled` basée sur l'autorisation
+  const { data: patientByUser, isLoading: isLoadingByUser } = useQuery(
+    ['patient-by-user', id],
+    () => patientService.getPatientByUserId(Number(id)),
+    { 
+      enabled: !!id && isAuthorized // Désactiver si non autorisé
+    }
+  );
+
+  const record_id = patientByUser?.record_id;
+
+  const { data: patient, isLoading: isLoadingPatient, refetch } = useQuery(
+    ['patient-detail', record_id],
+    () => patientService.getPatient(record_id!),
+    { 
+      enabled: !!record_id && isAuthorized // Désactiver si non autorisé
+    }
+  );
+
+  const { data: followUps, refetch: refetchFollowUps } = useQuery(
+    ['patient-followups', record_id],
+    () => patientService.getFollowUps({ patient: id! }),
+    { 
+      enabled: !!record_id && isAuthorized // Désactiver si non autorisé
+    }
+  );
+
+  // 3. Gérer les états de chargement et d'autorisation APRÈS les hooks
+  if (!isAuthorized) {
     return (
       <div className="text-center py-12">
         <ExclamationCircleIcon className="w-12 h-12 text-error-600 mx-auto mb-4" />
@@ -43,42 +73,6 @@ const PatientDetail: React.FC = () => {
       </div>
     );
   }
-
-  // 1. Récupérer avec user_id (de l'URL)
-  const { data: patientByUser, isLoading: isLoadingByUser } = useQuery(
-    ['patient-by-user', id],
-    () => patientService.getPatientByUserId(Number(id)),
-    { enabled: !!id }
-  );
-
-  // 2. Extraire record_id
-  const record_id = patientByUser?.record_id;
-
-  // 3. Récupérer détails complets avec record_id
-  const { data: patient, isLoading: isLoadingPatient, refetch } = useQuery(
-    ['patient-detail', record_id],
-    () => patientService.getPatient(record_id!),
-    { enabled: !!record_id }
-  );
-
-  // 4. Récupérer les suivis avec record_id
-  const { data: followUps, refetch: refetchFollowUps } = useQuery(
-    ['patient-followups', record_id],
-    () => patientService.getFollowUps({ patient: id! }),
-    { enabled: !!record_id }
-  );
-
-  const handlePatientUpdated = () => {
-    setShowEditForm(false);
-    refetch();
-    toast.success('Informations mises à jour avec succès !');
-  };
-
-  const handleFollowUpCreated = () => {
-    setShowFollowUpForm(false);
-    refetchFollowUps();
-    toast.success('Suivi programmé avec succès !');
-  };
 
   const isLoading = isLoadingByUser || isLoadingPatient;
 
@@ -125,7 +119,7 @@ const PatientDetail: React.FC = () => {
           </div>
         </div>
         
-        {/* 👁️ Boutons visibles UNIQUEMENT pour admin et health_agent */}
+        {/* Boutons visibles UNIQUEMENT pour admin et health_agent */}
         {!isPatient && (
           <div className="flex items-center space-x-3">
             <button
