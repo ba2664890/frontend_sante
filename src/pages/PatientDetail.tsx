@@ -7,7 +7,7 @@ import LoadingSpinner from '../components/LoadingSpinner.tsx';
 import Modal from '../components/Modal.tsx';
 import PatientForm from '../components/PatientForm.tsx';
 import FollowUpForm from '../components/FollowUpForm.tsx';
-import { useAuth } from '../contexts/AuthContext.tsx';
+import { useAuth } from '../contexts/AuthContext.tsx'; // 👈 Ajoutez cette importation
 import { 
   UserIcon, 
   CalendarIcon, 
@@ -26,53 +26,45 @@ const PatientDetail: React.FC = () => {
   const [showEditForm, setShowEditForm] = useState(false);
   const [showFollowUpForm, setShowFollowUpForm] = useState(false);
   
-  // 1. Appeler TOUS les hooks EN PREMIER (inconditionnellement)
+  // 👈 Vérifiez le rôle de l'utilisateur connecté
   const { user } = useAuth();
   const isPatient = user?.role === 'patient';
-  
-  // Vérification de sécurité (mais pas de return ici)
-  const isAuthorized = !isPatient || (isPatient && Number(id) === user?.id);
 
-  // 2. Appeler useQuery avec l'option `enabled` basée sur l'autorisation
+  // 1. Récupérer avec user_id (de l'URL)
   const { data: patientByUser, isLoading: isLoadingByUser } = useQuery(
     ['patient-by-user', id],
     () => patientService.getPatientByUserId(Number(id)),
-    { 
-      enabled: !!id && isAuthorized // Désactiver si non autorisé
-    }
+    { enabled: !!id }
   );
 
+  // 2. Extraire record_id
   const record_id = patientByUser?.record_id;
 
+  // 3. Récupérer détails complets avec record_id
   const { data: patient, isLoading: isLoadingPatient, refetch } = useQuery(
     ['patient-detail', record_id],
     () => patientService.getPatient(record_id!),
-    { 
-      enabled: !!record_id && isAuthorized // Désactiver si non autorisé
-    }
+    { enabled: !!record_id }
   );
 
+  // 4. Récupérer les suivis avec record_id
   const { data: followUps, refetch: refetchFollowUps } = useQuery(
     ['patient-followups', record_id],
     () => patientService.getFollowUps({ patient: id! }),
-    { 
-      enabled: !!record_id && isAuthorized // Désactiver si non autorisé
-    }
+    { enabled: !!record_id }
   );
 
-  // 3. Gérer les états de chargement et d'autorisation APRÈS les hooks
-  if (!isAuthorized) {
-    return (
-      <div className="text-center py-12">
-        <ExclamationCircleIcon className="w-12 h-12 text-error-600 mx-auto mb-4" />
-        <h2 className="text-xl font-bold text-gray-900 mb-2">Accès refusé</h2>
-        <p className="text-gray-600 mb-4">Vous ne pouvez consulter que votre propre fiche patient.</p>
-        <Link to="/dashboard" className="btn-primary">
-          Retour au tableau de bord
-        </Link>
-      </div>
-    );
-  }
+  const handlePatientUpdated = () => {
+    setShowEditForm(false);
+    refetch();
+    toast.success('Informations mises à jour avec succès !');
+  };
+
+  const handleFollowUpCreated = () => {
+    setShowFollowUpForm(false);
+    refetchFollowUps();
+    toast.success('Suivi programmé avec succès !');
+  };
 
   const isLoading = isLoadingByUser || isLoadingPatient;
 
@@ -119,7 +111,7 @@ const PatientDetail: React.FC = () => {
           </div>
         </div>
         
-        {/* Boutons visibles UNIQUEMENT pour admin et health_agent */}
+        {/* 👈 Condition d'affichage des boutons */}
         {!isPatient && (
           <div className="flex items-center space-x-3">
             <button
@@ -335,11 +327,12 @@ const PatientDetail: React.FC = () => {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* 🔒 SECTION ACTIONS RAPIDES CACHÉE POUR LES PATIENTS */}
-          {!isPatient && (
-            <div className="card">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Actions rapides</h3>
-              <div className="space-y-3">
+          {/* Quick Actions */}
+          <div className="card">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Actions rapides</h3>
+            <div className="space-y-3">
+              {/* 👈 Condition d'affichage du bouton "Nouveau suivi" */}
+              {!isPatient && (
                 <button
                   onClick={() => setShowFollowUpForm(true)}
                   className="w-full btn-secondary justify-start"
@@ -347,17 +340,17 @@ const PatientDetail: React.FC = () => {
                   <PlusIcon className="w-4 h-4 mr-2" />
                   Nouveau suivi
                 </button>
-                <button className="w-full btn-secondary justify-start">
-                  <CalendarIcon className="w-4 h-4 mr-2" />
-                  Historique complète
-                </button>
-                <button className="w-full btn-secondary justify-start">
-                  <UserIcon className="w-4 h-4 mr-2" />
-                  Contacter la patiente
-                </button>
-              </div>
+              )}
+              <button className="w-full btn-secondary justify-start">
+                <CalendarIcon className="w-4 h-4 mr-2" />
+                Historique complète
+              </button>
+              <button className="w-full btn-secondary justify-start">
+                <UserIcon className="w-4 h-4 mr-2" />
+                Contacter la patiente
+              </button>
             </div>
-          )}
+          </div>
 
           {/* Contact Info */}
           <div className="card">
