@@ -113,7 +113,7 @@ const Sidebar: React.FC = () => {
       <div
         className={`
           fixed inset-y-0 left-0 z-40 w-64
-          bg-white shadow-neon
+          bg-gray-900 shadow-neon
           transform transition-transform duration-500 ease-[cubic-bezier(.4,0,.2,1)]
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0 lg:static lg:inset-0
