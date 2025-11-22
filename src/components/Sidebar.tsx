@@ -51,6 +51,7 @@ const Sidebar: React.FC = () => {
         ];
       case 'patient':
         return [
+          {name: 'Acceuil', href: `/acceuil_patient`, icon: HomeIcon },
           { name: 'Mon Suivi', href: `/patients/${user?.id}`, icon: HomeIcon },
           { name: 'Rendez-vous', href: `/appointments/${user?.id}`, icon: CalendarIcon },
           { name: 'Messages', href: '/notifications', icon: BellIcon },
