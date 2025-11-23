@@ -110,13 +110,10 @@ const HeroSection: React.FC = () => {
               </>
             ) : (
               <>
-                <Link to="/register" className="btn-primary text-lg px-8 py-4">
+                <Link to="/login" className="btn-primary text-lg px-8 py-4">
                   <UserGroupIcon className="w-6 h-6" />
-                  S'inscrire Gratuitement
+                  Commencer 
                   <ArrowRightIcon className="w-5 h-5" />
-                </Link>
-                <Link to="/login" className="btn-secondary text-lg px-8 py-4">
-                  Connexion
                 </Link>
               </>
             )}
@@ -337,24 +334,18 @@ const HowItWorksSection: React.FC = () => {
   const steps = [
     {
       number: '01',
-      title: 'Inscription',
-      description: 'Créez votre compte en quelques clics. Simple, rapide et sécurisé.',
-      icon: UserGroupIcon,
-    },
-    {
-      number: '02',
       title: 'Rendez-vous',
       description: 'Prenez rendez-vous dans le centre le plus proche de chez vous.',
       icon: CalendarIcon,
     },
     {
-      number: '03',
+      number: '02',
       title: 'Dépistage',
       description: 'Réalisez votre test de dépistage avec nos professionnels de santé.',
       icon: HeartIcon,
     },
     {
-      number: '04',
+      number: '03',
       title: 'Suivi',
       description: 'Recevez vos résultats et bénéficiez d\'un suivi personnalisé.',
       icon: CheckCircleIcon,
