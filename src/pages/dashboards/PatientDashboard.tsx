@@ -29,7 +29,7 @@ const PatientDashboard: React.FC = () => {
       duration: "3:15",
       description: "Comprendre simplement le dépistage et son importance",
       thumbnail: "🎥",
-      url: "https://www.youtube.com/watch?v=example1"
+      url: "https://www.youtube.com/watch?v=swF5s4Hnf54"
     },
     {
       id: 2,
@@ -37,7 +37,7 @@ const PatientDashboard: React.FC = () => {
       duration: "5:22",
       description: "Le nouveau test de dépistage plus efficace après 30 ans",
       thumbnail: "🧬",
-      url: "https://www.youtube.com/watch?v=example2"
+      url: "https://www.youtube.com/watch?v=W47U8QFWGq0"
     },
     {
       id: 3,
@@ -45,7 +45,7 @@ const PatientDashboard: React.FC = () => {
       duration: "7:08",
       description: "Témoignages et conseils pour un dépistage serein",
       thumbnail: "🌸",
-      url: "https://www.youtube.com/watch?v=example3"
+      url: "https://www.youtube.com/watch?v=uAFhzOTu234"
     }
   ];
 
