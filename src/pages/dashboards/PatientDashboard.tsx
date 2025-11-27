@@ -25,27 +25,27 @@ const PatientDashboard: React.FC = () => {
   const educationalVideos = [
     {
       id: 1,
-      title: "Le dépistage du cancer du col en 3 minutes",
-      duration: "3:15",
-      description: "Comprendre simplement le dépistage et son importance",
+      title: "Comprendre le dépistage du cancer du col de l'utérus",
+      duration: "Info",
+      description: "Site officiel avec toutes les informations essentielles",
       thumbnail: "🎥",
-      url: "https://www.youtube.com/watch?v=swF5s4Hnf54"
+      url: "https://jefaismondepistage.cancer.fr/cancer-du-col-de-l-uterus/"
     },
     {
       id: 2,
-      title: "Test HPV : tout ce que vous devez savoir",
-      duration: "5:22",
-      description: "Le nouveau test de dépistage plus efficace après 30 ans",
-      thumbnail: "🧬",
-      url: "https://www.youtube.com/watch?v=W47U8QFWGq0"
+      title: "Le dépistage en pratique",
+      duration: "Guide",
+      description: "Comment se déroule l'examen étape par étape",
+      thumbnail: "📋",
+      url: "https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://www.youtube.com/watch%3Fv%3D0GsKk8gmVvA&ved=2ahUKEwjpsYjb2pKRAxVgOPsDHQPSPGMQtwJ6BAgQEAI&usg=AOvVaw0IZ-ONk08ZZDGZoiS2vram"
     },
     {
       id: 3,
-      title: "Rassurer et prévenir : votre santé entre de bonnes mains",
-      duration: "7:08",
-      description: "Témoignages et conseils pour un dépistage serein",
-      thumbnail: "🌸",
-      url: "https://www.youtube.com/watch?v=uAFhzOTu234"
+      title: "Dépistage organisé - Ameli",
+      duration: "Info",
+      description: " cancer du col de l'utérus. Dépistage, symptômes, vaccin, frottis… On fait le point",
+      thumbnail: "💳",
+      url: "https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://www.youtube.com/watch%3Fv%3DN8lNxXqT8PI&ved=2ahUKEwi7uqae2pKRAxWdNvsDHaxPHMUQtwJ6BAgTEAI&usg=AOvVaw3dGkdMWt-i0hERhY7iQt8b"
     }
   ];
 
@@ -81,6 +81,7 @@ const PatientDashboard: React.FC = () => {
       description: "Un mode de vie sain renforce votre système immunitaire"
     }
   ];
+  const [selectedVideo, setSelectedVideo] = useState(null);
 
   if (isLoading || !user) {
     return (
@@ -265,27 +266,65 @@ const PatientDashboard: React.FC = () => {
             </div>
           )}
 
-          {activeTab === 'videos' && (
-            <div className="space-y-6">
-              <h3 className="text-xl font-bold text-gray-800 mb-4">Vidéos éducatives</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {educationalVideos.map((video) => (
-                  <div key={video.id} className="bg-gray-50 rounded-xl p-4 hover:shadow-lg transition-shadow cursor-pointer">
-                    <div className="aspect-video bg-gradient-to-br from-blue-100 to-pink-100 rounded-lg flex items-center justify-center mb-4">
-                      <span className="text-4xl">{video.thumbnail}</span>
-                    </div>
-                    <h4 className="font-semibold text-gray-800 mb-2">{video.title}</h4>
-                    <p className="text-gray-600 text-sm mb-3">{video.description}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-500">⏱️ {video.duration}</span>
-                      <button className="text-indigo-600 hover:text-indigo-800 font-medium text-sm">
-                        ▶️ Regarder
-                      </button>
-                    </div>
+
+        {activeTab === 'videos' && (
+          <div className="space-y-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">Vidéos éducatives</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {educationalVideos.map((video) => (
+                <div
+                  key={video.id}
+                  className="bg-gray-50 rounded-xl p-4 hover:shadow-lg transition-shadow cursor-pointer"
+                >
+                  {/* Thumbnail */}
+                  <div className="aspect-video bg-gradient-to-br from-blue-100 to-pink-100 rounded-lg flex items-center justify-center mb-4">
+                    <span className="text-4xl">{video.thumbnail}</span>
                   </div>
-                ))}
+
+                  <h4 className="font-semibold text-gray-800 mb-2">{video.title}</h4>
+                  <p className="text-gray-600 text-sm mb-3">{video.description}</p>
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-500">⏱️ {video.duration}</span>
+                    <button
+                      className="text-indigo-600 hover:text-indigo-800 font-medium text-sm"
+                      onClick={() => setSelectedVideo(video)}
+                    >
+                      ▶️ Regarder
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* --- MODAL VIDÉO --- */}
+            {selectedVideo && (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+                <div className="bg-white rounded-xl p-4 w-full max-w-3xl shadow-xl">
+                  <h3 className="text-lg font-bold mb-3">{selectedVideo.title}</h3>
+
+                  <div className="aspect-video w-full rounded-lg overflow-hidden mb-4">
+                    <iframe
+                      src={selectedVideo.url}
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+
+                  <button
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                    onClick={() => setSelectedVideo(null)}
+                  >
+                    Fermer
+                  </button>
+                </div>
               </div>
+            )}
+          </div>
+        )}
+
 
               <div className="bg-blue-50 rounded-xl p-6">
                 <h4 className="font-semibold text-blue-800 mb-3">Pourquoi ces vidéos sont importantes ?</h4>
