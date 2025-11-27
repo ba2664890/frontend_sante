@@ -37,7 +37,7 @@ const PatientDashboard: React.FC = () => {
       id: 2,
       title: "Le dépistage en pratique",
       duration: "Guide",
-      description: "Comment se déroule l'examen étape par étape",
+      description: "Comment se déroule l'examen étape par étape oui",
       thumbnail: "📋",
       url: "https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://www.youtube.com/watch%3Fv%3D0GsKk8gmVvA&ved=2ahUKEwjpsYjb2pKRAxVgOPsDHQPSPGMQtwJ6BAgQEAI&usg=AOvVaw0IZ-ONk08ZZDGZoiS2vram"
     },
