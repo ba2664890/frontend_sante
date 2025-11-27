@@ -22,6 +22,8 @@ const PatientDashboard: React.FC = () => {
     }
   );
 
+  const [selectedVideo, setSelectedVideo] = useState(null);
+
   const educationalVideos = [
     {
       id: 1,
@@ -90,7 +92,7 @@ const PatientDashboard: React.FC = () => {
     );
   }
 
-  const [selectedVideo, setSelectedVideo] = useState(null);
+
 
 
   const stats = [
