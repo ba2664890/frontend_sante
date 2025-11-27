@@ -81,7 +81,6 @@ const PatientDashboard: React.FC = () => {
       description: "Un mode de vie sain renforce votre système immunitaire"
     }
   ];
-  const [selectedVideo, setSelectedVideo] = useState(null);
 
   if (isLoading || !user) {
     return (
@@ -90,6 +89,9 @@ const PatientDashboard: React.FC = () => {
       </div>
     );
   }
+
+  const [selectedVideo, setSelectedVideo] = useState(null);
+
 
   const stats = [
     {
@@ -266,77 +268,77 @@ const PatientDashboard: React.FC = () => {
             </div>
           )}
 
-
-        {activeTab === 'videos' && (
-          <div className="space-y-6">
-            <h3 className="text-xl font-bold text-gray-800 mb-4">Vidéos éducatives</h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {educationalVideos.map((video) => (
-                <div
-                  key={video.id}
-                  className="bg-gray-50 rounded-xl p-4 hover:shadow-lg transition-shadow cursor-pointer"
-                >
-                  {/* Thumbnail */}
-                  <div className="aspect-video bg-gradient-to-br from-blue-100 to-pink-100 rounded-lg flex items-center justify-center mb-4">
-                    <span className="text-4xl">{video.thumbnail}</span>
-                  </div>
-
-                  <h4 className="font-semibold text-gray-800 mb-2">{video.title}</h4>
-                  <p className="text-gray-600 text-sm mb-3">{video.description}</p>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500">⏱️ {video.duration}</span>
-                    <button
-                      className="text-indigo-600 hover:text-indigo-800 font-medium text-sm"
-                      onClick={() => setSelectedVideo(video)}
+            {activeTab === 'videos' && (
+              <div className="space-y-6">
+                <h3 className="text-xl font-bold text-gray-800 mb-4">Vidéos éducatives</h3>
+                
+                {/* --- CARDS VIDÉOS --- */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {educationalVideos.map((video) => (
+                    <div
+                      key={video.id}
+                      className="bg-gray-50 rounded-xl p-4 hover:shadow-lg transition-shadow cursor-pointer"
                     >
-                      ▶️ Regarder
-                    </button>
-                  </div>
+                      {/* Thumbnail */}
+                      <div className="aspect-video bg-gradient-to-br from-blue-100 to-pink-100 rounded-lg flex items-center justify-center mb-4">
+                        <span className="text-4xl">{video.thumbnail}</span>
+                      </div>
+
+                      <h4 className="font-semibold text-gray-800 mb-2">{video.title}</h4>
+                      <p className="text-gray-600 text-sm mb-3">{video.description}</p>
+
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-gray-500">⏱️ {video.duration}</span>
+
+                        {/* --- OUVERTURE MODAL --- */}
+                        <button
+                          className="text-indigo-600 hover:text-indigo-800 font-medium text-sm"
+                          onClick={() => setSelectedVideo(video)}
+                        >
+                          ▶️ Regarder
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
 
-            {/* --- MODAL VIDÉO --- */}
-            {selectedVideo && (
-              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-                <div className="bg-white rounded-xl p-4 w-full max-w-3xl shadow-xl">
-                  <h3 className="text-lg font-bold mb-3">{selectedVideo.title}</h3>
-
-                  <div className="aspect-video w-full rounded-lg overflow-hidden mb-4">
-                    <iframe
-                      src={selectedVideo.url}
-                      className="w-full h-full"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  </div>
-
-                  <button
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-                    onClick={() => setSelectedVideo(null)}
-                  >
-                    Fermer
-                  </button>
+                {/* --- TEXTE EXPLICATIF --- */}
+                <div className="bg-blue-50 rounded-xl p-6">
+                  <h4 className="font-semibold text-blue-800 mb-3">Pourquoi ces vidéos sont importantes ?</h4>
+                  <ul className="space-y-2 text-blue-700">
+                    <li>• Elles vous aident à comprendre chaque étape du processus</li>
+                    <li>• Elles répondent aux questions les plus fréquentes</li>
+                    <li>• Elles vous rassurent avec des témoignages positifs</li>
+                    <li>• Elles vous préparent mentalement à l'examen</li>
+                  </ul>
                 </div>
+
+                {/* --- MODAL VIDÉO --- */}
+                {selectedVideo && (
+                  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl p-4 w-full max-w-3xl shadow-xl">
+                      <h3 className="text-lg font-bold mb-3">{selectedVideo.title}</h3>
+
+                      <div className="aspect-video w-full rounded-lg overflow-hidden mb-4">
+                        <iframe
+                          src={selectedVideo.url}
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      </div>
+
+                      <button
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                        onClick={() => setSelectedVideo(null)}
+                      >
+                        Fermer
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
-          </div>
-        )}
-
-
-              <div className="bg-blue-50 rounded-xl p-6">
-                <h4 className="font-semibold text-blue-800 mb-3">Pourquoi ces vidéos sont importantes ?</h4>
-                <ul className="space-y-2 text-blue-700">
-                  <li>• Elles vous aident à comprendre chaque étape du processus</li>
-                  <li>• Elles répondent aux questions les plus fréquentes</li>
-                  <li>• Elles vous rassurent avec des témoignages positifs</li>
-                  <li>• Elles vous préparent mentalement à l'examen</li>
-                </ul>
-              </div>
-            </div>
-          )}
 
           {activeTab === 'faq' && (
             <div className="space-y-4">
