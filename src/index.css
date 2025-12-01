@@ -9,7 +9,7 @@
   :root {
     /* PALETTE MÉDICALE MODERNE - Violet/Purple pour sensibilisation cancer */
     --c-primary: #8B5CF6;
-    --c-primary-light: #A78BFA;
+    --c-primary-light: #f4f4f5;
     --c-primary-dark: #7C3AED;
     
     --c-secondary: #EC4899;
@@ -29,8 +29,8 @@
     --c-border-light: rgba(255, 255, 255, 0.06);
     
     --c-text: #131516;
-    --c-text-muted: #94A3B8;
-    --c-text-dim: #64748B;
+    --c-text-muted: #f5f5f5;
+    --c-text-dim: #fefeff;
   }
 
   [data-theme="light"] {

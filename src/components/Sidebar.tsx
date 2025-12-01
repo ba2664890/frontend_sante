@@ -105,7 +105,7 @@ const Sidebar: React.FC = () => {
           {isOpen ? (
             <XIcon className="w-5 h-5 text-white animate-spin-short" />
           ) : (
-            <MenuIcon className="w-5 h-5 text-white" />
+            <MenuIcon className="w-5 h-5 text-gray-200" />
           )}
         </button>
       </div>
