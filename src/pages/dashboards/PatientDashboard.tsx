@@ -31,7 +31,7 @@ const PatientDashboard: React.FC = () => {
       duration: "Info",
       description: "Site officiel avec toutes les informations essentielles",
       thumbnail: "🎥",
-      url: "https://jefaismondepistage.cancer.fr/cancer-du-col-de-l-uterus/"
+      url: "https://www.youtube.com/watch?v=uAFhzOTu234"
     },
     {
       id: 2,
