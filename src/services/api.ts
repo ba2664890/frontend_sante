@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://backendsante-production.up.railway.app/api';
+const API_BASE_URL = 'https://backend-sante-1.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
