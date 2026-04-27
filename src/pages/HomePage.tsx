@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 //import { analyticsService } from '../services/analyticsService.ts';
@@ -13,7 +13,6 @@ import {
   CheckCircleIcon,
   MapPinIcon,
   CalendarIcon,
-  BellIcon,
   PhoneIcon,
   StarIcon,
 } from '@heroicons/react/24/outline';
@@ -152,177 +151,7 @@ const HeroSection: React.FC = () => {
   );
 };
 
-// Stats Section Component
-const StatsSection: React.FC<{ stats: any }> = ({ stats }) => {
-  const statItems = [
-    {
-      icon: UserGroupIcon,
-      label: 'Patientes Enregistrées',
-      value: stats?.total_patients || 0,
-      suffix: '+',
-      color: 'purple',
-      description: 'Femmes suivies dans notre système'
-    },
-    {
-      icon: CheckCircleIcon,
-      label: 'Dépistages Réalisés',
-      value: stats?.total_screened || 0,
-      suffix: '+',
-      color: 'green',
-      description: 'Tests de dépistage effectués'
-    },
-    {
-      icon: CalendarIcon,
-      label: 'Campagnes Actives',
-      value: stats?.active_campaigns?.length || 0,
-      suffix: '',
-      color: 'blue',
-      description: 'En cours dans toutes les régions'
-    },
-    {
-      icon: HeartIcon,
-      label: 'Vies Sauvées',
-      value: Math.floor((stats?.total_screened || 0) * 0.15),
-      suffix: '+',
-      color: 'pink',
-      description: 'Grâce au dépistage précoce'
-    },
-  ];
-
-  return (
-    <section className="py-20 relative">
-      <div className="max-w-7xl mx-auto px-6">
-        <motion.div
-          initial="initial"
-          whileInView="animate"
-          viewport={{ once: true }}
-          variants={staggerContainer}
-          className="text-center mb-16"
-        >
-          <motion.h2 variants={fadeInUp} className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Notre Impact en <span className="text-gradient-primary">Chiffres</span>
-          </motion.h2>
-          <motion.p variants={fadeInUp} className="text-xl text-gray-400 max-w-2xl mx-auto">
-            Des résultats concrets dans la lutte contre le cancer du col de l'utérus
-          </motion.p>
-        </motion.div>
-
-        <motion.div
-          initial="initial"
-          whileInView="animate"
-          viewport={{ once: true }}
-          variants={staggerContainer}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-        >
-          {statItems.map((stat, index) => (
-            <motion.div
-              key={index}
-              variants={fadeInUp}
-              className="card group hover:border-purple-500/50 transition-all duration-500"
-            >
-              <div className={`inline-flex p-4 rounded-2xl bg-${stat.color}-500/10 mb-4 group-hover:scale-110 transition-transform`}>
-                <stat.icon className={`w-8 h-8 text-${stat.color}-400`} />
-              </div>
-              <div className="text-5xl font-bold text-white mb-2">
-                <CountUp end={stat.value} />
-                {stat.suffix}
-              </div>
-              <div className="text-sm font-semibold text-gray-300 mb-2">{stat.label}</div>
-              <div className="text-xs text-gray-500">{stat.description}</div>
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
-    </section>
-  );
-};
-
-// Features Section Component
-const FeaturesSection: React.FC = () => {
-  const features = [
-    {
-      icon: UserGroupIcon,
-      title: 'Gestion des Patientes',
-      description: 'Suivi personnalisé de chaque patiente avec historique médical complet et rappels automatiques',
-      color: 'purple'
-    },
-    {
-      icon: CalendarIcon,
-      title: 'Campagnes de Dépistage',
-      description: 'Organisation et suivi de campagnes mobiles dans toutes les régions du Sénégal',
-      color: 'pink'
-    },
-    {
-      icon: ChartBarIcon,
-      title: 'Analyses & Statistiques',
-      description: 'Tableaux de bord interactifs avec données en temps réel pour une meilleure prise de décision',
-      color: 'blue'
-    },
-    {
-      icon: BellIcon,
-      title: 'Notifications Intelligentes',
-      description: 'Rappels SMS et email automatiques pour les rendez-vous et suivis médicaux',
-      color: 'green'
-    },
-    {
-      icon: MapPinIcon,
-      title: 'Couverture Nationale',
-      description: 'Présence dans les 14 régions du Sénégal avec centres de dépistage accessibles',
-      color: 'cyan'
-    },
-    {
-      icon: ShieldCheckIcon,
-      title: 'Sécurité & Confidentialité',
-      description: 'Protection des données médicales selon les normes internationales RGPD',
-      color: 'red'
-    },
-  ];
-
-  return (
-    <section className="py-20 relative">
-      <div className="max-w-7xl mx-auto px-6">
-        <motion.div
-          initial="initial"
-          whileInView="animate"
-          viewport={{ once: true }}
-          variants={staggerContainer}
-          className="text-center mb-16"
-        >
-          <motion.h2 variants={fadeInUp} className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Fonctionnalités <span className="text-gradient-primary">Innovantes</span>
-          </motion.h2>
-          <motion.p variants={fadeInUp} className="text-xl text-gray-400 max-w-2xl mx-auto">
-            Une plateforme complète pour révolutionner le dépistage du cancer au Sénégal
-          </motion.p>
-        </motion.div>
-
-        <motion.div
-          initial="initial"
-          whileInView="animate"
-          viewport={{ once: true }}
-          variants={staggerContainer}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
-          {features.map((feature, index) => (
-            <motion.div
-              key={index}
-              variants={fadeInUp}
-              className="card group hover:scale-105 transition-all duration-500"
-            >
-              <div className={`inline-flex p-4 rounded-2xl bg-${feature.color}-500/10 mb-4 group-hover:shadow-lg group-hover:shadow-${feature.color}-500/20 transition-all`}>
-                <feature.icon className={`w-8 h-8 text-${feature.color}-400`} />
-              </div>
-              <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
-              <p className="text-gray-400 leading-relaxed">{feature.description}</p>
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
-    </section>
-  );
-};
-
-// How It Works Section
+// How It Works Section Component
 const HowItWorksSection: React.FC = () => {
   const steps = [
     {
@@ -526,31 +355,6 @@ const CTASection: React.FC = () => {
       </div>
     </section>
   );
-};
-
-// CountUp Component
-const CountUp: React.FC<{ end: number }> = ({ end }) => {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    let start = 0;
-    const duration = 2000;
-    const increment = end / (duration / 16);
-
-    const timer = setInterval(() => {
-      start += increment;
-      if (start >= end) {
-        setCount(end);
-        clearInterval(timer);
-      } else {
-        setCount(Math.floor(start));
-      }
-    }, 16);
-
-    return () => clearInterval(timer);
-  }, [end]);
-
-  return <span>{count.toLocaleString('fr-FR')}</span>;
 };
 
 // Main Component

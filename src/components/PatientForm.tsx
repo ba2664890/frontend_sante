@@ -102,7 +102,6 @@ const HPV_VACCIN = [
   opt(0,'Non vaccinée'), opt(1,'Vaccinée (1 dose)'),
   opt(2,'Vaccinée (2 doses)'), opt(3,'Vaccinée (3 doses)'), opt(9,'Ne sait pas'),
 ];
-const OUI_NON = [opt(1,'Oui'), opt(2,'Non')];
 
 // ─── Reusable field components ─────────────────────────────────────────────
 const cls = (err?: boolean) =>
