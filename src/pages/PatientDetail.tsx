@@ -86,12 +86,7 @@ const PatientDetail: React.FC = () => {
     { enabled: !!record_id && (isPatient ? !!patientByUser : true) }
   );
   
-  refetchFollowUps; // Mark as used conceptually if needed, or remove completely if not used. 
-  // Wait, refetchFollowUps is used in handleFollowUpCreated. So it's fine.
-  // But followUps was reported as unused.
-  
-  // Let's just remove the assignment if it's truly not used in the JSX.
-  useQuery(
+  const { refetch: refetchFollowUps } = useQuery(
     ['patient-followups', record_id],
     () => patientService.getFollowUps({ patient: String(record_id) }),
     { enabled: !!record_id && (isPatient ? !!patientByUser : true) }
