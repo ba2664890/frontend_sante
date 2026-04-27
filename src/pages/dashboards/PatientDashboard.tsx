@@ -324,6 +324,7 @@ const PatientDashboard: React.FC = () => {
                       <div className="aspect-video w-full rounded-lg overflow-hidden mb-4">
                         <iframe
                           src={selectedVideo.url}
+                          title="Vidéo éducative"
                           className="w-full h-full"
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                           allowFullScreen

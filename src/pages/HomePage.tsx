@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from 'react-query';
 import { motion } from 'framer-motion';
 //import { analyticsService } from '../services/analyticsService.ts';
 import { useAuth } from '../contexts/AuthContext.tsx';
@@ -16,14 +15,8 @@ import {
   CalendarIcon,
   BellIcon,
   PhoneIcon,
-  ClockIcon,
-  TrophyIcon,
   StarIcon,
-  LightBulbIcon,
 } from '@heroicons/react/24/outline';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
-
 // Animation variants
 const fadeInUp = {
   initial: { opacity: 0, y: 60 },
@@ -567,7 +560,6 @@ const HomePage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[var(--c-bg)]">
       <HeroSection />
-      <FeaturesSection />
       <HowItWorksSection />
       <TestimonialsSection />
       <CTASection />

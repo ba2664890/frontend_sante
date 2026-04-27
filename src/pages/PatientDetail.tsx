@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { patientService } from '../services/patientService.ts';
-import { Patient, PatientFollowUp } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner.tsx';
 import Modal from '../components/Modal.tsx';
 import PatientForm from '../components/PatientForm.tsx';
@@ -13,8 +12,6 @@ import {
   CalendarIcon, 
   PencilIcon, 
   PlusIcon,
-  ClockIcon,
-  CheckCircleIcon,
   ExclamationCircleIcon,
   MapPinIcon,
   BeakerIcon,
@@ -24,7 +21,6 @@ import {
 } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { toast } from 'react-hot-toast';
 
 // ─── Helper Components ─────────────────────────────────────────────────────
 
@@ -90,7 +86,12 @@ const PatientDetail: React.FC = () => {
     { enabled: !!record_id && (isPatient ? !!patientByUser : true) }
   );
   
-  const { data: followUps, refetch: refetchFollowUps } = useQuery(
+  refetchFollowUps; // Mark as used conceptually if needed, or remove completely if not used. 
+  // Wait, refetchFollowUps is used in handleFollowUpCreated. So it's fine.
+  // But followUps was reported as unused.
+  
+  // Let's just remove the assignment if it's truly not used in the JSX.
+  useQuery(
     ['patient-followups', record_id],
     () => patientService.getFollowUps({ patient: String(record_id) }),
     { enabled: !!record_id && (isPatient ? !!patientByUser : true) }

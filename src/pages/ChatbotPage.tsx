@@ -3,12 +3,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useQuery } from 'react-query';
 import { patientService } from '../services/patientService.ts';
 import { Patient } from '../types';
-import LoadingSpinner from '../components/LoadingSpinner';
 import Modal from '../components/Modal.tsx';
 import {
   PaperAirplaneIcon,
   ChatBubbleLeftRightIcon,
-  UserIcon,
   ClockIcon,
 } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';

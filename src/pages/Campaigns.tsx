@@ -19,7 +19,7 @@ import {
   HeartIcon,
   ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
-import { format, isPast, isFuture, differenceInDays, parseISO } from 'date-fns';
+import { format, differenceInDays, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import LoadingSpinner from '../components/LoadingSpinner.tsx';
 import Modal from '../components/Modal.tsx';

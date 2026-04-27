@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
-import { PlusIcon, MagnifyingGlassIcon as SearchIcon, FunnelIcon as FilterIcon, ArrowDownTrayIcon as DownloadIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, MagnifyingGlassIcon as SearchIcon, ArrowDownTrayIcon as DownloadIcon } from '@heroicons/react/24/outline';
 import { patientService } from '../services/patientService.ts';
 import { Patient, PatientFilters } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner.tsx';
