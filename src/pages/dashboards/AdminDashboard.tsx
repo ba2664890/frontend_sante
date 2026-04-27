@@ -12,6 +12,8 @@ import {
   ClipboardIcon as ClipboardCheckIcon,
   ExclamationTriangleIcon,
   CalendarIcon,
+  HeartIcon,
+  ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 
 const AdminDashboard: React.FC = () => {
@@ -73,37 +75,78 @@ const AdminDashboard: React.FC = () => {
       value: data.total_patients,
       icon: UsersIcon,
       color: 'primary',
-      change: '+12%',
-      changeType: 'increase',
     },
     {
-      title: 'Dépistages',
-      value: data.total_screened,
+      title: 'Taux Dépistage (Objectif 90%)',
+      value: `${data.oms_90_70_90?.screened_percentage || 0}%`,
       icon: ClipboardCheckIcon,
       color: 'success',
-      change: '+8%',
-      changeType: 'increase',
     },
     {
-      title: 'Résultats Anormaux',
-      value: data.abnormal_results,
-      icon: ExclamationTriangleIcon,
+      title: 'Taux Traitement (Objectif 90%)',
+      value: `${data.oms_90_70_90?.treated_percentage || 0}%`,
+      icon: HeartIcon,
       color: 'warning',
-      change: '+3%',
-      changeType: 'increase',
     },
     {
-      title: 'Suivis en Attente',
-      value: data.pending_followups,
+      title: 'Suivis (Objectif 90%)',
+      value: `${data.oms_90_70_90?.suppressed_percentage || 0}%`,
       icon: CalendarIcon,
-      color: 'error',
-      change: '-5%',
-      changeType: 'decrease',
+      color: 'info',
     },
   ];
 
   return (
     <div className="space-y-6">
+      {/* WHO 90-70-90 Progress Bars */}
+      <div className="card bg-indigo-900 border-none text-white overflow-hidden relative">
+        <div className="relative z-10">
+          <h2 className="text-xl font-black mb-4 flex items-center">
+            <ShieldCheckIcon className="w-6 h-6 mr-2 text-indigo-300" />
+            Performance Objectifs OMS (90-70-90)
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm font-bold">
+                <span>Dépistage (90%)</span>
+                <span>{data.oms_90_70_90?.screened_percentage || 0}%</span>
+              </div>
+              <div className="h-3 w-full bg-indigo-800 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-emerald-400 transition-all duration-1000" 
+                  style={{ width: `${Math.min(data.oms_90_70_90?.screened_percentage || 0, 100)}%` }}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm font-bold">
+                <span>Traitement (90%)</span>
+                <span>{data.oms_90_70_90?.treated_percentage || 0}%</span>
+              </div>
+              <div className="h-3 w-full bg-indigo-800 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-amber-400 transition-all duration-1000" 
+                  style={{ width: `${Math.min(data.oms_90_70_90?.treated_percentage || 0, 100)}%` }}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm font-bold">
+                <span>Suivi/Guérison (90%)</span>
+                <span>{data.oms_90_70_90?.suppressed_percentage || 0}%</span>
+              </div>
+              <div className="h-3 w-full bg-indigo-800 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-blue-400 transition-all duration-1000" 
+                  style={{ width: `${Math.min(data.oms_90_70_90?.suppressed_percentage || 0, 100)}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="absolute top-0 right-0 -mt-8 -mr-8 w-48 h-48 bg-white/5 rounded-full blur-3xl" />
+      </div>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat) => (
@@ -113,8 +156,6 @@ const AdminDashboard: React.FC = () => {
             value={stat.value}
             icon={stat.icon}
             color={stat.color as 'primary' | 'success' | 'warning' | 'error' | 'info'}
-            change={stat.change}
-            changeType={stat.changeType as 'increase' | 'decrease'}
           />
         ))}
       </div>
