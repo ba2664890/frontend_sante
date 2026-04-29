@@ -105,8 +105,7 @@ const HPV_VACCIN = [
 
 // ─── Reusable field components ─────────────────────────────────────────────
 const cls = (err?: boolean) =>
-  `mt-1 block w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${err ? 'border-red-400 ring-red-100' : 'border-gray-200 ring-indigo-100'
-  }`;
+  `input-field ${err ? 'border-red-400 focus:border-red-500' : ''}`;
 
 type SelectProps = React.SelectHTMLAttributes<HTMLSelectElement> & {
   options: { value: number | string; label: string }[];
@@ -119,22 +118,14 @@ const Sel: React.FC<SelectProps> = ({ options, err, ...rest }) => (
   </select>
 );
 
-const Label: React.FC<{ text: string; required?: boolean }> = ({ text, required }) => (
-  <label className="block text-sm font-medium text-gray-700">
-    {text}{required && <span className="text-red-500 ml-1">*</span>}
-  </label>
-);
-
-const Err: React.FC<{ msg?: string }> = ({ msg }) =>
-  msg ? <p className="text-xs text-red-600 mt-0.5">{msg}</p> : null;
-
-const F: React.FC<{ label: string; required?: boolean; error?: string; children: React.ReactNode; col2?: boolean }> = ({
-  label, required, error, children, col2
-}) => (
-  <div className={col2 ? 'md:col-span-2' : ''}>
-    <Label text={label} required={required} />
+const F = ({ label, required, children, col2, error }: { label: string; required?: boolean; children: React.ReactNode; col2?: boolean; error?: string }) => (
+  <div className={col2 ? "md:col-span-2" : ""}>
+    <label className="form-label">
+      {label}
+      {required && <span className="text-error ml-1">*</span>}
+    </label>
     {children}
-    <Err msg={error} />
+    {error && <p className="text-xs text-error mt-1">{error}</p>}
   </div>
 );
 
@@ -150,30 +141,37 @@ const MultiCheck: React.FC<{
     onChange(next.join(','));
   };
   return (
-    <div className="grid grid-cols-2 gap-1 mt-1">
-      {options.map(o => (
-        <label key={o.value} className="flex items-center gap-2 text-sm cursor-pointer">
-          <input
-            type="checkbox"
-            className="rounded text-indigo-600"
-            checked={selected.includes(o.value)}
-            onChange={() => toggle(o.value)}
-          />
-          {o.label}
-        </label>
-      ))}
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+      {options.map((opt) => {
+        const active = selected.includes(opt.value);
+        return (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => toggle(opt.value)}
+            className={`px-3 py-2 text-xs font-semibold rounded-xl border transition-all duration-300 ${active
+              ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20'
+              : 'bg-surface border-border text-muted hover:border-primary/50'
+              }`}
+          >
+            {opt.label}
+          </button>
+        );
+      })}
     </div>
   );
 };
 
 // ─── Step header ───────────────────────────────────────────────────────────
-const StepHeader: React.FC<{ code: string; title: string; desc?: string }> = ({ code, title, desc }) => (
-  <div className="mb-6 pb-3 border-b border-gray-100">
-    <div className="flex items-center gap-2">
-      <span className="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 text-xs font-mono font-bold">{code}</span>
-      <h3 className="text-base font-semibold text-gray-800">{title}</h3>
+const StepHeader = ({ code, title, desc }: { code: string; title: string, desc?: string }) => (
+  <div className="mb-6 fade-in">
+    <div className="flex items-center gap-3 mb-2">
+      <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary font-bold border border-primary/20">
+        {code}
+      </span>
+      <h3 className="text-xl font-bold text-gradient-primary tracking-tight">{title}</h3>
     </div>
-    {desc && <p className="text-xs text-gray-500 mt-1">{desc}</p>}
+    {desc && <p className="text-sm text-dim leading-relaxed bg-surface/50 p-3 rounded-xl border border-border-light">{desc}</p>}
   </div>
 );
 
@@ -239,7 +237,7 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
 
   const goNext = async () => {
     const valid = await trigger(fieldsByStep[step] as any);
-    if (!valid) { toast.error('Corrigez les erreurs avant de continuer'); return; }
+    if (!valid) { toast.error('Veuillez remplir les champs obligatoires'); return; }
     setStep(s => Math.min(TOTAL_STEPS, s + 1));
   };
   const goPrev = () => setStep(s => Math.max(1, s - 1));
@@ -293,36 +291,63 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
     }
   };
 
-  const progress = Math.round(((step - 1) / (TOTAL_STEPS - 1)) * 100);
-
   return (
-    <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-2xl p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900">Fiche de collecte — Cancer du Col</h2>
-          <p className="text-xs text-gray-500">Programme CerviCare+ / MSAS Sénégal — v1.0</p>
+    <div className="max-w-4xl mx-auto py-8 px-4 fade-in">
+      <div className="card mb-8">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-extrabold text-gradient-primary tracking-tight">Fiche de Collecte</h1>
+            <p className="text-sm text-dim mt-1">Caravane Nationale d'Élimination du Cancer du Col de l'Utérus</p>
+          </div>
+          <div className="text-right">
+            <span className="text-sm font-bold text-muted bg-surface px-4 py-1.5 rounded-full border border-border">
+              Étape {step} / {TOTAL_STEPS}
+            </span>
+          </div>
         </div>
-        <span className="text-sm text-gray-500 font-medium">Étape {step} / {TOTAL_STEPS}</span>
-      </div>
 
-      {/* Progress */}
-      <div className="w-full bg-gray-100 rounded-full h-2 mb-2">
-        <div className="h-2 rounded-full bg-gradient-to-r from-indigo-500 to-emerald-500 transition-all duration-300"
-          style={{ width: `${progress}%` }} />
-      </div>
-      <div className="flex gap-1 mb-6 overflow-x-auto">
-        {STEP_LABELS.map((l, i) => (
-          <button key={i} type="button" onClick={() => setStep(i + 1)}
-            className={`flex-shrink-0 text-xs px-2 py-1 rounded-full transition-colors ${i + 1 === step ? 'bg-indigo-600 text-white' :
-                i + 1 < step ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'
-              }`}>
-            {i + 1}. {l}
-          </button>
-        ))}
-      </div>
+        {/* Futuristic Progress Bar */}
+        <div className="relative h-2 bg-surface rounded-full overflow-hidden mb-8 border border-border-light">
+          <div
+            className="absolute top-0 left-0 h-full bg-gradient-to-r from-primary to-primary-dark shadow-[0_0_15px_rgba(139,92,246,0.5)] transition-all duration-700 ease-out"
+            style={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
+          />
+        </div>
 
-      <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-5">
+        {/* Step Navigation Tabs */}
+        <nav className="flex flex-wrap gap-2 mb-10 justify-center">
+          {STEP_LABELS.map((label, i) => {
+            const isPast = i + 1 < step;
+            const isCurrent = i + 1 === step;
+            return (
+              <button
+                key={i}
+                type="button"
+                disabled={i + 1 > step && !isSubmitting}
+                onClick={() => setStep(i + 1)}
+                className={`group relative flex items-center justify-center w-10 h-10 rounded-xl font-bold transition-all duration-300 ${isCurrent
+                    ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-110 border border-primary/20'
+                    : isPast
+                      ? 'bg-success text-white'
+                      : 'bg-surface text-muted border border-border border-dashed'
+                  }`}
+                title={label}
+              >
+                {isPast ? (
+                  <span className="material-symbols-outlined text-sm">check</span>
+                ) : (
+                  i + 1
+                )}
+                {/* Tooltip on hover */}
+                <span className="absolute -bottom-10 left-1/2 -translate-x-1/2 px-2 py-1 bg-bg-light border border-border rounded text-[10px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 text-muted">
+                  {label}
+                </span>
+              </button>
+            );
+          })}
+        </nav>
+
+        <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-8 slide-up">
 
         {/* ═══════════════════════════════════════════════════
             STEP 1 — META + GEO
@@ -895,9 +920,10 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
           <section>
             <StepHeader code="L" title="Consentements éclairés (CON)"
               desc="Loi n° 2008-12 du 25 janvier 2008 — Protection données personnelles (CDP Sénégal) — Consentement libre, éclairé et révocable" />
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
-              <p className="text-sm text-amber-800 font-medium">
-                ⚠️ Le consentement au dépistage est obligatoire avant toute procédure.
+            <div className="alert alert-warning mb-6">
+              <span className="material-symbols-outlined text-warning">warning</span>
+              <p className="text-sm text-warning font-semibold">
+                Le consentement au dépistage est obligatoire avant toute procédure clinique.
               </p>
             </div>
             <div className="space-y-4">
@@ -908,14 +934,14 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                 { field: 'con_rappels_sms', label: 'Consentement à recevoir des rappels SMS pour les rendez-vous', required: true },
                 { field: 'con_signature_presente', label: 'Signature / empreinte recueillie sur formulaire papier (traçabilité)', required: true },
               ].map(({ field, label, required }) => (
-                <label key={field} className="flex items-start gap-3 p-3 rounded-lg border border-gray-100 hover:bg-gray-50 cursor-pointer">
-                  <input type="checkbox" className="mt-0.5 rounded text-indigo-600 w-5 h-5 flex-shrink-0"
+                <label key={field} className="flex items-start gap-3 p-4 rounded-xl border border-border bg-surface hover:bg-surface-hover cursor-pointer transition-all duration-300">
+                  <input type="checkbox" className="mt-0.5 rounded text-primary w-5 h-5 flex-shrink-0 bg-transparent border-border"
                     {...register(field as any, required ? { required: `${label} est obligatoire` } : {})} />
                   <div>
-                    <span className="text-sm font-medium text-gray-800">{label}</span>
-                    {required && <span className="text-red-500 ml-1 text-xs">*</span>}
+                    <span className="text-sm font-semibold text-text">{label}</span>
+                    {required && <span className="text-error ml-1 text-xs">*</span>}
                     {errors[field as keyof typeof errors] && (
-                      <p className="text-xs text-red-600 mt-0.5">
+                      <p className="text-xs text-error mt-0.5">
                         {(errors[field as keyof typeof errors] as any)?.message}
                       </p>
                     )}
@@ -930,32 +956,33 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
         )}
 
         {/* ─── Navigation ─────────────────────────────────── */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+        <div className="flex items-center justify-between pt-6 border-t border-border">
           <button type="button" onClick={onCancel}
-            className="text-sm text-gray-500 hover:text-gray-700 px-4 py-2">
+            className="btn-secondary !border-transparent !bg-transparent !shadow-none hover:!bg-surface">
             Annuler
           </button>
-          <div className="flex gap-3">
+          <div className="flex gap-4">
             {step > 1 && (
-              <button type="button" onClick={goPrev}
-                className="px-5 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                ← Précédent
+              <button type="button" onClick={goPrev} className="btn-secondary">
+                <span className="material-symbols-outlined">navigate_before</span>
+                Précédent
               </button>
             )}
             {step < TOTAL_STEPS ? (
-              <button type="button" onClick={goNext}
-                className="px-5 py-2 rounded-lg bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition-colors">
-                Suivant →
+              <button type="button" onClick={goNext} className="btn-primary">
+                Suivant
+                <span className="material-symbols-outlined">navigate_next</span>
               </button>
             ) : (
-              <button type="submit" disabled={isSubmitting}
-                className="px-6 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 disabled:opacity-50 transition-colors">
-                {isSubmitting ? 'Enregistrement…' : '✓ Enregistrer la fiche'}
+              <button type="submit" disabled={isSubmitting} className="btn-primary btn-success">
+                <span className="material-symbols-outlined">{isSubmitting ? 'sync' : 'check_circle'}</span>
+                {isSubmitting ? 'Enregistrement…' : 'Enregistrer la fiche'}
               </button>
             )}
           </div>
         </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 };
