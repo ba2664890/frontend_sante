@@ -104,8 +104,12 @@ const HPV_VACCIN = [
 ];
 
 // ─── Reusable field components ─────────────────────────────────────────────
+// Helper for premium clinical input styles
 const cls = (err?: boolean) =>
-  `input-field ${err ? 'border-red-400 focus:border-red-500' : ''}`;
+  `w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none text-base ${err
+    ? 'border-red-200 bg-red-50 focus:border-red-500'
+    : 'border-slate-100 bg-slate-50/50 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10'
+  }`;
 
 type SelectProps = React.SelectHTMLAttributes<HTMLSelectElement> & {
   options: { value: number | string; label: string }[];
@@ -120,9 +124,9 @@ const Sel: React.FC<SelectProps> = ({ options, err, ...rest }) => (
 
 const F = ({ label, required, children, col2, error }: { label: string; required?: boolean; children: React.ReactNode; col2?: boolean; error?: string }) => (
   <div className={col2 ? "md:col-span-2" : ""}>
-    <label className="form-label">
+    <label className="block text-sm font-bold text-slate-700 mb-2 tracking-tight uppercase">
       {label}
-      {required && <span className="text-error ml-1">*</span>}
+      {required && <span className="text-red-500 ml-1">*</span>}
     </label>
     {children}
     {error && <p className="text-xs text-error mt-1">{error}</p>}
@@ -141,7 +145,7 @@ const MultiCheck: React.FC<{
     onChange(next.join(','));
   };
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
       {options.map((opt) => {
         const active = selected.includes(opt.value);
         return (
@@ -149,12 +153,15 @@ const MultiCheck: React.FC<{
             key={opt.value}
             type="button"
             onClick={() => toggle(opt.value)}
-            className={`px-3 py-2 text-xs font-semibold rounded-xl border transition-all duration-300 ${active
-              ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20'
-              : 'bg-surface border-border text-muted hover:border-primary/50'
+            className={`px-4 py-4 text-sm font-bold rounded-2xl border-2 transition-all duration-300 text-left flex flex-col justify-between h-full ${active
+              ? 'bg-blue-600 text-white border-blue-600 shadow-xl shadow-blue-600/20 scale-[1.02]'
+              : 'bg-white border-slate-100 text-slate-600 hover:border-blue-200 hover:bg-blue-50/30'
               }`}
           >
-            {opt.label}
+            <span className="mb-2 block">{opt.label}</span>
+            <span className={`material-symbols-outlined text-xl ${active ? 'opacity-100' : 'opacity-20'}`}>
+              {active ? 'check_circle' : 'circle'}
+            </span>
           </button>
         );
       })}
@@ -164,14 +171,14 @@ const MultiCheck: React.FC<{
 
 // ─── Step header ───────────────────────────────────────────────────────────
 const StepHeader = ({ code, title, desc }: { code: string; title: string, desc?: string }) => (
-  <div className="mb-6 fade-in">
-    <div className="flex items-center gap-3 mb-2">
-      <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary font-bold border border-primary/20">
+  <div className="mb-8 border-b border-slate-100 pb-6 fade-in">
+    <div className="flex items-center gap-4 mb-3">
+      <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-blue-600 text-white font-black shadow-lg shadow-blue-500/30 text-xl">
         {code}
-      </span>
-      <h3 className="text-xl font-bold text-gradient-primary tracking-tight">{title}</h3>
+      </div>
+      <h3 className="text-3xl font-black text-slate-900 tracking-tight">{title}</h3>
     </div>
-    {desc && <p className="text-sm text-dim leading-relaxed bg-surface/50 p-3 rounded-xl border border-border-light">{desc}</p>}
+    {desc && <p className="text-lg text-slate-500 leading-relaxed font-medium">{desc}</p>}
   </div>
 );
 
@@ -292,62 +299,63 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4 fade-in">
-      <div className="card mb-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-extrabold text-gradient-primary tracking-tight">Fiche de Collecte</h1>
-            <p className="text-sm text-dim mt-1">Caravane Nationale d'Élimination du Cancer du Col de l'Utérus</p>
-          </div>
-          <div className="text-right">
-            <span className="text-sm font-bold text-muted bg-surface px-4 py-1.5 rounded-full border border-border">
-              Étape {step} / {TOTAL_STEPS}
-            </span>
+    <div className="max-w-[1400px] mx-auto py-12 px-6 fade-in">
+      <div className="bg-white rounded-[40px] shadow-[0_32px_120px_-20px_rgba(0,0,0,0.08)] border border-slate-100 overflow-hidden">
+        
+        {/* Superior Clinical Header */}
+        <div className="bg-slate-900 px-12 py-10 text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-blue-500/20 to-transparent pointer-events-none" />
+          <div className="relative z-10 flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <span className="px-3 py-1 bg-blue-500 text-[10px] font-black uppercase tracking-[0.2em] rounded-full">Clinical Data Hub</span>
+                <span className="text-slate-400 text-xs font-bold">CerviCare+ v2.0</span>
+              </div>
+              <h1 className="text-5xl font-black tracking-tighter">Fiche de Collecte Patient</h1>
+              <p className="text-slate-400 mt-3 text-lg font-medium">Caravane Nationale d'Élimination du Cancer du Col de l'Utérus</p>
+            </div>
+            <div className="text-right">
+              <div className="text-6xl font-black text-blue-500 mb-1 leading-none">{step}</div>
+              <div className="text-xs font-black uppercase tracking-widest text-slate-500">ÉTAPE SUR {TOTAL_STEPS}</div>
+            </div>
           </div>
         </div>
 
-        {/* Futuristic Progress Bar */}
-        <div className="relative h-2 bg-surface rounded-full overflow-hidden mb-8 border border-border-light">
-          <div
-            className="absolute top-0 left-0 h-full bg-gradient-to-r from-primary to-primary-dark shadow-[0_0_15px_rgba(139,92,246,0.5)] transition-all duration-700 ease-out"
-            style={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
-          />
-        </div>
+        <div className="p-12">
+          {/* Enhanced Progress Indicator */}
+          <div className="flex items-center gap-4 mb-12">
+            <div className="flex-1 h-4 bg-slate-100 rounded-full overflow-hidden p-1 shadow-inner">
+              <div
+                className="h-full bg-blue-600 rounded-full shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all duration-1000 ease-out"
+                style={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
+              />
+            </div>
+            <span className="text-lg font-black text-slate-900 min-w-[60px]">{Math.round((step / TOTAL_STEPS) * 100)}%</span>
+          </div>
 
-        {/* Step Navigation Tabs */}
-        <nav className="flex flex-wrap gap-2 mb-10 justify-center">
-          {STEP_LABELS.map((label, i) => {
-            const isPast = i + 1 < step;
-            const isCurrent = i + 1 === step;
-            return (
-              <button
-                key={i}
-                type="button"
-                disabled={i + 1 > step && !isSubmitting}
-                onClick={() => setStep(i + 1)}
-                className={`group relative flex items-center justify-center w-10 h-10 rounded-xl font-bold transition-all duration-300 ${isCurrent
-                    ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-110 border border-primary/20'
-                    : isPast
-                      ? 'bg-success text-white'
-                      : 'bg-surface text-muted border border-border border-dashed'
-                  }`}
-                title={label}
-              >
-                {isPast ? (
-                  <span className="material-symbols-outlined text-sm">check</span>
-                ) : (
-                  i + 1
-                )}
-                {/* Tooltip on hover */}
-                <span className="absolute -bottom-10 left-1/2 -translate-x-1/2 px-2 py-1 bg-bg-light border border-border rounded text-[10px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 text-muted">
-                  {label}
-                </span>
-              </button>
-            );
-          })}
-        </nav>
+          <nav className="flex flex-wrap gap-4 mb-16 overflow-x-auto pb-4 scrollbar-hide">
+            {STEP_LABELS.map((label, i) => {
+              const isActive = i + 1 === step;
+              const isPast = i + 1 < step;
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  disabled={i + 1 > step && !isSubmitting}
+                  onClick={() => setStep(i + 1)}
+                  className={`flex flex-col gap-2 min-w-[120px] transition-all duration-500 text-left ${isActive ? 'opacity-100 scale-105' : 'opacity-40 hover:opacity-70'}`}
+                >
+                  <div className={`h-1.5 w-full rounded-full transition-all duration-500 ${isActive ? 'bg-blue-600' : isPast ? 'bg-slate-900' : 'bg-slate-200'}`} />
+                  <div className="px-1">
+                    <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">Section {i + 1}</div>
+                    <div className={`text-sm font-black truncate ${isActive ? 'text-slate-900' : 'text-slate-500'}`}>{label}</div>
+                  </div>
+                </button>
+              );
+            })}
+          </nav>
 
-        <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-8 slide-up">
+          <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-12 slide-up">
 
         {/* ═══════════════════════════════════════════════════
             STEP 1 — META + GEO
@@ -917,66 +925,76 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
             STEP 10 — CONSENTEMENTS (CON)
         ═══════════════════════════════════════════════════ */}
         {step === 10 && (
-          <section>
+          <section className="fade-in">
             <StepHeader code="L" title="Consentements éclairés (CON)"
               desc="Loi n° 2008-12 du 25 janvier 2008 — Protection données personnelles (CDP Sénégal) — Consentement libre, éclairé et révocable" />
-            <div className="alert alert-warning mb-6">
-              <span className="material-symbols-outlined text-warning">warning</span>
-              <p className="text-sm text-warning font-semibold">
-                Le consentement au dépistage est obligatoire avant toute procédure clinique.
-              </p>
+            
+            <div className="bg-amber-50 border-2 border-amber-100 rounded-3xl p-8 mb-10 flex items-start gap-6">
+              <div className="w-12 h-12 rounded-2xl bg-amber-200 flex items-center justify-center text-amber-700 flex-shrink-0">
+                <span className="material-symbols-outlined text-3xl">warning</span>
+              </div>
+              <div>
+                <h4 className="text-xl font-black text-amber-900 mb-1 uppercase tracking-tight">Attention Clinique Obligatoire</h4>
+                <p className="text-amber-800 text-lg font-medium">Le consentement au dépistage est obligatoire avant toute procédure clinique. Vérifiez la signature papier.</p>
+              </div>
             </div>
-            <div className="space-y-4">
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {[
-                { field: 'con_depistage', label: 'Consentement éclairé au dépistage', required: true },
-                { field: 'con_traitement', label: 'Consentement éclairé au traitement (si applicable)', required: false },
-                { field: 'con_donnees_anonymisees', label: 'Consentement à l\'utilisation des données anonymisées (recherche, statistiques)', required: true },
-                { field: 'con_rappels_sms', label: 'Consentement à recevoir des rappels SMS pour les rendez-vous', required: true },
-                { field: 'con_signature_presente', label: 'Signature / empreinte recueillie sur formulaire papier (traçabilité)', required: true },
+                { field: 'con_depistage', label: 'Consentement au dépistage', required: true },
+                { field: 'con_traitement', label: 'Consentement au traitement', required: false },
+                { field: 'con_donnees_anonymisees', label: 'Utilisation des données anonymisées', required: true },
+                { field: 'con_rappels_sms', label: 'Rappels SMS pour RDV', required: true },
+                { field: 'con_signature_presente', label: 'Signature recueillie (papier)', required: true },
               ].map(({ field, label, required }) => (
-                <label key={field} className="flex items-start gap-3 p-4 rounded-xl border border-border bg-surface hover:bg-surface-hover cursor-pointer transition-all duration-300">
-                  <input type="checkbox" className="mt-0.5 rounded text-primary w-5 h-5 flex-shrink-0 bg-transparent border-border"
-                    {...register(field as any, required ? { required: `${label} est obligatoire` } : {})} />
+                <label key={field} className="group flex items-center gap-6 p-6 rounded-3xl border-2 border-slate-100 hover:border-blue-500 hover:bg-blue-50/30 cursor-pointer transition-all duration-300">
+                  <div className="relative flex items-center justify-center">
+                    <input type="checkbox" className="peer appearance-none w-10 h-10 rounded-2xl border-2 border-slate-200 checked:bg-blue-600 checked:border-blue-600 transition-all duration-300"
+                      {...register(field as any, required ? { required: `${label} est obligatoire` } : {})} />
+                    <span className="material-symbols-outlined absolute text-white opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none font-black">check</span>
+                  </div>
                   <div>
-                    <span className="text-sm font-semibold text-text">{label}</span>
-                    {required && <span className="text-error ml-1 text-xs">*</span>}
+                    <span className="text-xl font-black text-slate-800 group-hover:text-blue-600 transition-colors uppercase tracking-tight">{label}</span>
+                    {required && <span className="text-red-500 ml-1 font-bold text-xl">*</span>}
                     {errors[field as keyof typeof errors] && (
-                      <p className="text-xs text-error mt-0.5">
+                      <p className="text-sm text-red-500 font-bold mt-1 uppercase tracking-wider">
                         {(errors[field as keyof typeof errors] as any)?.message}
                       </p>
                     )}
                   </div>
                 </label>
               ))}
-              <F label="Date/heure du consentement dépistage">
-                <input type="datetime-local" {...register('con_depistage_date')} className={cls()} />
-              </F>
+              <div className="md:col-span-2">
+                <F label="Date/heure précise du consentement">
+                  <input type="datetime-local" {...register('con_depistage_date')} className={cls()} />
+                </F>
+              </div>
             </div>
           </section>
         )}
 
         {/* ─── Navigation ─────────────────────────────────── */}
-        <div className="flex items-center justify-between pt-6 border-t border-border">
+        <div className="flex items-center justify-between pt-12 border-t-2 border-slate-100 mt-12">
           <button type="button" onClick={onCancel}
-            className="btn-secondary !border-transparent !bg-transparent !shadow-none hover:!bg-surface">
-            Annuler
+            className="text-slate-400 hover:text-slate-900 font-black uppercase tracking-[0.2em] text-sm px-8 py-4 transition-colors">
+            Abandonner
           </button>
-          <div className="flex gap-4">
+          <div className="flex gap-6">
             {step > 1 && (
-              <button type="button" onClick={goPrev} className="btn-secondary">
-                <span className="material-symbols-outlined">navigate_before</span>
+              <button type="button" onClick={goPrev} className="px-10 py-5 rounded-3xl border-2 border-slate-200 font-black text-slate-900 hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-3 uppercase tracking-widest text-sm">
+                <span className="material-symbols-outlined">west</span>
                 Précédent
               </button>
             )}
             {step < TOTAL_STEPS ? (
-              <button type="button" onClick={goNext} className="btn-primary">
+              <button type="button" onClick={goNext} className="px-12 py-5 rounded-3xl bg-blue-600 text-white font-black hover:bg-blue-700 shadow-2xl shadow-blue-600/30 transition-all active:scale-95 flex items-center gap-3 uppercase tracking-widest text-sm">
                 Suivant
-                <span className="material-symbols-outlined">navigate_next</span>
+                <span className="material-symbols-outlined">east</span>
               </button>
             ) : (
-              <button type="submit" disabled={isSubmitting} className="btn-primary btn-success">
-                <span className="material-symbols-outlined">{isSubmitting ? 'sync' : 'check_circle'}</span>
-                {isSubmitting ? 'Enregistrement…' : 'Enregistrer la fiche'}
+              <button type="submit" disabled={isSubmitting} className="px-12 py-5 rounded-3xl bg-emerald-600 text-white font-black hover:bg-emerald-700 shadow-2xl shadow-emerald-600/30 transition-all active:scale-95 flex items-center gap-3 uppercase tracking-widest text-sm">
+                <span className="material-symbols-outlined">{isSubmitting ? 'sync' : 'verified'}</span>
+                {isSubmitting ? 'Traitement…' : 'Finaliser la Fiche'}
               </button>
             )}
           </div>
@@ -984,7 +1002,8 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
         </form>
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default PatientFormWizard;
