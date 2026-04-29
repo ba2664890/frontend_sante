@@ -1,370 +1,85 @@
-/* ====== CERVICARE+ 2025 - DESIGN MÉDICAL FUTURISTE ====== */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* PALETTE MÉDICALE MODERNE - Violet/Purple pour sensibilisation cancer */
-    --c-primary: #8B5CF6;
-    --c-primary-light: #f4f4f5;
-    --c-primary-dark: #7C3AED;
+    --primary: #003f87;
+    --secondary: #b80049;
+    --on-surface: #121c28;
+    --outline: #727784;
+    --background: #f8f9ff;
+    --surface-container-lowest: #ffffff;
+    --primary-container: #0056b3;
     
-    --c-secondary: #EC4899;
-    --c-accent: #06B6D4;
-    
-    --c-success: #10B981;
-    --c-warning: #F59E0B;
-    --c-error: #EF4444;
-    --c-info: #3B82F6;
-    
-    --c-bg: #0F0F1A;
-    --c-bg-light: #1A1A2E;
-    --c-surface: rgba(139, 92, 246, 0.05);
-    --c-surface-hover: rgba(139, 92, 246, 0.1);
-    
-    --c-border: rgba(139, 92, 246, 0.15);
-    --c-border-light: rgba(255, 255, 255, 0.06);
-    
-    --c-text: #131516;
-    --c-text-muted: #f5f5f5;
-    --c-text-dim: #fefeff;
-  }
-
-  [data-theme="light"] {
-    --c-bg: #110909;
-    --c-bg-light: #0e0b0b;
-    --c-surface: rgba(139, 92, 246, 0.03);
-    --c-surface-hover: rgba(139, 92, 246, 0.08);
-    --c-border: rgba(139, 92, 246, 0.12);
-    --c-border-light: rgba(0, 0, 0, 0.06);
-    --c-text: #1E293B;
-    --c-text-muted: #475569;
-    --c-text-dim: #64748B;
+    /* Legacy variables mapping */
+    --c-primary: var(--primary);
+    --c-secondary: var(--secondary);
+    --c-bg: var(--background);
+    --c-text: var(--on-surface);
   }
 
   html {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    @apply font-sans;
     scroll-behavior: smooth;
   }
 
   body {
-    background-color: var(--c-bg);
-    color: var(--c-text);
+    background-color: var(--background);
+    color: var(--on-surface);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 }
 
 @layer components {
-  /* ========== BOUTONS FUTURISTES ========== */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 86, 179, 0.04);
+  }
+
   .btn-primary {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    border-radius: 1rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    letter-spacing: 0.025em;
-    background: linear-gradient(to right, var(--c-primary), var(--c-primary-dark));
-    color: white;
-    box-shadow: 0 10px 15px -3px rgba(139, 92, 246, 0.3);
-    border: 1px solid rgba(167, 139, 250, 0.2);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .btn-primary:hover {
-    transform: scale(1.02) translateY(-2px);
-    box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
-  }
-
-  .btn-primary:active {
-    transform: scale(0.98) translateY(0);
+    @apply bg-primary text-white px-8 py-2.5 rounded-xl shadow-lg shadow-primary/20 hover:bg-primary-container transition-all active:scale-95 flex items-center gap-2 font-semibold;
   }
 
   .btn-secondary {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    border-radius: 1rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    letter-spacing: 0.025em;
-    background-color: var(--c-surface);
-    border: 2px solid var(--c-border);
-    color: var(--c-text);
-    backdrop-filter: blur(12px);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    @apply bg-secondary text-white px-8 py-2.5 rounded-xl shadow-lg shadow-secondary/20 hover:bg-secondary-container transition-all active:scale-95 flex items-center gap-2 font-semibold;
   }
 
-  .btn-secondary:hover {
-    background-color: var(--c-surface-hover);
-    border-color: rgba(139, 92, 246, 0.5);
-    transform: scale(1.02) translateY(-2px);
-    box-shadow: 0 10px 20px rgba(139, 92, 246, 0.1);
-  }
-
-  .btn-success {
-    background: linear-gradient(to right, var(--c-success), #059669);
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
-    border: 1px solid rgba(16, 185, 129, 0.2);
-  }
-
-  .btn-success:hover {
-    box-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
-  }
-
-  .btn-warning {
-    background: linear-gradient(to right, var(--c-warning), #d97706);
-    box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
-    border: 1px solid rgba(245, 158, 11, 0.2);
-  }
-
-  .btn-danger, .btn-error {
-    background: linear-gradient(to right, var(--c-error), #f43f5e);
-    box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
-    border: 1px solid rgba(239, 68, 68, 0.2);
-  }
-
-  /* ========== CARTES GLASSMORPHISM ========== */
-  .card {
-    position: relative;
-    background-color: var(--c-surface);
-    border: 1px solid var(--c-border);
-    border-radius: 1.5rem;
-    padding: 1.5rem;
-    backdrop-filter: blur(24px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 48px rgba(139, 92, 246, 0.15);
-    border-color: rgba(139, 92, 246, 0.3);
-  }
-
-  /* ========== INPUTS MODERNES ========== */
   .input-field {
-    width: 100%;
-    padding: 0.875rem 1.25rem;
-    border-radius: 1rem;
-    background-color: var(--c-surface);
-    border: 2px solid var(--c-border);
-    color: var(--c-text);
-    font-size: 0.875rem;
-    backdrop-filter: blur(12px);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    @apply w-full border-slate-200 rounded-xl focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all py-3 px-4 text-body-md bg-white;
   }
 
-  .input-field::placeholder {
-    color: var(--c-text-dim);
-  }
-
-  .input-field:focus {
-    outline: none;
-    border-color: var(--c-primary);
-    background-color: var(--c-surface-hover);
-    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
-  }
-
-  .form-label {
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--c-text);
-    margin-bottom: 0.5rem;
-    letter-spacing: 0.025em;
-  }
-
-  /* ========== BADGES & STATUS ========== */
-  .status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 0.375rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.025em;
-    border: 1px solid;
-    backdrop-filter: blur(4px);
-  }
-
-  .status-success {
-    background-color: rgba(16, 185, 129, 0.1);
-    color: var(--c-success);
-    border-color: rgba(16, 185, 129, 0.3);
-  }
-
-  .status-warning {
-    background-color: rgba(245, 158, 11, 0.1);
-    color: var(--c-warning);
-    border-color: rgba(245, 158, 11, 0.3);
-  }
-
-  .status-error {
-    background-color: rgba(239, 68, 68, 0.1);
-    color: var(--c-error);
-    border-color: rgba(239, 68, 68, 0.3);
-  }
-
-  .status-info {
-    background-color: rgba(139, 92, 246, 0.1);
-    color: var(--c-primary);
-    border-color: rgba(139, 92, 246, 0.3);
-  }
-
-  /* ========== LOADING SPINNER ========== */
-  .loading-spinner {
-    width: 2rem;
-    height: 2rem;
-    border: 3px solid transparent;
-    border-top-color: var(--c-primary);
-    border-right-color: rgba(139, 92, 246, 0.4);
-    border-radius: 9999px;
-    animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-
-  /* ========== ALERTS ========== */
-  .alert {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    padding: 1.25rem;
-    border-radius: 1rem;
-    border-left: 4px solid;
-    backdrop-filter: blur(12px);
-  }
-
-  .alert-success {
-    background-color: rgba(16, 185, 129, 0.1);
-    border-color: var(--c-success);
-  }
-
-  .alert-warning {
-    background-color: rgba(245, 158, 11, 0.1);
-    border-color: var(--c-warning);
-  }
-
-  .alert-error {
-    background-color: rgba(239, 68, 68, 0.1);
-    border-color: var(--c-error);
-  }
-
-  .alert-info {
-    background-color: rgba(139, 92, 246, 0.1);
-    border-color: var(--c-primary);
-  }
-
-  /* ========== NAVIGATION ========== */
-  .nav-link {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem 1rem;
-    border-radius: 1rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--c-text-muted);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .nav-link:hover {
-    color: var(--c-text);
-    background-color: var(--c-surface-hover);
-  }
-
-  .nav-link.active {
-    color: var(--c-text);
-    background-color: var(--c-surface-hover);
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.1);
-  }
-
-  /* ========== MODAL ========== */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-    z-index: 40;
-  }
-
-  .modal-content {
-    position: relative;
-    background-color: var(--c-bg-light);
-    border: 2px solid var(--c-border);
-    border-radius: 1.5rem;
-    padding: 2rem;
-    backdrop-filter: blur(24px);
-    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
-    max-height: 90vh;
-    overflow-y: auto;
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    vertical-align: middle;
   }
 }
 
 @layer utilities {
-  .text-gradient-primary {
-    background: linear-gradient(to right, var(--c-primary), var(--c-primary-light));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+  .animate-slide-in {
+    animation: slideIn 0.4s ease-out forwards;
   }
 
-  .fade-in {
-    animation: fadeIn 0.6s ease-out forwards;
-  }
-
-  .slide-up {
-    animation: slideUp 0.5s ease-out forwards;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
   }
 }
 
-/* ========== SCROLLBAR ========== */
+/* Custom Scrollbar for Clinical UI */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
 }
-
 ::-webkit-scrollbar-track {
-  background: rgba(139, 92, 246, 0.05);
-  border-radius: 10px;
+  background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, var(--c-primary), var(--c-primary-dark));
+  background: #cbd5e1;
   border-radius: 10px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, var(--c-primary-light), var(--c-primary));
+  background: #94a3b8;
 }
