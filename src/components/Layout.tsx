@@ -2,7 +2,6 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar.tsx';
 import Header from './Header.tsx';
-import bgImage from '../assets/background.jpg';
 
 const Layout: React.FC = () => {
   return (

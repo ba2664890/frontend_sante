@@ -75,11 +75,6 @@ const DEP_COLPO_ASPECT = [
   opt(1,'Normal'), opt(2,'Anormal mineur'), opt(3,'Anormal majeur'),
   opt(4,'Suspicion de cancer invasif'), opt(5,'Polype'), opt(6,'Non satisfaisante'),
 ];
-const DEP_ZONE_TRANSFO = [
-  opt(1,'ZT1 — entièrement exocervicale, visible'),
-  opt(2,'ZT2 — partiellement endocervicale, visible'),
-  opt(3,'ZT3 — endocervicale non visible'),
-];
 const TRT_NON_ELIG = [
   opt(1,'Suspicion de cancer invasif'), opt(2,'Lésion >75% ou extension endocervicale'),
   opt(3,'ZT3 non visualisable'), opt(4,'Grossesse en cours'),
@@ -97,7 +92,6 @@ const SUI_ANAPATH = [
   opt(6,'Carcinome épidermoïde invasif'), opt(7,'Adénocarcinome invasif'),
   opt(8,'Autre'), opt(9,'Non concluant'),
 ];
-const FIGO = ['IA1','IA2','IB1','IB2','IB3','IIA1','IIA2','IIB','IIIA','IIIB','IIIC1','IIIC2','IVA','IVB'];
 const HPV_VACCIN = [
   opt(0,'Non vaccinée'), opt(1,'Vaccinée (1 dose)'),
   opt(2,'Vaccinée (2 doses)'), opt(3,'Vaccinée (3 doses)'), opt(9,'Ne sait pas'),

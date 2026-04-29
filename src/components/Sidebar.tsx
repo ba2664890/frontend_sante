@@ -2,18 +2,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.tsx';
-import {
-  HomeIcon,
-  UsersIcon,
-  ChartBarIcon,
-  BellIcon,
-  ArrowRightOnRectangleIcon as LogoutIcon,
-  Bars3Icon as MenuIcon,
-  XMarkIcon as XIcon,
-  ShieldCheckIcon,
-  DocumentTextIcon as DocumentReportIcon,
-  CalendarIcon,
-} from '@heroicons/react/24/outline';
 
 const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);

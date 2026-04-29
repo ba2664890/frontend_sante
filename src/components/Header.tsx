@@ -3,16 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { useAuth } from '../contexts/AuthContext.tsx';
-import { useTheme } from '../contexts/ThemeContext.tsx';
 import { notificationService } from '../services/notificationService.ts';
-import {
-  BellIcon,
-  MoonIcon,
-  SunIcon,
-  Cog6ToothIcon,
-  UserCircleIcon,
-} from '@heroicons/react/24/outline';
-import { toast } from 'react-hot-toast';
 
 const Header: React.FC = () => {
   const { user } = useAuth();
@@ -107,7 +98,7 @@ const Header: React.FC = () => {
               onClick={() => goToSettings('profile')}
             >
               {user?.avatar 
-                ? <img src={user.avatar} className="w-full h-full object-cover" />
+                ? <img src={user.avatar} className="w-full h-full object-cover" alt="Avatar" />
                 : user?.first_name?.[0]}
             </div>
           </div>
