@@ -2,15 +2,19 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar.tsx';
 import Header from './Header.tsx';
+import bgImage from '../assets/background.jpg';
 
 const Layout: React.FC = () => {
   return (
-    <div className="min-h-screen bg-background flex overflow-x-hidden">
+    <div
+      className="min-h-screen bg-cover  bg-no-repeat flex"
+      style={{ backgroundImage: `url(${bgImage})` }}
+    >
       <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col bg-white/70 backdrop-blur-sm">
         <Header />
-        <main className="flex-1 overflow-y-auto">
-          <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <main className="flex-1 p-6">
+          <div className="max-w-7xl mx-auto">
             <Outlet />
           </div>
         </main>

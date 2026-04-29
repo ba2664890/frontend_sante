@@ -2,6 +2,18 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.tsx';
+import {
+  HomeIcon,
+  UsersIcon,
+  ChartBarIcon,
+  BellIcon,
+  ArrowRightOnRectangleIcon as LogoutIcon,
+  Bars3Icon as MenuIcon,
+  XMarkIcon as XIcon,
+  ShieldCheckIcon,
+  DocumentTextIcon as DocumentReportIcon,
+  CalendarIcon,
+} from '@heroicons/react/24/outline';
 
 const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,39 +22,40 @@ const Sidebar: React.FC = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
+  /* ----------  NAVIGATION PAR RÔLE  ---------- */
   const rawNav = (() => {
     switch (user?.role) {
       case 'admin':
         return [
-          { name: 'Tableau de bord', href: '/dashboard', icon: 'dashboard' },
-          { name: 'Patientes', href: '/patients', icon: 'group' },
-          { name: 'Statistiques', href: '/statistics', icon: 'monitoring' },
-          { name: 'Notifications', href: '/notifications', icon: 'notifications' },
-          { name: 'Administration', href: '/admin', icon: 'shield_person' },
-          { name: 'Rapports', href: '/reports', icon: 'clinical_notes' },
-          { name: 'Campagne', href: '/accueil', icon: 'campaign' }
+          { name: 'Tableau de bord', href: '/dashboard', icon: HomeIcon },
+          { name: 'Patientes', href: '/patients', icon: UsersIcon },
+          { name: 'Statistiques', href: '/statistics', icon: ChartBarIcon },
+          { name: 'Notifications', href: '/notifications', icon: BellIcon },
+          { name: 'Administration', href: '/admin', icon: ShieldCheckIcon },
+          { name: 'Rapports', href: '/reports', icon: DocumentReportIcon },
+          { name: 'Campagne', href: '/accueil', icon: DocumentReportIcon }
         ];
       case 'supervisor':
         return [
-          { name: 'Tableau de bord', href: '/dashboard', icon: 'dashboard' },
-          { name: 'Patientes', href: '/patients', icon: 'group' },
-          { name: 'Statistiques', href: '/statistics', icon: 'monitoring' },
-          { name: 'Notifications', href: '/notifications', icon: 'notifications' },
-          { name: 'Rapports', href: '/reports', icon: 'clinical_notes' },
+          { name: 'Tableau de bord', href: '/dashboard', icon: HomeIcon },
+          { name: 'Patientes', href: '/patients', icon: UsersIcon },
+          { name: 'Statistiques', href: '/statistics', icon: ChartBarIcon },
+          { name: 'Notifications', href: '/notifications', icon: BellIcon },
+          { name: 'Rapports', href: '/reports', icon: DocumentReportIcon },
         ];
       case 'health_agent':
         return [
-          { name: 'Tableau de bord', href: '/dashboard', icon: 'dashboard' },
-          { name: 'Mes Patientes', href: '/patients', icon: 'group' },
-          { name: 'Notifications', href: '/notifications', icon: 'notifications' },
+          { name: 'Tableau de bord', href: '/dashboard', icon: HomeIcon },
+          { name: 'Mes Patientes', href: '/patients', icon: UsersIcon },
+          { name: 'Notifications', href: '/notifications', icon: BellIcon },
         ];
       case 'patient':
         return [
-          { name: 'Accueil', href: '/acceuil_patient', icon: 'home' },
-          { name: 'Mon Suivi', href: `/patients/${user?.id}`, icon: 'patient_list' },
-          { name: 'Rendez-vous', href: `/appointments/${user?.id}`, icon: 'calendar_month' },
-          { name: 'Messages', href: '/notifications', icon: 'mail' },
-          { name: 'Chatbot', href: '/chatbot', icon: 'smart_toy' },
+          { name: 'Acceuil', href: `/acceuil_patient`, icon: HomeIcon },
+          { name: 'Mon Suivi', href: `/patients/${user?.id}`, icon: HomeIcon },
+          { name: 'Rendez-vous', href: `/appointments/${user?.id}`, icon: CalendarIcon },
+          { name: 'Messages', href: '/notifications', icon: BellIcon },
+          { name: 'Chatbot', href: '/chatbot', icon: BellIcon },
         ];
       default:
         return [];
@@ -51,72 +64,113 @@ const Sidebar: React.FC = () => {
 
   const navigation = rawNav.map((item, idx) => ({ ...item, idx }));
 
+  /* ----------  STYLES  ---------- */
+  const navItemBase =
+    'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium ' +
+    'transition-all duration-300 ease-out';
+  const activeClass =
+    'bg-gradient-primary text-black shadow-[0_0_12px_var(--c-primary)]';
+  const inactiveClass =
+    'text-gray-400 hover:text-white hover:bg-white/10';
+
+  /* ----------  NAV ITEM ANIMÉ  ---------- */
   const NavItem: React.FC<{ item: any }> = ({ item }) => {
     const active = isActive(item.href);
     return (
       <Link
         to={item.href}
-        className={`
-          flex items-center gap-3 py-3 px-4 rounded-xl transition-all duration-200 cursor-pointer text-sm font-medium
-          ${active 
-            ? 'bg-white text-primary shadow-sm' 
-            : 'text-slate-500 hover:text-primary hover:bg-white/50'}
-        `}
+        className={`${navItemBase} ${active ? activeClass : inactiveClass} ${isOpen ? 'translate-x-0' : '-translate-x-4'
+          } animate-slide-in`}
+        style={{ animationDelay: `${item.idx * 60}ms` }}
       >
-        <span className="material-symbols-outlined" style={{ fontVariationSettings: `'FILL' ${active ? 1 : 0}` }}>
-          {item.icon}
-        </span>
-        <span className={active ? 'font-semibold' : ''}>{item.name}</span>
+        <item.icon className="w-5 h-5" />
+        <span className="flex-1">{item.name}</span>
+        {active && (
+          <span className="h-1 w-1 rounded-full bg-white animate-ping" />
+        )}
       </Link>
     );
   };
 
+  /* ----------  RETURN  ---------- */
   return (
     <>
       {/* Burger mobile */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md text-slate-600"
-      >
-        <span className="material-symbols-outlined">{isOpen ? 'close' : 'menu'}</span>
-      </button>
+      <div className="lg:hidden fixed top-4 left-4 z-50">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-10 h-10 grid place-items-center rounded-xl glass shadow-neon"
+        >
+          {isOpen ? (
+            <XIcon className="w-5 h-5 text-white animate-spin-short" />
+          ) : (
+            <MenuIcon className="w-5 h-5 text-gray-200" />
+          )}
+        </button>
+      </div>
 
       {/* Sidebar */}
-      <nav className={`
-        fixed left-0 top-0 pt-20 pb-8 flex flex-col h-full z-40 bg-slate-50/80 backdrop-blur-lg w-64 border-r border-slate-200
-        transition-transform duration-300 ease-in-out
-        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-      `}>
-        <div className="px-6 mb-8">
-          <div className="flex items-center gap-3 mb-1">
-            <div className="w-2 h-2 bg-secondary rounded-full animate-pulse"></div>
-            <h2 className="text-primary font-bold text-lg uppercase tracking-tight">
-              {user?.role === 'patient' ? 'Votre Suivi' : 'En cours'}
-            </h2>
+      <div
+        className={`
+          fixed inset-y-0 left-0 z-40 w-64
+          bg-gray-900 shadow-neon
+          transform transition-transform duration-500 ease-[cubic-bezier(.4,0,.2,1)]
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+          lg:translate-x-0 lg:static lg:inset-0
+        `}
+      >
+
+        {/* Logo */}
+        <div className="flex items-center justify-center h-20 px-4 border-b border-white/10">
+          <div className="flex items-center gap-2">
+            <div className="w-9 h-9 rounded-lg bg-gradient-primary shadow-[0_0_12px_var(--c-primary)] grid place-items-center">
+              <span className="text-black font-extrabold text-xs">C+</span>
+            </div>
+            <span className="text-white font-bold text-xl tracking-tight">CerviCare+</span>
           </div>
-          <p className="text-slate-500 text-xs truncate">
-            {user?.role === 'patient' ? 'Espace Patient CerviCare' : 'ID Dossier: #SEN-2024-CAR-042'}
-          </p>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-3 space-y-1">
+        {/* Navigation */}
+        <nav className="flex-1 px-4 py-6 space-y-2">
           {navigation.map((item) => (
             <NavItem key={item.name} item={item} />
           ))}
-        </div>
+        </nav>
 
-        <div className="mt-auto px-4 pt-4 border-t border-slate-200">
-          <div className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer group" onClick={logout}>
-            <span className="material-symbols-outlined text-slate-400 group-hover:text-error transition-colors">logout</span>
-            <span className="text-sm font-medium text-slate-500 group-hover:text-error transition-colors">Déconnexion</span>
+        {/* Profil */}
+        <div className="border-t border-white/10 p-4">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full bg-gradient-secondary shadow-[0_0_12px_var(--c-secondary)] grid place-items-center">
+              <span className="text-black font-bold text-sm">
+                {user?.first_name?.[0] || 'U'}
+              </span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-white text-sm font-medium truncate">
+                {user?.first_name} {user?.last_name}
+              </p>
+              <p className="text-gray-400 text-xs capitalize">
+                {user?.role === 'admin' && 'Administrateur'}
+                {user?.role === 'supervisor' && 'Superviseur'}
+                {user?.role === 'health_agent' && 'Agent de santé'}
+                {user?.role === 'patient' && 'Patient'}
+              </p>
+            </div>
+            <button
+              onClick={logout}
+              className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+              title="Déconnexion"
+            >
+              <LogoutIcon className="w-5 h-5 text-gray-400 hover:text-white" />
+            </button>
           </div>
         </div>
-      </nav>
+      </div>
 
       {/* Overlay mobile */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-30 lg:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 lg:hidden animate-fade-in"
           onClick={() => setIsOpen(false)}
         />
       )}
