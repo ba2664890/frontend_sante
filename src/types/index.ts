@@ -35,6 +35,7 @@ export interface Patient {
 
   // A — MÉTADONNÉES
   meta_agent_qualif?: number;
+  meta_agent_qualif_autre?: string;
   meta_version_fiche?: string;
 
   // B — GÉOGRAPHIE
@@ -65,6 +66,7 @@ export interface Patient {
   soc_menage_polygame?: boolean;
   soc_mode_entree?: number;
   ethnie?: number;
+  ethnie_autre?: string;
 
   // Legacy D
   statut_matrimoniale?: number;
@@ -98,9 +100,11 @@ export interface Patient {
   // F — FACTEURS DE RISQUE
   ris_ist_antecedent?: number;
   ris_ist_type?: string;
+  ris_ist_type_autre?: string;
   ris_vih_statut?: number;
   ris_tabagisme?: number;
   ris_contraception?: string;
+  ris_contraception_autre?: string;
   ris_duree_contraception_horm?: number;
   ris_depistage_anterieur?: number;
   ris_date_dern_depistage?: string;
@@ -175,11 +179,13 @@ export interface Patient {
   trt_nb_applications?: number;
   trt_temperature_sonde?: number;
   trt_effets_immediats?: string;
+  trt_effets_immediats_autre?: string;
   trt_antalgique_administre?: boolean;
 
   // J — SUIVI / ANAPATH
   sui_anapath_date_reception?: string;
   sui_anapath_resultat?: number;
+  sui_anapath_resultat_autre?: string;
   sui_stade_figo?: string;
   sui_rdv_1mois?: string;
   sui_rdv_3mois?: string;
@@ -194,12 +200,14 @@ export interface Patient {
   // K — HPV / VACCINATION
   hpv_connaissance_ccu?: boolean;
   hpv_source_info?: string;
+  hpv_source_info_autre?: string;
   hpv_statut_vaccinal?: number;
   hpv_a_des_filles?: boolean;
   hpv_nb_filles_total?: number;
   hpv_nb_filles_9_14?: number;
   hpv_nb_filles_vaccinees?: number;
   hpv_raison_non_vaccination?: string;
+  hpv_raison_non_vaccination_autre?: string;
 
   // L — CONSENTEMENTS
   con_depistage?: boolean;

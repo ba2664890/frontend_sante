@@ -450,6 +450,11 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                     <Sel options={META_QUALIF} err={!!errors.meta_agent_qualif}
                       {...register('meta_agent_qualif', { valueAsNumber: true })} />
                   </F>
+                  {Number(watch('meta_agent_qualif')) === 5 && (
+                    <F label="Qualification (préciser)">
+                      <input type="text" {...register('meta_agent_qualif_autre')} className={cls()} />
+                    </F>
+                  )}
                 </div>
 
                 <StepHeader code="B" title="Identification géographique (GEO)"
@@ -577,8 +582,13 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                     <Sel options={SOC_MODE_ENTREE} {...register('soc_mode_entree', { required: true, valueAsNumber: true })} />
                   </F>
                   <F label="Groupe ethnolinguistique (optionnel)">
-                    <Sel options={ETHNIE} {...register('ethnie')} />
+                    <Sel options={ETHNIE} {...register('ethnie', { valueAsNumber: true })} />
                   </F>
+                  {Number(watch('ethnie')) === 7 && (
+                    <F label="Groupe ethnolinguistique (préciser)">
+                      <input type="text" {...register('ethnie_autre')} className={cls()} />
+                    </F>
+                  )}
                 </div>
               </section>
             )}
@@ -652,6 +662,11 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                         value={multiValues.ris_ist_type}
                         onChange={v => setMulti('ris_ist_type', v)}
                       />
+                      {(multiValues.ris_ist_type || '').split(',').includes('7') && (
+                        <div className="mt-4">
+                          <input type="text" placeholder="Précisez le ou les type(s) d'IST..." {...register('ris_ist_type_autre')} className={cls()} />
+                        </div>
+                      )}
                     </F>
                   )}
                   <F label="Statut VIH" required>
@@ -670,6 +685,11 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                       value={multiValues.ris_contraception}
                       onChange={v => setMulti('ris_contraception', v)}
                     />
+                    {(multiValues.ris_contraception || '').split(',').includes('8') && (
+                      <div className="mt-4">
+                        <input type="text" placeholder="Précisez la méthode contraceptive..." {...register('ris_contraception_autre')} className={cls()} />
+                      </div>
+                    )}
                   </F>
                   <F label="Durée contraception orale (années)">
                     <input type="number" min={0} placeholder="Facteur de risque si ≥5 ans"
@@ -905,6 +925,11 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                           value={multiValues.trt_effets_immediats}
                           onChange={v => setMulti('trt_effets_immediats', v)}
                         />
+                        {(multiValues.trt_effets_immediats || '').split(',').includes('6') && (
+                          <div className="mt-4">
+                            <input type="text" placeholder="Autre effet immédiat..." {...register('trt_effets_immediats_autre')} className={cls()} />
+                          </div>
+                        )}
                       </F>
                       <F label="Antalgique administré ?">
                         <label className="flex items-center gap-2 mt-2 text-sm">
@@ -933,6 +958,11 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                   <F label="Résultat anatomopathologique">
                     <Sel options={SUI_ANAPATH} {...register('sui_anapath_resultat', { valueAsNumber: true })} />
                   </F>
+                  {Number(watch('sui_anapath_resultat')) === 8 && (
+                    <F label="Résultat anapath (préciser)">
+                      <input type="text" {...register('sui_anapath_resultat_autre')} className={cls()} />
+                    </F>
+                  )}
                   <F label="Stade FIGO 2018 (si cancer)">
                     <select className={cls()} {...register('sui_stade_figo')}>
                       <option value="">— Choisir —</option>
@@ -992,6 +1022,11 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                       value={multiValues.hpv_source_info}
                       onChange={v => setMulti('hpv_source_info', v)}
                     />
+                    {(multiValues.hpv_source_info || '').split(',').includes('9') && (
+                      <div className="mt-4">
+                        <input type="text" placeholder="Autre source..." {...register('hpv_source_info_autre')} className={cls()} />
+                      </div>
+                    )}
                   </F>
                   <F label="Statut vaccinal HPV personnel">
                     <Sel options={HPV_VACCIN} {...register('hpv_statut_vaccinal', { valueAsNumber: true })} />
@@ -1026,6 +1061,11 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                             value={multiValues.hpv_raison_non_vaccination}
                             onChange={v => setMulti('hpv_raison_non_vaccination', v)}
                           />
+                          {(multiValues.hpv_raison_non_vaccination || '').split(',').includes('8') && (
+                            <div className="mt-4">
+                              <input type="text" placeholder="Précisez la raison..." {...register('hpv_raison_non_vaccination_autre')} className={cls()} />
+                            </div>
+                          )}
                         </F>
                       )}
                     </>
