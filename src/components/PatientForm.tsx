@@ -236,13 +236,27 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
     4: ['gyn_nb_grossesses', 'gyn_nb_accouchements', 'gyn_age_premier_rapport'],
     5: ['ris_ist_antecedent', 'ris_vih_statut', 'ris_tabagisme'],
     6: ['phy_statut'],
-    7: ['dep_date', 'con_depistage'],
+    7: ['dep_date'],
     8: ['trt_eligible_immediat'],
-    9: [],
+    9: ['hpv_connaissance_ccu', 'hpv_statut_vaccinal', 'hpv_a_des_filles'],
     10: ['con_depistage', 'con_donnees_anonymisees', 'con_signature_presente'],
   };
 
   const goNext = async () => {
+    // Validation personnalisée pour les champs complexes (MultiCheck)
+    if (step === 5) {
+      if (Number(w.ris_ist) === 1 && !multiValues.ris_ist_type) {
+        toast.error("Veuillez préciser le(s) type(s) d'IST");
+        return;
+      }
+    }
+    if (step === 7) {
+      if (!multiValues.dep_methode) {
+        toast.error("Veuillez choisir au moins une méthode de dépistage");
+        return;
+      }
+    }
+
     const valid = await trigger(fieldsByStep[step] as any);
     if (!valid) { toast.error('Veuillez remplir les champs obligatoires'); return; }
     setStep(s => Math.min(TOTAL_STEPS, s + 1));
