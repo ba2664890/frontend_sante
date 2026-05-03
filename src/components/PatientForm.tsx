@@ -115,12 +115,15 @@ type SelectProps = React.SelectHTMLAttributes<HTMLSelectElement> & {
   options: { value: number | string; label: string }[];
   err?: boolean;
 };
-const Sel: React.FC<SelectProps> = ({ options, err, ...rest }) => (
-  <select className={cls(err)} {...rest}>
-    <option value="">— Choisir —</option>
-    {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-  </select>
+const Sel = React.forwardRef<HTMLSelectElement, SelectProps>(
+  ({ options, err, ...rest }, ref: React.ForwardedRef<HTMLSelectElement>) => (
+    <select className={cls(err)} ref={ref} {...rest}>
+      <option value="">— Choisir —</option>
+      {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+    </select>
+  )
 );
+Sel.displayName = 'Sel';
 
 const F = ({ label, required, children, col2, error }: { label: string; required?: boolean; children: React.ReactNode; col2?: boolean; error?: string }) => (
   <div className={col2 ? "md:col-span-2" : ""}>
@@ -386,7 +389,7 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
               </F>
               <F label="Qualification de l'agent" error={errors.meta_agent_qualif?.message}>
                 <Sel options={META_QUALIF} err={!!errors.meta_agent_qualif}
-                  {...register('meta_agent_qualif')} />
+                  {...register('meta_agent_qualif', { valueAsNumber: true })} />
               </F>
             </div>
 
@@ -395,7 +398,7 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <F label="Région médicale" required error={errors.geo_region?.message}>
                 <Sel options={GEO_REGIONS} err={!!errors.geo_region}
-                  {...register('geo_region', { required: 'Région requise' })} />
+                  {...register('geo_region', { required: 'Région requise', valueAsNumber: true })} />
               </F>
               <F label="District sanitaire (DHIS2)">
                 <input type="text" placeholder="Ex: Boucotte" className={cls()}
@@ -406,7 +409,7 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                   {...register('geo_structure')} />
               </F>
               <F label="Type de structure">
-                <Sel options={GEO_TYPE_STRUCTURE} {...register('geo_type_structure')} />
+                <Sel options={GEO_TYPE_STRUCTURE} {...register('geo_type_structure', { valueAsNumber: true })} />
               </F>
               <F label="Latitude GPS (caravane mobile)">
                 <input type="number" step="0.000001" placeholder="-90 à +90" className={cls()}
@@ -482,7 +485,7 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <F label="Profession" required error={errors.soc_profession?.message}>
                 <Sel options={SOC_PROF} err={!!errors.soc_profession}
-                  {...register('soc_profession', { required: 'Profession requise' })} />
+                  {...register('soc_profession', { required: 'Profession requise', valueAsNumber: true })} />
               </F>
               {Number(w.soc_prof) === 8 && (
                 <F label="Profession (préciser)">
@@ -490,11 +493,11 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                 </F>
               )}
               <F label="Niveau d'instruction" required>
-                <Sel options={SOC_INSTRUCTION} {...register('soc_niveau_instruction', { required: true })} />
+                <Sel options={SOC_INSTRUCTION} {...register('soc_niveau_instruction', { required: true, valueAsNumber: true })} />
               </F>
               <F label="Statut matrimonial" required error={errors.soc_statut_matrimonial?.message}>
                 <Sel options={SOC_STATUT_MATRIM} err={!!errors.soc_statut_matrimonial}
-                  {...register('soc_statut_matrimonial', { required: 'Statut requis' })} />
+                  {...register('soc_statut_matrimonial', { required: 'Statut requis', valueAsNumber: true })} />
               </F>
               {Number(w.soc_matrim) === 3 && (
                 <F label="Vie en ménage polygame">
@@ -505,7 +508,7 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                 </F>
               )}
               <F label="Mode d'entrée dans le programme" required>
-                <Sel options={SOC_MODE_ENTREE} {...register('soc_mode_entree', { required: true })} />
+                <Sel options={SOC_MODE_ENTREE} {...register('soc_mode_entree', { required: true, valueAsNumber: true })} />
               </F>
               <F label="Groupe ethnolinguistique (optionnel)">
                 <Sel options={ETHNIE} {...register('ethnie')} />
@@ -551,7 +554,7 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                 <input type="date" {...register('gyn_ddr')} className={cls()} />
               </F>
               <F label="Cycles réguliers ?">
-                <Sel options={GYN_CYCLE} {...register('gyn_cycle_regulier')} />
+                <Sel options={GYN_CYCLE} {...register('gyn_cycle_regulier', { valueAsNumber: true })} />
               </F>
               <F label="Âge à la première menstruation (années)">
                 <input type="number" min={8} max={20}
@@ -569,7 +572,7 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
             <StepHeader code="F" title="Antécédents médicaux et facteurs de risque (RIS)" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <F label="Antécédent d'IST" required>
-                <Sel options={RIS_IST} {...register('ris_ist_antecedent', { required: true })} />
+                <Sel options={RIS_IST} {...register('ris_ist_antecedent', { required: true, valueAsNumber: true })} />
               </F>
               {Number(w.ris_ist) === 1 && (
                 <F label="Type(s) d'IST" col2>
@@ -585,10 +588,10 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                 </F>
               )}
               <F label="Statut VIH" required>
-                <Sel options={RIS_VIH} {...register('ris_vih_statut', { required: true })} />
+                <Sel options={RIS_VIH} {...register('ris_vih_statut', { required: true, valueAsNumber: true })} />
               </F>
               <F label="Tabagisme">
-                <Sel options={RIS_TABAC} {...register('ris_tabagisme')} />
+                <Sel options={RIS_TABAC} {...register('ris_tabagisme', { valueAsNumber: true })} />
               </F>
               <F label="Méthode(s) contraceptive(s) en cours" col2>
                 <MultiCheck
@@ -606,7 +609,7 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                   {...register('ris_duree_contraception_horm')} className={cls()} />
               </F>
               <F label="Antécédent de dépistage du col ?">
-                <Sel options={RIS_DEPISTAGE} {...register('ris_depistage_anterieur')} />
+                <Sel options={RIS_DEPISTAGE} {...register('ris_depistage_anterieur', { valueAsNumber: true })} />
               </F>
               {Number(w.ris_dep) === 1 && (
                 <>
@@ -614,7 +617,7 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                     <input type="date" {...register('ris_date_dern_depistage')} className={cls()} />
                   </F>
                   <F label="Résultat du dernier dépistage">
-                    <Sel options={RIS_RESULTAT_DEP} {...register('ris_resultat_dern_depistage')} />
+                    <Sel options={RIS_RESULTAT_DEP} {...register('ris_resultat_dern_depistage', { valueAsNumber: true })} />
                   </F>
                 </>
               )}
@@ -632,7 +635,7 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <F label="Statut physiologique" required error={errors.phy_statut?.message}>
                 <Sel options={PHY_STATUT} err={!!errors.phy_statut}
-                  {...register('phy_statut', { required: 'Statut requis' })} />
+                  {...register('phy_statut', { required: 'Statut requis', valueAsNumber: true })} />
               </F>
               {Number(w.phy) === 2 && (
                 <F label="Âge gestationnel (semaines d'aménorrhée)">
@@ -679,7 +682,7 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
               {/* Résultats conditionnels selon méthode */}
               {methodSet('1') && (
                 <F label="Résultat IVA">
-                  <Sel options={DEP_RESULTAT_IVA} {...register('dep_resultat_iva')} />
+                  <Sel options={DEP_RESULTAT_IVA} {...register('dep_resultat_iva', { valueAsNumber: true })} />
                 </F>
               )}
               {methodSet('2') && (
@@ -690,12 +693,12 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
               )}
               {methodSet('3') && (
                 <F label="Résultat Test HPV">
-                  <Sel options={DEP_RESULTAT_HPV} {...register('dep_resultat_hpv')} />
+                  <Sel options={DEP_RESULTAT_HPV} {...register('dep_resultat_hpv', { valueAsNumber: true })} />
                 </F>
               )}
               {(methodSet('4') || methodSet('5')) && (
                 <F label="Résultat cytologique (Bethesda 2014)">
-                  <Sel options={DEP_CYTOLOGIE} {...register('dep_resultat_cytologie')} />
+                  <Sel options={DEP_CYTOLOGIE} {...register('dep_resultat_cytologie', { valueAsNumber: true })} />
                 </F>
               )}
 
@@ -710,10 +713,10 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
               {w.dep_colpo && (
                 <>
                   <F label="Aspect colposcopique">
-                    <Sel options={DEP_COLPO_ASPECT} {...register('dep_colposcopie_aspect')} />
+                    <Sel options={DEP_COLPO_ASPECT} {...register('dep_colposcopie_aspect', { valueAsNumber: true })} />
                   </F>
                   <F label="Zone de transformation (IFCPC)">
-                    <Sel options={DEP_ZONE_TRANSFO} {...register('dep_zone_transformation')} />
+                    <Sel options={DEP_ZONE_TRANSFO} {...register('dep_zone_transformation', { valueAsNumber: true })} />
                   </F>
                 </>
               )}
@@ -762,7 +765,7 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
               {!w.trt_elig && (
                 <>
                   <F label="Motif de non-éligibilité">
-                    <Sel options={TRT_NON_ELIG} {...register('trt_non_eligible_motif')} />
+                    <Sel options={TRT_NON_ELIG} {...register('trt_non_eligible_motif', { valueAsNumber: true })} />
                   </F>
                   <F label="Précision (si autre)" col2>
                     <input type="text" {...register('trt_non_eligible_autre')} className={cls()} />
@@ -773,7 +776,7 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
               {w.trt_elig && (
                 <>
                   <F label="Méthode de traitement">
-                    <Sel options={TRT_METHODE} {...register('trt_methode')} />
+                    <Sel options={TRT_METHODE} {...register('trt_methode', { valueAsNumber: true })} />
                   </F>
                   <F label="Date du traitement">
                     <input type="date" {...register('trt_date')} className={cls()} />
@@ -832,7 +835,7 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                 <input type="date" {...register('sui_anapath_date_reception')} className={cls()} />
               </F>
               <F label="Résultat anatomopathologique">
-                <Sel options={SUI_ANAPATH} {...register('sui_anapath_resultat')} />
+                <Sel options={SUI_ANAPATH} {...register('sui_anapath_resultat', { valueAsNumber: true })} />
               </F>
               <F label="Stade FIGO 2018 (si cancer)">
                 <select className={cls()} {...register('sui_stade_figo')}>
@@ -895,7 +898,7 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                 />
               </F>
               <F label="Statut vaccinal HPV personnel">
-                <Sel options={HPV_VACCIN} {...register('hpv_statut_vaccinal')} />
+                <Sel options={HPV_VACCIN} {...register('hpv_statut_vaccinal', { valueAsNumber: true })} />
               </F>
               <F label="A des filles ?">
                 <label className="flex items-center gap-2 mt-2 text-sm">
