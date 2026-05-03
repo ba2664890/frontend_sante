@@ -155,7 +155,8 @@ export interface Patient {
   dep_methode?: string;
   dep_resultat_iva?: number;
   dep_resultat_ivl?: number;
-  dep_resultat_hpv?: number;
+  dep_resultat_hpv?: string; // Change to string for multi-select
+  dep_hpv_details?: any; // Add details field
   dep_resultat_cytologie?: number;
   dep_colposcopie_realisee?: boolean;
   dep_colposcopie_aspect?: number;

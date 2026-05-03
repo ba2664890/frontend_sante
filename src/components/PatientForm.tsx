@@ -63,8 +63,11 @@ const DEP_RESULTAT_IVA = [
   opt(4, 'Suspicion de cancer'), opt(5, 'Non concluant (ZT3)'),
 ];
 const DEP_RESULTAT_HPV = [
-  opt(0, 'Négatif'), opt(1, 'Positif HPV 16'), opt(2, 'Positif HPV 18'),
-  opt(3, 'Positif autre HR-HPV'), opt(4, 'Positif multi-types'),
+  opt(0, 'Négatif'), opt(1, 'HPV 16'), opt(2, 'HPV 18'),
+  opt(3, 'Autres HPV à haut risque'), opt(4, 'Multi-types'),
+  opt(5, 'HPV 31'), opt(6, 'HPV 33'), opt(7, 'HPV 35'), opt(8, 'HPV 39'),
+  opt(9, 'HPV 45'), opt(10, 'HPV 51'), opt(11, 'HPV 52'), opt(12, 'HPV 56'),
+  opt(13, 'HPV 58'), opt(14, 'HPV 59'), opt(15, 'HPV 68'),
 ];
 const DEP_CYTOLOGIE = [
   opt(1, 'NILM (normal)'), opt(2, 'ASC-US'), opt(3, 'ASC-H'), opt(4, 'LSIL'),
@@ -239,9 +242,9 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
     4: ['gyn_nb_grossesses', 'gyn_nb_accouchements', 'gyn_age_premier_rapport'],
     5: ['ris_ist_antecedent', 'ris_vih_statut', 'ris_tabagisme'],
     6: ['phy_statut'],
-    7: ['dep_date'],
-    8: ['trt_eligible_immediat'],
-    9: ['hpv_connaissance_ccu', 'hpv_statut_vaccinal', 'hpv_a_des_filles'],
+    7: ['dep_date', 'dep_methode', 'dep_resultat_iva', 'dep_resultat_ivl', 'dep_resultat_hpv', 'dep_resultat_cytologie', 'dep_biopsie_sites'],
+    8: ['trt_eligible_immediat', 'trt_non_eligible_motif', 'trt_methode', 'trt_date', 'trt_duree_application', 'trt_nb_applications', 'trt_temperature_sonde'],
+    9: ['sui_anapath_date_reception', 'sui_anapath_resultat', 'hpv_connaissance_ccu', 'hpv_statut_vaccinal', 'hpv_a_des_filles', 'hpv_nb_filles_total', 'hpv_nb_filles_9_14', 'hpv_nb_filles_vaccinees'],
     10: ['con_depistage', 'con_donnees_anonymisees', 'con_signature_presente'],
   };
 
@@ -320,6 +323,41 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
         examen_depistag: 'voir_section_dep',
         status: data.status || 'new',
       };
+      
+      const p = payload as any;
+
+      // Clean Date Fields
+      const dateFields = [
+        'date_naiss', 'gyn_ddr', 'ris_date_dern_depistage', 'dep_date', 'trt_date',
+        'sui_anapath_date_reception', 'sui_rdv_1mois', 'sui_rdv_3mois', 'sui_rdv_6mois',
+        'sui_rdv_12mois', 'sui_rdv_24mois', 'sui_rdv_36mois'
+      ];
+      dateFields.forEach(f => { if (p[f] === '') p[f] = null; });
+
+      // Format datetime-local
+      if (p.con_depistage_date) {
+        const dt = p.con_depistage_date;
+        if (dt.length === 16) p.con_depistage_date = dt + ':00Z';
+        else if (dt.length === 19) p.con_depistage_date = dt + 'Z';
+      } else p.con_depistage_date = null;
+
+      // Force Number Casting
+      const numFields = [
+        'id_patient', 'age', 'meta_agent_qualif', 'geo_region', 'geo_type_structure',
+        'soc_statut_matrimonial', 'soc_profession', 'soc_niveau_instruction', 'soc_mode_entree', 'ethnie',
+        'gyn_nb_grossesses', 'gyn_nb_accouchements', 'gyn_age_premier_rapport', 'gyn_age_premiere_grossesse',
+        'gyn_nb_partenaires_vie', 'gyn_cycle_regulier', 'age_menstrue',
+        'ris_ist_antecedent', 'ris_vih_statut', 'ris_tabagisme', 'ris_duree_contraception_horm', 'ris_depistage_anterieur', 'ris_resultat_dern_depistage',
+        'phy_statut', 'phy_age_gestationnel', 'phy_age_menopause',
+        'dep_resultat_iva', 'dep_resultat_ivl', 'dep_resultat_cytologie', 'dep_colposcopie_aspect', 'dep_zone_transformation', 'dep_biopsie_sites',
+        'trt_non_eligible_motif', 'trt_methode', 'trt_duree_application', 'trt_nb_applications', 'trt_temperature_sonde',
+        'sui_anapath_resultat',
+        'hpv_statut_vaccinal', 'hpv_nb_filles_total', 'hpv_nb_filles_9_14', 'hpv_nb_filles_vaccinees'
+      ];
+      numFields.forEach(f => {
+        if (p[f] !== undefined && p[f] !== null && p[f] !== '') p[f] = Number(p[f]);
+        else p[f] = null;
+      });
       if (patient?.record_id) {
         await patientService.updatePatient(patient.record_id, payload);
         toast.success('Patiente mise à jour');
@@ -569,14 +607,15 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                         required: 'Requis',
                         min: { value: 8, message: '≥ 8' },
                         max: { value: 60, message: '≤ 60' },
+                        valueAsNumber: true,
                       })} className={cls(!!errors.gyn_age_premier_rapport)} />
                   </F>
                   <F label="Âge à la première grossesse">
                     <input type="number" min={10} max={55}
-                      {...register('gyn_age_premiere_grossesse')} className={cls()} />
+                      {...register('gyn_age_premiere_grossesse', { valueAsNumber: true })} className={cls()} />
                   </F>
                   <F label="Nombre de partenaires sexuels (vie entière)">
-                    <input type="number" min={0} {...register('gyn_nb_partenaires_vie')} className={cls()} />
+                    <input type="number" min={0} {...register('gyn_nb_partenaires_vie', { valueAsNumber: true })} className={cls()} />
                   </F>
                   <F label="Date des dernières règles (DDR)">
                     <input type="date" {...register('gyn_ddr')} className={cls()} />
@@ -720,9 +759,38 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                     </F>
                   )}
                   {methodSet('3') && (
-                    <F label="Résultat Test HPV">
-                      <Sel options={DEP_RESULTAT_HPV} {...register('dep_resultat_hpv', { valueAsNumber: true })} />
-                    </F>
+                    <div className="md:col-span-2 space-y-6 bg-blue-50/50 p-8 rounded-[32px] border-2 border-blue-100/50">
+                      <F label="Résultat Test HPV (sélectionnez tous les types positifs)" col2>
+                        <MultiCheck
+                          options={DEP_RESULTAT_HPV}
+                          value={multiValues.dep_resultat_hpv}
+                          onChange={v => setMulti('dep_resultat_hpv', v)}
+                        />
+                      </F>
+                      
+                      {/* Precision fields for each selected type */}
+                      {multiValues.dep_resultat_hpv && multiValues.dep_resultat_hpv.split(',').filter(id => id !== '0').length > 0 && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                          <p className="md:col-span-2 text-sm font-bold text-blue-900 uppercase tracking-tight">Précisions par type (ex: CT values)</p>
+                          {multiValues.dep_resultat_hpv.split(',').filter(id => id !== '0').map(id => {
+                            const label = DEP_RESULTAT_HPV.find(o => String(o.value) === id)?.label;
+                            return (
+                              <F key={id} label={`Détails pour ${label}`}>
+                                <input
+                                  type="text"
+                                  placeholder="Valeur CT ou observation..."
+                                  className={cls()}
+                                  onChange={(e) => {
+                                    const current = watch('dep_hpv_details') || {};
+                                    setValue('dep_hpv_details', { ...current, [id]: e.target.value });
+                                  }}
+                                />
+                              </F>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
                   )}
                   {(methodSet('4') || methodSet('5')) && (
                     <F label="Résultat cytologique (Bethesda 2014)">
