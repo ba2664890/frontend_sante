@@ -265,7 +265,7 @@ const Patients: React.FC = () => {
         isOpen={showForm}
         onClose={() => setShowForm(false)}
         title="Enregistrer une nouvelle patiente"
-        size="xl"
+        size="6xl"
       >
         <PatientFormWizard
           onSubmit={handlePatientCreated}
