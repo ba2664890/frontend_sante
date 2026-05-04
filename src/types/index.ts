@@ -174,7 +174,7 @@ export interface Patient {
   dep_biopsie_indiquee?: boolean;
   dep_biopsie_realisee?: boolean;
   dep_biopsie_sites?: number;
-  dep_image_cervix?: any; // File or URL
+  dep_mapping_json?: any; // Stores interactive map data (zones marked)
   dep_distance_capture?: number;
   dep_ia_deep_learning_result?: string;
 

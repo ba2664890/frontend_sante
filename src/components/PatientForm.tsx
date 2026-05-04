@@ -206,7 +206,97 @@ const StepHeader = ({ code, title, desc }: { code: string; title: string, desc?:
   </div>
 );
 
-// ─── Component ─────────────────────────────────────────────────────────────
+// ─── Cervix Mapping Component (SVG) ──────────────────────────────────────────────────
+const CervixMap: React.FC<{ value: any; onChange: (v: any) => void }> = ({ value, onChange }) => {
+  const marked = value || { os: false, zones: [] };
+  const toggleZone = (z: string) => {
+    const zones = marked.zones || [];
+    const newZones = zones.includes(z) ? zones.filter((i: string) => i !== z) : [...zones, z];
+    onChange({ ...marked, zones: newZones });
+  };
+  const toggleOs = () => onChange({ ...marked, os: !marked.os });
+
+  const R = [25, 60, 95, 130]; // Radii for Os, Z1, Z2, Z3
+  const hours = Array.from({ length: 12 }, (_, i) => i + 1);
+
+  const getPath = (h: number, rIn: number, rOut: number) => {
+    const startAngle = (h - 1) * 30 - 105;
+    const endAngle = h * 30 - 105;
+    const rad = (deg: number) => (deg * Math.PI) / 180;
+    const x1 = 150 + rIn * Math.cos(rad(startAngle));
+    const y1 = 150 + rIn * Math.sin(rad(startAngle));
+    const x2 = 150 + rOut * Math.cos(rad(startAngle));
+    const y2 = 150 + rOut * Math.sin(rad(startAngle));
+    const x3 = 150 + rOut * Math.cos(rad(endAngle));
+    const y3 = 150 + rOut * Math.sin(rad(endAngle));
+    const x4 = 150 + rIn * Math.cos(rad(endAngle));
+    const y4 = 150 + rIn * Math.sin(rad(endAngle));
+    return `M ${x1} ${y1} L ${x2} ${y2} A ${rOut} ${rOut} 0 0 1 ${x3} ${y3} L ${x4} ${y4} A ${rIn} ${rIn} 0 0 0 ${x1} ${y1} Z`;
+  };
+
+  return (
+    <div className="flex flex-col items-center bg-slate-900/50 p-8 rounded-[40px] border border-white/10 backdrop-blur-md">
+      <svg viewBox="0 0 300 300" className="w-[320px] h-[320px] drop-shadow-2xl">
+        <defs>
+          <radialGradient id="grad-cervix" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#1e293b" />
+            <stop offset="100%" stopColor="#0f172a" />
+          </radialGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+        
+        {/* Hour markers */}
+        {hours.map(h => {
+          const angle = (h * 30 - 90) * Math.PI / 180;
+          return <text key={h} x={150 + 142 * Math.cos(angle)} y={150 + 142 * Math.sin(angle)} 
+            fill="#64748b" fontSize="10" fontWeight="900" textAnchor="middle" alignmentBaseline="middle">{h}h</text>
+        })}
+
+        {/* Zones (Rings x Hours) */}
+        {[1, 2, 3].map(zIdx => hours.map(h => {
+          const id = `H${h}-Z${zIdx}`;
+          const active = (marked.zones || []).includes(id);
+          return (
+            <path key={id} d={getPath(h, R[zIdx - 1], R[zIdx])} 
+              fill={active ? "#8b5cf6" : "transparent"} 
+              stroke="#ffffff10" strokeWidth="1"
+              className="cursor-pointer hover:fill-blue-500/30 transition-all duration-200"
+              onClick={() => toggleZone(id)}
+              filter={active ? "url(#glow)" : ""}
+            />
+          )
+        }))}
+
+        {/* Central Os */}
+        <circle cx="150" cy="150" r={R[0]} 
+          fill={marked.os ? "#ec4899" : "#334155"} 
+          className="cursor-pointer hover:opacity-80 transition-all"
+          onClick={toggleOs}
+          stroke="#ffffff20" strokeWidth="2"
+          filter={marked.os ? "url(#glow)" : ""}
+        />
+      </svg>
+      <div className="mt-6 flex flex-wrap justify-center gap-3">
+         {(marked.zones || []).length > 0 && (
+           <span className="px-4 py-1.5 bg-blue-500/20 text-blue-400 rounded-full text-xs font-black uppercase tracking-widest border border-blue-500/20">
+             {(marked.zones || []).length} zones marquées
+           </span>
+         )}
+         {marked.os && (
+           <span className="px-4 py-1.5 bg-pink-500/20 text-pink-400 rounded-full text-xs font-black uppercase tracking-widest border border-pink-500/20">
+             Orifice externe atteint
+           </span>
+         )}
+      </div>
+    </div>
+  );
+};
+
 interface Props { patient?: any; onCancel: () => void; onSubmit?: (data?: any) => void; }
 
 const TOTAL_STEPS = 11;
@@ -990,7 +1080,7 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                   )}
 
                   {/* ──────────────────────────────────────────────────────────────────
-                      DEEP LEARNING ANALYSIS (IMAGE & DISTANCE)
+                      CARTO / MAPPING DU COL
                   ────────────────────────────────────────────────────────────────── */}
                   <div className="md:col-span-2 mt-12 p-10 bg-[#0f172a] rounded-[48px] text-white shadow-2xl relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-12 opacity-5 group-hover:opacity-10 transition-opacity">
@@ -1000,49 +1090,43 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                     <div className="relative z-10">
                       <div className="flex items-center gap-6 mb-8">
                         <div className="p-4 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[28px] shadow-2xl shadow-blue-500/20">
-                          <span className="material-symbols-outlined text-4xl block">center_focus_strong</span>
+                          <span className="material-symbols-outlined text-4xl block">clinical_notes</span>
                         </div>
                         <div>
-                          <h4 className="text-3xl font-black uppercase tracking-tight leading-tight">Analyse Deep Learning</h4>
-                          <p className="text-slate-400 font-bold text-sm tracking-widest uppercase mt-1">IA de détection pathologique (Vision)</p>
+                          <h4 className="text-3xl font-black uppercase tracking-tight leading-tight">Cartographie Cervicale</h4>
+                          <p className="text-slate-400 font-bold text-sm tracking-widest uppercase mt-1">Localisation interactive des lésions (Schéma horaire)</p>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                        <div className="flex justify-center">
+                           <CervixMap 
+                             value={watch('dep_mapping_json')} 
+                             onChange={(v) => setValue('dep_mapping_json', v)} 
+                           />
+                        </div>
+
                         <div className="space-y-8">
-                          <F label="Image du col (Capture / Transfert)">
-                             <div className="relative group/btn">
-                               <input type="file" accept="image/*" 
-                                 onChange={(e) => {
-                                   if (e.target.files?.[0]) setValue('dep_image_cervix', e.target.files[0]);
-                                 }}
-                                 className="hidden" id="cervix-img-dl" />
-                               <label htmlFor="cervix-img-dl" className="flex flex-col items-center justify-center gap-4 w-full py-10 bg-white/5 border-2 border-dashed border-white/20 rounded-[32px] hover:bg-white/10 hover:border-blue-500 cursor-pointer transition-all duration-300">
-                                 <span className="material-symbols-outlined text-5xl text-blue-400 group-hover/btn:scale-110 transition-transform">photo_camera</span>
-                                 <span className="font-black text-xs uppercase tracking-[0.2em]">{watch('dep_image_cervix') ? (watch('dep_image_cervix') as File).name : "Choisir l'image du col"}</span>
-                               </label>
-                             </div>
-                          </F>
-                          <F label="Distance de capture (Centimètres)">
+                          <F label="Distance de travail / capture (cm)">
                             <div className="relative">
                               <input type="number" step="0.1" placeholder="Distance..." {...register('dep_distance_capture')}
                                 className="w-full bg-white/5 border-2 border-white/10 rounded-[24px] px-6 py-5 text-xl font-black text-white focus:border-blue-500 outline-none transition-all placeholder:text-slate-600" />
                               <span className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 font-black uppercase tracking-widest text-sm">cm</span>
                             </div>
                           </F>
-                        </div>
 
-                        <div className="bg-gradient-to-b from-white/10 to-transparent rounded-[40px] p-10 border border-white/10 flex flex-col justify-center items-center text-center backdrop-blur-xl">
-                          <div className="w-24 h-24 bg-blue-500/20 rounded-full flex items-center justify-center mb-6 shadow-3xl">
-                            <span className="material-symbols-outlined text-blue-400 text-5xl animate-pulse">analytics</span>
-                          </div>
-                          <h5 className="font-black uppercase tracking-[0.2em] text-xs text-blue-400 mb-4">Diagnostic Probabiliste IA</h5>
-                          <div className="text-slate-300 font-medium leading-relaxed px-4">
-                            <textarea
-                              {...register('dep_ia_deep_learning_result')}
-                              className="w-full bg-transparent border-none focus:ring-0 text-center italic text-lg resize-none min-h-[100px]"
-                              placeholder="Le résultat DL apparaîtra ici après analyse..."
-                            />
+                          <div className="bg-gradient-to-b from-white/10 to-transparent rounded-[40px] p-10 border border-white/10 flex flex-col justify-center items-center text-center backdrop-blur-xl">
+                            <div className="w-24 h-24 bg-blue-500/20 rounded-full flex items-center justify-center mb-6 shadow-3xl">
+                              <span className="material-symbols-outlined text-blue-400 text-5xl animate-pulse">analytics</span>
+                            </div>
+                            <h5 className="font-black uppercase tracking-[0.2em] text-xs text-blue-400 mb-4">Diagnostic Probabiliste IA</h5>
+                            <div className="text-slate-300 font-medium leading-relaxed px-4">
+                              <textarea
+                                {...register('dep_ia_deep_learning_result')}
+                                className="w-full bg-transparent border-none focus:ring-0 text-center italic text-lg resize-none min-h-[100px]"
+                                placeholder="Analyse automatique du pattern cartographique..."
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -1181,7 +1265,7 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                       </F>
                       {watch('sui_reference_structure') === 'Autre' && (
                         <F label="Préciser la structure">
-                          <input type="text" {...register('ref_structure_autre')} className={cls()} />
+                          <input type="text" {...register('sui_reference_structure_autre')} className={cls()} />
                         </F>
                       )}
                       <F label="Motif de référence" col2>
