@@ -193,7 +193,28 @@ const MultiCheck: React.FC<{
   );
 };
 
-// ─── Step header ───────────────────────────────────────────────────────────
+// ─── Checkbox Card Component ────────────────────────────────────────────────────────
+const CheckCard = ({ label, icon, checked, onChange, sublabel }: { label: string; icon: string; checked: boolean; onChange: (v: boolean) => void; sublabel?: string }) => (
+  <button
+    type="button"
+    onClick={() => onChange(!checked)}
+    className={`p-6 rounded-[32px] border-2 text-left transition-all duration-300 flex items-center gap-6 group ${checked ? 'bg-blue-600 border-blue-600 text-white shadow-xl shadow-blue-600/20' : 'bg-white border-slate-100 text-slate-700 hover:border-blue-200'}`}
+  >
+    <div className={`p-4 rounded-2xl transition-colors ${checked ? 'bg-white/20' : 'bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500'}`}>
+      <span className="material-symbols-outlined text-3xl block">{icon}</span>
+    </div>
+    <div className="flex-1">
+      <p className="font-black text-lg tracking-tight leading-tight">{label}</p>
+      <p className={`text-[10px] font-black uppercase tracking-widest mt-1 ${checked ? 'text-blue-200' : 'text-slate-400'}`}>
+        {sublabel || (checked ? 'Accordé' : 'En attente')}
+      </p>
+    </div>
+    <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${checked ? 'bg-white border-white' : 'border-slate-200 group-hover:border-blue-300'}`}>
+      {checked && <span className="material-symbols-outlined text-blue-600 text-xl font-bold">check</span>}
+    </div>
+  </button>
+);
+
 const StepHeader = ({ code, title, desc }: { code: string; title: string, desc?: string }) => (
   <div className="mb-8 border-b border-slate-100 pb-6 fade-in">
     <div className="flex items-center gap-4 mb-3">
@@ -411,13 +432,13 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
 
   const goNext = async () => {
     // Validation personnalisée pour les champs complexes (MultiCheck)
-    if (step === 5) {
+    if (step === 6) {
       if (Number(w.ris_ist) === 1 && !multiValues.ris_ist_type) {
         toast.error("Veuillez préciser le(s) type(s) d'IST");
         return;
       }
     }
-    if (step === 7) {
+    if (step === 8) {
       if (!multiValues.dep_methode) {
         toast.error("Veuillez choisir au moins une méthode de dépistage");
         return;
@@ -591,39 +612,48 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <F label="Consentement au dépistage" required>
-                    <label className="flex items-center gap-2 mt-2 text-sm">
-                      <input type="checkbox" className="rounded text-indigo-600" {...register('con_depistage')} />
-                      La patiente consent au dépistage
-                    </label>
-                  </F>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <CheckCard 
+                    label="Consentement au dépistage"
+                    icon="clinical_notes"
+                    checked={!!watch('con_depistage')}
+                    onChange={v => setValue('con_depistage', v)}
+                    sublabel="IVA / IVL / HPV / Cytologie"
+                  />
+                  <CheckCard 
+                    label="Consentement au traitement"
+                    icon="medical_services"
+                    checked={!!watch('con_traitement')}
+                    onChange={v => setValue('con_traitement', v)}
+                    sublabel="Cryo / Thermo / LEEP"
+                  />
+                  <CheckCard 
+                    label="Données anonymisées"
+                    icon="database"
+                    checked={!!watch('con_donnees_anonymisees')}
+                    onChange={v => setValue('con_donnees_anonymisees', v)}
+                    sublabel="Utilisation pour la recherche médicale"
+                  />
+                  <CheckCard 
+                    label="Rappels par SMS"
+                    icon="sms"
+                    checked={!!watch('con_rappels_sms')}
+                    onChange={v => setValue('con_rappels_sms', v)}
+                    sublabel="Notifications de suivi automatique"
+                  />
+                </div>
+                <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 p-10 bg-slate-50 rounded-[40px] border border-slate-100 items-center">
                   <F label="Date du consentement">
                     <input type="date" {...register('con_depistage_date')} className={cls()} />
                   </F>
-                  <F label="Consentement au traitement">
-                    <label className="flex items-center gap-2 mt-2 text-sm">
-                      <input type="checkbox" className="rounded text-indigo-600" {...register('con_traitement')} />
-                      La patiente consent au traitement
-                    </label>
-                  </F>
-                  <F label="Utilisation données anonymisées">
-                    <label className="flex items-center gap-2 mt-2 text-sm">
-                      <input type="checkbox" className="rounded text-indigo-600" {...register('con_donnees_anonymisees')} />
-                      Accord utilisation anonymisée des données
-                    </label>
-                  </F>
-                  <F label="Rappels SMS pour RDV">
-                    <label className="flex items-center gap-2 mt-2 text-sm">
-                      <input type="checkbox" className="rounded text-indigo-600" {...register('con_rappels_sms')} />
-                      Accord rappels SMS
-                    </label>
-                  </F>
-                  <F label="Signature / empreinte recueillie">
-                    <label className="flex items-center gap-2 mt-2 text-sm">
-                      <input type="checkbox" className="rounded text-indigo-600" {...register('con_signature_presente')} />
-                      Signature ou empreinte présente
-                    </label>
+                  <F label="Validation Physique" col2>
+                    <CheckCard 
+                      label="Signature / Empreinte Recueillie"
+                      icon="draw"
+                      checked={!!watch('con_signature_presente')}
+                      onChange={v => setValue('con_signature_presente', v)}
+                      sublabel="Signé sur fiche papier"
+                    />
                   </F>
                 </div>
               </section>
