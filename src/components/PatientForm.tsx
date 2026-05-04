@@ -106,6 +106,24 @@ const HPV_VACCIN = [
   opt(2, 'Vaccinée (2 doses)'), opt(3, 'Vaccinée (3 doses)'), opt(9, 'Ne sait pas'),
 ];
 
+const HPV_VACCIN_TYPE = [
+  opt('Gardasil 4', 'Gardasil® 4 (Merck, bivalent HPV 6/11/16/18)'),
+  opt('Gardasil 9', 'Gardasil® 9 (Merck, 9-valent)'),
+  opt('Cervarix', 'Cervarix® (GSK, bivalent HPV 16/18)'),
+  opt('Cecolin', 'Cecolin® (Innovax, bivalent HPV 16/18)'),
+  opt('Autre', 'Autre / Inconnu'),
+];
+
+const REFERENCE_STRUCTURES = [
+  'CHU de Dakar (CHNU de Fann)', 'CHU Aristide Le Dantec',
+  'CHU A. Roume (enfants)', 'Hôpital Principal de Dakar',
+  'Hôpital de Ziguinchor', 'Hôpital régional de Saint-Louis',
+  'Hôpital régional de Kaolack', 'Hôpital régional de Thiès',
+  'Institut Curie de Dakar (oncologie)', 'Centre de lutte anti-cancer (Dalal Jamm)',
+  'Institut de cancérologie de Dakar', 'Hôpital de Touba',
+  'Autre structure (préciser)',
+];
+
 // ─── Reusable field components ─────────────────────────────────────────────
 // Helper for premium clinical input styles
 const cls = (err?: boolean) =>
@@ -191,17 +209,19 @@ const StepHeader = ({ code, title, desc }: { code: string; title: string, desc?:
 // ─── Component ─────────────────────────────────────────────────────────────
 interface Props { patient?: any; onCancel: () => void; onSubmit?: (data?: any) => void; }
 
-const TOTAL_STEPS = 10;
+const TOTAL_STEPS = 11;
 
 const STEP_LABELS = [
-  'META + GEO', 'Identité (PAT)', 'Socio (SOC)', 'Gynéco (GYN)',
+  'Consentements (CON)', 'META + GEO', 'Identité (PAT)', 'Socio (SOC)', 'Gynéco (GYN)',
   'Risques (RIS)', 'Physiologie (PHY)', 'Dépistage (DEP)',
-  'Traitement (TRT)', 'Suivi + HPV', 'Consentements (CON)',
+  'Traitement (TRT)', 'Suivi + HPV', 'Synthèse IA',
 ];
 
 const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [aiSummary, setAiSummary] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
   const [multiValues, setMultiValues] = useState<Record<string, string>>({
     ris_ist_type: '', ris_contraception: '',
     dep_methode: '', trt_effets_immediats: '',
@@ -224,10 +244,17 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
     trt_elig: watch('trt_eligible_immediat'),
     trt_meth: watch('trt_methode'),
     hpv_filles: watch('hpv_a_des_filles'),
+    hpv_filles_total: watch('hpv_nb_filles_total'),
     hpv_filles914: watch('hpv_nb_filles_9_14'),
     hpv_vacc: watch('hpv_nb_filles_vaccinees'),
+    hpv_statut_vacc: watch('hpv_statut_vaccinal'),
     soc_prof: watch('soc_profession'),
     soc_matrim: watch('soc_statut_matrimonial'),
+    trt_non_elig_motif: watch('trt_non_eligible_motif'),
+    sui_ref: watch('sui_reference'),
+    sui_ref_structure: watch('sui_reference_structure'),
+    gyn_1er_rapport: watch('gyn_age_premier_rapport'),
+    gyn_1ere_grossesse: watch('gyn_age_premiere_grossesse'),
   };
 
   const methodSet = (code: string) => (multiValues.dep_methode || '').split(',').includes(code);
@@ -236,16 +263,39 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
     setMultiValues(prev => ({ ...prev, [key]: val }));
 
   const fieldsByStep: Record<number, (keyof PatientFormData)[]> = {
-    1: ['id_patient', 'meta_agent_qualif', 'geo_region', 'geo_type_structure'],
-    2: ['prenom', 'nom', 'age', 'num_phone', 'pat_adresse'],
-    3: ['soc_statut_matrimonial', 'soc_profession', 'soc_niveau_instruction', 'soc_mode_entree'],
-    4: ['gyn_nb_grossesses', 'gyn_nb_accouchements', 'gyn_age_premier_rapport'],
-    5: ['ris_ist_antecedent', 'ris_vih_statut', 'ris_tabagisme'],
-    6: ['phy_statut'],
-    7: ['dep_date', 'dep_methode', 'dep_resultat_iva', 'dep_resultat_ivl', 'dep_resultat_hpv', 'dep_resultat_cytologie', 'dep_biopsie_sites'],
-    8: ['trt_eligible_immediat', 'trt_non_eligible_motif', 'trt_methode', 'trt_date', 'trt_duree_application', 'trt_nb_applications', 'trt_temperature_sonde'],
-    9: ['sui_anapath_date_reception', 'sui_anapath_resultat', 'hpv_connaissance_ccu', 'hpv_statut_vaccinal', 'hpv_a_des_filles', 'hpv_nb_filles_total', 'hpv_nb_filles_9_14', 'hpv_nb_filles_vaccinees'],
-    10: ['con_depistage', 'con_donnees_anonymisees', 'con_signature_presente'],
+    1: ['con_depistage', 'con_donnees_anonymisees', 'con_signature_presente'],
+    2: ['id_patient', 'meta_agent_qualif', 'geo_region', 'geo_type_structure'],
+    3: ['prenom', 'nom', 'age', 'num_phone', 'pat_adresse'],
+    4: ['soc_statut_matrimonial', 'soc_profession', 'soc_niveau_instruction', 'soc_mode_entree'],
+    5: ['gyn_nb_grossesses', 'gyn_nb_accouchements', 'gyn_age_premier_rapport', 'gyn_nb_avortements', 'gyn_nb_morts_nes', 'gyn_parite_simple'],
+    6: ['ris_ist_antecedent', 'ris_vih_statut', 'ris_tabagisme', 'ris_contraception'],
+    7: ['phy_statut', 'phy_ddr', 'phy_age_gestationnel', 'phy_age_menopause'],
+    8: ['dep_date', 'dep_methode', 'dep_resultat_iva', 'dep_resultat_ivl', 'dep_resultat_hpv', 'dep_resultat_cytologie', 'dep_biopsie_sites'],
+    9: ['trt_eligible_immediat', 'trt_non_eligible_motif', 'trt_methode', 'trt_date', 'trt_duree_application', 'trt_nb_applications', 'trt_temperature_sonde'],
+    10: ['sui_anapath_date_reception', 'sui_anapath_resultat', 'hpv_connaissance_ccu', 'hpv_statut_vaccinal', 'hpv_a_des_filles', 'hpv_nb_filles_total', 'hpv_nb_filles_9_14', 'hpv_nb_filles_vaccinees'],
+    11: ['ai_synthese'],
+  };
+
+  const generateAISummary = async () => {
+    const data = watch();
+    setAiLoading(true);
+    try {
+      const response = await fetch('/api/patients/ai-summary/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error('Erreur lors de la génération');
+      const result = await response.json();
+      setAiSummary(result.summary);
+      setValue('ai_synthese', result.summary);
+      toast.success('Synthèse IA générée avec succès');
+    } catch (error) {
+      toast.error('Échec de la génération de la synthèse');
+      console.error(error);
+    } finally {
+      setAiLoading(false);
+    }
   };
 
   const getGPS = () => {
@@ -253,8 +303,8 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
       toast.error("La géolocalisation n'est pas supportée par votre navigateur");
       return;
     }
-    const loadingToast = toast.loading("Récupération de la position (GPS)...");
-    navigator.geolocation.getCurrentPosition(
+    const loadingToast = toast.loading("Activation du GPS temps réel...");
+    navigator.geolocation.watchPosition(
       (pos) => {
         setValue('geo_gps_lat', Number(pos.coords.latitude.toFixed(6)));
         setValue('geo_gps_lon', Number(pos.coords.longitude.toFixed(6)));
@@ -433,10 +483,66 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
 
           <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-12 slide-up">
 
-            {/* ═══════════════════════════════════════════════════
-            STEP 1 — META + GEO
-        ═══════════════════════════════════════════════════ */}
+            {/* ══════════════════════════════════════════════════
+            STEP 1 — CONSENTEMENTS (CON)
+        ══════════════════════════════════════════════════ */}
             {step === 1 && (
+              <section className="fade-in">
+                <StepHeader code="L" title="Consentements éclairés (CON)"
+                  desc="Loi n° 2008-12 du 25 janvier 2008 — Protection données personnelles (CDP Sénégal) — Consentement libre, éclairé et révocable" />
+
+                <div className="bg-amber-50 border-2 border-amber-100 rounded-3xl p-8 mb-10 flex items-start gap-6">
+                  <div className="w-12 h-12 rounded-2xl bg-amber-200 flex items-center justify-center text-amber-700 flex-shrink-0">
+                    <span className="material-symbols-outlined text-3xl">warning</span>
+                  </div>
+                  <div>
+                    <p className="text-amber-800 font-bold text-sm mb-1">Important</p>
+                    <p className="text-amber-700 text-sm">La patiente doit être informée de ses droits avant tout acte de dépistage ou de traitement. Ce consentement peut être retiré à tout moment.</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <F label="Consentement au dépistage" required>
+                    <label className="flex items-center gap-2 mt-2 text-sm">
+                      <input type="checkbox" className="rounded text-indigo-600" {...register('con_depistage')} />
+                      La patiente consent au dépistage
+                    </label>
+                  </F>
+                  <F label="Date du consentement">
+                    <input type="date" {...register('con_depistage_date')} className={cls()} />
+                  </F>
+                  <F label="Consentement au traitement">
+                    <label className="flex items-center gap-2 mt-2 text-sm">
+                      <input type="checkbox" className="rounded text-indigo-600" {...register('con_traitement')} />
+                      La patiente consent au traitement
+                    </label>
+                  </F>
+                  <F label="Utilisation données anonymisées">
+                    <label className="flex items-center gap-2 mt-2 text-sm">
+                      <input type="checkbox" className="rounded text-indigo-600" {...register('con_donnees_anonymisees')} />
+                      Accord utilisation anonymisée des données
+                    </label>
+                  </F>
+                  <F label="Rappels SMS pour RDV">
+                    <label className="flex items-center gap-2 mt-2 text-sm">
+                      <input type="checkbox" className="rounded text-indigo-600" {...register('con_rappels_sms')} />
+                      Accord rappels SMS
+                    </label>
+                  </F>
+                  <F label="Signature / empreinte recueillie">
+                    <label className="flex items-center gap-2 mt-2 text-sm">
+                      <input type="checkbox" className="rounded text-indigo-600" {...register('con_signature_presente')} />
+                      Signature ou empreinte présente
+                    </label>
+                  </F>
+                </div>
+              </section>
+            )}
+
+            {/* ══════════════════════════════════════════════════
+            STEP 2 — META + GEO
+        ══════════════════════════════════════════════════ */}
+            {step === 2 && (
               <section>
                 <StepHeader code="A" title="Métadonnées de saisie" desc="Information sur l'agent et la session de collecte" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -494,10 +600,10 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
               </section>
             )}
 
-            {/* ═══════════════════════════════════════════════════
-            STEP 2 — IDENTITÉ (PAT)
-        ═══════════════════════════════════════════════════ */}
-            {step === 2 && (
+            {/* ══════════════════════════════════════════════════
+            STEP 3 — IDENTITÉ (PAT)
+        ══════════════════════════════════════════════════ */}
+            {step === 3 && (
               <section>
                 <StepHeader code="C" title="Identité de la patiente (PAT)"
                   desc="Critères OMS : dépistage organisé 30-49 ans, étendu 25-65 ans, VIH+ dès 25 ans" />
@@ -533,8 +639,14 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                         pattern: { value: /^(70|75|76|77|78)[0-9]{7}$/, message: 'Format SN invalide (7X + 7 chiffres)' },
                       })} className={cls(!!errors.num_phone)} />
                   </F>
-                  <F label="Téléphone d'un proche">
+                  <F label="Téléphone d'un proche (1)">
                     <input type="tel" {...register('pat_telephone_proche')} className={cls()} />
+                  </F>
+                  <F label="Téléphone d'un proche (2)">
+                    <input type="tel" {...register('pat_telephone_proche_2')} className={cls()} />
+                  </F>
+                  <F label="Téléphone d'un proche (3)">
+                    <input type="tel" {...register('pat_telephone_proche_3')} className={cls()} />
                   </F>
                   <F label="Adresse / Quartier" required error={errors.pat_adresse?.message} col2>
                     <input type="text" {...register('pat_adresse', { required: 'Adresse requise' })}
@@ -547,10 +659,10 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
               </section>
             )}
 
-            {/* ═══════════════════════════════════════════════════
-            STEP 3 — SOCIODÉMOGRAPHIQUE (SOC)
-        ═══════════════════════════════════════════════════ */}
-            {step === 3 && (
+            {/* ══════════════════════════════════════════════════
+            STEP 4 — SOCIODÉMOGRAPHIQUE (SOC)
+        ══════════════════════════════════════════════════ */}
+            {step === 4 && (
               <section>
                 <StepHeader code="D" title="Données sociodémographiques (SOC)" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -578,25 +690,25 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                       </label>
                     </F>
                   )}
-                  <F label="Mode d'entrée dans le programme" required>
-                    <Sel options={SOC_MODE_ENTREE} {...register('soc_mode_entree', { required: true, valueAsNumber: true })} />
-                  </F>
-                  <F label="Groupe ethnolinguistique (optionnel)">
+                  <F label="Appartenance ethnique">
                     <Sel options={ETHNIE} {...register('ethnie', { valueAsNumber: true })} />
                   </F>
                   {Number(watch('ethnie')) === 7 && (
-                    <F label="Groupe ethnolinguistique (préciser)">
+                    <F label="Ethnie (préciser)">
                       <input type="text" {...register('ethnie_autre')} className={cls()} />
                     </F>
                   )}
+                  <F label="Mode d'entrée dans le programme">
+                    <Sel options={SOC_MODE_ENTREE} {...register('soc_mode_entree', { valueAsNumber: true })} />
+                  </F>
                 </div>
               </section>
             )}
 
-            {/* ═══════════════════════════════════════════════════
-            STEP 4 — GYNÉCO-OBSTÉTRICAUX (GYN)
-        ═══════════════════════════════════════════════════ */}
-            {step === 4 && (
+            {/* ══════════════════════════════════════════════════
+            STEP 5 — GYNÉCO-OBSTÉTRICAUX (GYN)
+        ══════════════════════════════════════════════════ */}
+            {step === 5 && (
               <section>
                 <StepHeader code="E" title="Antécédents gynéco-obstétricaux (GYN)"
                   desc="Multiparité et âge précoce au premier rapport sont des cofacteurs HPV reconnus" />
@@ -611,6 +723,16 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                       {...register('gyn_nb_accouchements', { required: 'Requis', min: 0, max: 20 })}
                       className={cls(!!errors.gyn_nb_accouchements)} />
                   </F>
+                  <F label="Nombre d'avortements">
+                    <input type="number" min={0} max={20} {...register('gyn_nb_avortements')} className={cls()} />
+                  </F>
+                  <F label="Nombre de morts-nés">
+                    <input type="number" min={0} max={20} {...register('gyn_nb_morts_nes')} className={cls()} />
+                  </F>
+                  <F label="Parité (Nb enfants nés vivants)">
+                    <input type="number" min={0} max={20} {...register('gyn_parite_simple')} className={cls()} />
+                  </F>
+
                   <F label="Âge au premier rapport sexuel (années)" required error={errors.gyn_age_premier_rapport?.message}>
                     <input type="number" min={8} max={60}
                       {...register('gyn_age_premier_rapport', {
@@ -620,31 +742,31 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                         valueAsNumber: true,
                       })} className={cls(!!errors.gyn_age_premier_rapport)} />
                   </F>
-                  <F label="Âge à la première grossesse">
+                  <F label="Âge à la première grossesse" error={errors.gyn_age_premiere_grossesse?.message}>
                     <input type="number" min={10} max={55}
-                      {...register('gyn_age_premiere_grossesse', { valueAsNumber: true })} className={cls()} />
+                      {...register('gyn_age_premiere_grossesse', {
+                        valueAsNumber: true,
+                        validate: v => !v || !watch('gyn_age_premier_rapport') || v >= watch('gyn_age_premier_rapport') || "Doit être ≥ à l'âge au 1er rapport"
+                      })} className={cls(!!errors.gyn_age_premiere_grossesse)} />
                   </F>
                   <F label="Nombre de partenaires sexuels (vie entière)">
                     <input type="number" min={0} {...register('gyn_nb_partenaires_vie', { valueAsNumber: true })} className={cls()} />
-                  </F>
-                  <F label="Date des dernières règles (DDR)">
-                    <input type="date" {...register('gyn_ddr')} className={cls()} />
-                  </F>
-                  <F label="Cycles réguliers ?">
-                    <Sel options={GYN_CYCLE} {...register('gyn_cycle_regulier', { valueAsNumber: true })} />
                   </F>
                   <F label="Âge à la première menstruation (années)">
                     <input type="number" min={8} max={20}
                       {...register('age_menstrue')} className={cls()} />
                   </F>
+                  <F label="Cycles réguliers ?">
+                    <Sel options={GYN_CYCLE} {...register('gyn_cycle_regulier', { valueAsNumber: true })} />
+                  </F>
                 </div>
               </section>
             )}
 
-            {/* ═══════════════════════════════════════════════════
-            STEP 5 — FACTEURS DE RISQUE (RIS)
-        ═══════════════════════════════════════════════════ */}
-            {step === 5 && (
+            {/* ══════════════════════════════════════════════════
+            STEP 6 — FACTEURS DE RISQUE (RIS)
+        ══════════════════════════════════════════════════ */}
+            {step === 6 && (
               <section>
                 <StepHeader code="F" title="Antécédents médicaux et facteurs de risque (RIS)" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -712,10 +834,10 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
               </section>
             )}
 
-            {/* ═══════════════════════════════════════════════════
-            STEP 6 — STATUT PHYSIOLOGIQUE (PHY)
-        ═══════════════════════════════════════════════════ */}
-            {step === 6 && (
+            {/* ══════════════════════════════════════════════════
+            STEP 7 — STATUT PHYSIOLOGIQUE (PHY)
+        ══════════════════════════════════════════════════ */}
+            {step === 7 && (
               <section>
                 <StepHeader code="G" title="Statut physiologique actuel (PHY)"
                   desc="IVA et thermo-ablation possibles enceinte avec précaution ; LEEP différé au post-partum (OMS 2021)" />
@@ -724,26 +846,31 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                     <Sel options={PHY_STATUT} err={!!errors.phy_statut}
                       {...register('phy_statut', { required: 'Statut requis', valueAsNumber: true })} />
                   </F>
-                  {Number(w.phy) === 2 && (
+                  {Number(watch('phy_statut')) === 2 && (
                     <F label="Âge gestationnel (semaines d'aménorrhée)">
                       <input type="number" min={4} max={42}
                         {...register('phy_age_gestationnel')} className={cls()} />
                     </F>
                   )}
-                  {Number(w.phy) === 5 && (
+                  {Number(watch('phy_statut')) === 5 && (
                     <F label="Âge à la ménopause">
                       <input type="number" min={35} max={65}
                         {...register('phy_age_menopause')} className={cls()} />
+                    </F>
+                  )}
+                  {Number(watch('phy_statut')) !== 5 && (
+                    <F label="Date des dernières règles (DDR)">
+                      <input type="date" {...register('phy_ddr')} className={cls()} />
                     </F>
                   )}
                 </div>
               </section>
             )}
 
-            {/* ═══════════════════════════════════════════════════
-            STEP 7 — DÉPISTAGE (DEP)
-        ═══════════════════════════════════════════════════ */}
-            {step === 7 && (
+            {/* ══════════════════════════════════════════════════
+            STEP 8 — DÉPISTAGE (DEP)
+        ══════════════════════════════════════════════════ */}
+            {step === 8 && (
               <section>
                 <StepHeader code="H" title="Dépistage (DEP)"
                   desc="OMS 2021 : test HPV-DNA comme test primaire (sensibilité ≈98%). Cible 70% femmes dépistées à 35 et 45 ans." />
@@ -760,10 +887,18 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                         { value: 3, label: 'Test HPV-DNA' },
                         { value: 4, label: 'Cytologie (Pap)' },
                         { value: 5, label: 'Co-testing HPV + Cytologie' },
+                        { value: 6, label: 'Colposcopie' },
+                        { value: 7, label: 'IVA + HPV (co-testing)' },
+                        { value: 8, label: 'Autre' },
                       ]}
                       value={multiValues.dep_methode}
                       onChange={v => setMulti('dep_methode', v)}
                     />
+                    {methodSet('8') && (
+                      <div className="mt-4">
+                        <input type="text" placeholder="Précisez l'autre méthode..." {...register('dep_methode_autre')} className={cls()} />
+                      </div>
+                    )}
                   </F>
 
                   {/* Résultats conditionnels selon méthode */}
@@ -792,20 +927,22 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                       {multiValues.dep_resultat_hpv && multiValues.dep_resultat_hpv.split(',').filter(id => id !== '0').length > 0 && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                           <p className="md:col-span-2 text-sm font-bold text-blue-900 uppercase tracking-tight">Précisions par type (ex: CT values)</p>
-                          {multiValues.dep_resultat_hpv.split(',').filter(id => id !== '0').map(id => {
-                            const label = DEP_RESULTAT_HPV.find(o => String(o.value) === id)?.label;
+                          {multiValues.dep_resultat_hpv.split(',').filter((id: string) => id !== '0').map((id: string) => {
+                            const label = DEP_RESULTAT_HPV.find((o: any) => String(o.value) === id)?.label;
                             return (
-                              <F key={id} label={`Détails pour ${label}`}>
-                                <input
-                                  type="text"
-                                  placeholder="Valeur CT ou observation..."
-                                  className={cls()}
-                                  onChange={(e) => {
-                                    const current = watch('dep_hpv_details') || {};
-                                    setValue('dep_hpv_details', { ...current, [id]: e.target.value });
-                                  }}
-                                />
-                              </F>
+                              <div key={id}>
+                                <F label={`Détails pour ${label}`}>
+                                  <input
+                                    type="text"
+                                    placeholder="Valeur CT ou observation..."
+                                    className={cls()}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                      const current = watch('dep_hpv_details') || {};
+                                      setValue('dep_hpv_details', { ...current, [id]: e.target.value });
+                                    }}
+                                  />
+                                </F>
+                              </div>
                             );
                           })}
                         </div>
@@ -818,15 +955,8 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                     </F>
                   )}
 
-                  {/* Colposcopie */}
-                  <F label="Colposcopie réalisée ?">
-                    <label className="flex items-center gap-2 mt-2 text-sm">
-                      <input type="checkbox" className="rounded text-indigo-600"
-                        {...register('dep_colposcopie_realisee')} />
-                      Oui
-                    </label>
-                  </F>
-                  {w.dep_colpo && (
+                  {/* Colposcopie si sélectionnée comme méthode OU si cochée à part */}
+                  {(methodSet('6') || watch('dep_colposcopie_realisee')) && (
                     <>
                       <F label="Aspect colposcopique">
                         <Sel options={DEP_COLPO_ASPECT} {...register('dep_colposcopie_aspect', { valueAsNumber: true })} />
@@ -852,20 +982,80 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                       Oui
                     </label>
                   </F>
-                  {w.dep_biopsie && (
+                  {watch('dep_biopsie_realisee') && (
                     <F label="Nombre de prélèvements (1-4)">
                       <input type="number" min={1} max={4}
                         {...register('dep_biopsie_sites')} className={cls()} />
                     </F>
                   )}
+
+                  {/* ──────────────────────────────────────────────────────────────────
+                      DEEP LEARNING ANALYSIS (IMAGE & DISTANCE)
+                  ────────────────────────────────────────────────────────────────── */}
+                  <div className="md:col-span-2 mt-12 p-10 bg-[#0f172a] rounded-[48px] text-white shadow-2xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-12 opacity-5 group-hover:opacity-10 transition-opacity">
+                      <span className="material-symbols-outlined text-[160px]">biometrics</span>
+                    </div>
+                    
+                    <div className="relative z-10">
+                      <div className="flex items-center gap-6 mb-8">
+                        <div className="p-4 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[28px] shadow-2xl shadow-blue-500/20">
+                          <span className="material-symbols-outlined text-4xl block">center_focus_strong</span>
+                        </div>
+                        <div>
+                          <h4 className="text-3xl font-black uppercase tracking-tight leading-tight">Analyse Deep Learning</h4>
+                          <p className="text-slate-400 font-bold text-sm tracking-widest uppercase mt-1">IA de détection pathologique (Vision)</p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                        <div className="space-y-8">
+                          <F label="Image du col (Capture / Transfert)">
+                             <div className="relative group/btn">
+                               <input type="file" accept="image/*" 
+                                 onChange={(e) => {
+                                   if (e.target.files?.[0]) setValue('dep_image_cervix', e.target.files[0]);
+                                 }}
+                                 className="hidden" id="cervix-img-dl" />
+                               <label htmlFor="cervix-img-dl" className="flex flex-col items-center justify-center gap-4 w-full py-10 bg-white/5 border-2 border-dashed border-white/20 rounded-[32px] hover:bg-white/10 hover:border-blue-500 cursor-pointer transition-all duration-300">
+                                 <span className="material-symbols-outlined text-5xl text-blue-400 group-hover/btn:scale-110 transition-transform">photo_camera</span>
+                                 <span className="font-black text-xs uppercase tracking-[0.2em]">{watch('dep_image_cervix') ? (watch('dep_image_cervix') as File).name : "Choisir l'image du col"}</span>
+                               </label>
+                             </div>
+                          </F>
+                          <F label="Distance de capture (Centimètres)">
+                            <div className="relative">
+                              <input type="number" step="0.1" placeholder="Distance..." {...register('dep_distance_capture')}
+                                className="w-full bg-white/5 border-2 border-white/10 rounded-[24px] px-6 py-5 text-xl font-black text-white focus:border-blue-500 outline-none transition-all placeholder:text-slate-600" />
+                              <span className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 font-black uppercase tracking-widest text-sm">cm</span>
+                            </div>
+                          </F>
+                        </div>
+
+                        <div className="bg-gradient-to-b from-white/10 to-transparent rounded-[40px] p-10 border border-white/10 flex flex-col justify-center items-center text-center backdrop-blur-xl">
+                          <div className="w-24 h-24 bg-blue-500/20 rounded-full flex items-center justify-center mb-6 shadow-3xl">
+                            <span className="material-symbols-outlined text-blue-400 text-5xl animate-pulse">analytics</span>
+                          </div>
+                          <h5 className="font-black uppercase tracking-[0.2em] text-xs text-blue-400 mb-4">Diagnostic Probabiliste IA</h5>
+                          <div className="text-slate-300 font-medium leading-relaxed px-4">
+                            <textarea
+                              {...register('dep_ia_deep_learning_result')}
+                              className="w-full bg-transparent border-none focus:ring-0 text-center italic text-lg resize-none min-h-[100px]"
+                              placeholder="Le résultat DL apparaîtra ici après analyse..."
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </section>
             )}
 
-            {/* ═══════════════════════════════════════════════════
-            STEP 8 — TRAITEMENT (TRT)
-        ═══════════════════════════════════════════════════ */}
-            {step === 8 && (
+            {/* ══════════════════════════════════════════════════
+            STEP 9 — TRAITEMENT (TRT)
+        ══════════════════════════════════════════════════ */}
+            {step === 9 && (
               <section>
                 <StepHeader code="I" title="Traitement (TRT)"
                   desc="Critères thermo-ablation OMS 2019/2021 : ZT1/ZT2, lésion <75% col, absence suspicion cancer" />
@@ -878,18 +1068,20 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                     </label>
                   </F>
 
-                  {!w.trt_elig && (
+                  {!watch('trt_eligible_immediat') && (
                     <>
                       <F label="Motif de non-éligibilité">
                         <Sel options={TRT_NON_ELIG} {...register('trt_non_eligible_motif', { valueAsNumber: true })} />
                       </F>
-                      <F label="Précision (si autre)" col2>
-                        <input type="text" {...register('trt_non_eligible_autre')} className={cls()} />
-                      </F>
+                      {Number(watch('trt_non_eligible_motif')) === 8 && (
+                        <F label="Précision (si autre)" col2>
+                          <input type="text" {...register('trt_non_eligible_autre')} className={cls()} />
+                        </F>
+                      )}
                     </>
                   )}
 
-                  {w.trt_elig && (
+                  {watch('trt_eligible_immediat') && (
                     <>
                       <F label="Méthode de traitement">
                         <Sel options={TRT_METHODE} {...register('trt_methode', { valueAsNumber: true })} />
@@ -899,7 +1091,7 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                       </F>
 
                       {/* Thermo-ablation spécifique */}
-                      {Number(w.trt_meth) === 2 && (
+                      {Number(watch('trt_methode')) === 2 && (
                         <>
                           <F label="Durée d'application (secondes — norme OMS: 20-40s)">
                             <input type="number" min={20} max={40}
@@ -944,10 +1136,10 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
               </section>
             )}
 
-            {/* ═══════════════════════════════════════════════════
-            STEP 9 — SUIVI + HPV
-        ═══════════════════════════════════════════════════ */}
-            {step === 9 && (
+            {/* ══════════════════════════════════════════════════
+            STEP 10 — SUIVI + HPV
+        ══════════════════════════════════════════════════ */}
+            {step === 10 && (
               <section>
                 <StepHeader code="J" title="Suivi et résultats anatomopathologiques (SUI)"
                   desc="Calendrier OMS : contrôle à 12 mois par test HPV post-traitement ablatif" />
@@ -959,7 +1151,7 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                     <Sel options={SUI_ANAPATH} {...register('sui_anapath_resultat', { valueAsNumber: true })} />
                   </F>
                   {Number(watch('sui_anapath_resultat')) === 8 && (
-                    <F label="Résultat anapath (préciser)">
+                    <F label="Résultat anapath (préciser)" col2>
                       <input type="text" {...register('sui_anapath_resultat_autre')} className={cls()} />
                     </F>
                   )}
@@ -971,20 +1163,6 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                   </F>
                   <div />
 
-                  {/* RDV de suivi */}
-                  {[
-                    ['sui_rdv_1mois', 'RDV à 1 mois (post-traitement)'],
-                    ['sui_rdv_3mois', 'RDV à 3 mois'],
-                    ['sui_rdv_6mois', 'RDV à 6 mois'],
-                    ['sui_rdv_12mois', 'RDV à 12 mois (test de guérison) *'],
-                    ['sui_rdv_24mois', 'RDV à 24 mois'],
-                    ['sui_rdv_36mois', 'RDV à 36 mois'],
-                  ].map(([field, label]) => (
-                    <F key={field} label={label}>
-                      <input type="date" {...register(field as any)} className={cls()} />
-                    </F>
-                  ))}
-
                   <F label="Référence vers structure supérieure ?">
                     <label className="flex items-center gap-2 mt-2 text-sm">
                       <input type="checkbox" className="rounded text-indigo-600"
@@ -992,13 +1170,26 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                       Oui
                     </label>
                   </F>
-                  <F label="Structure de référence">
-                    <input type="text" {...register('sui_reference_structure')} className={cls()} />
-                  </F>
-                  <F label="Motif de référence" col2>
-                    <textarea rows={2} {...register('sui_reference_motif')}
-                      className={cls()} />
-                  </F>
+                  {watch('sui_reference') && (
+                    <>
+                      <F label="Structure de référence">
+                        <select className={cls()} {...register('sui_reference_structure')}>
+                          <option value="">— Choisir —</option>
+                          {REFERENCE_STRUCTURES.map(s => <option key={s} value={s}>{s}</option>)}
+                          <option value="Autre">Autre (préciser)</option>
+                        </select>
+                      </F>
+                      {watch('sui_reference_structure') === 'Autre' && (
+                        <F label="Préciser la structure">
+                          <input type="text" {...register('ref_structure_autre')} className={cls()} />
+                        </F>
+                      )}
+                      <F label="Motif de référence" col2>
+                        <textarea rows={2} {...register('sui_reference_motif')}
+                          className={cls()} />
+                      </F>
+                    </>
+                  )}
                 </div>
 
                 <StepHeader code="K" title="Vaccination HPV et connaissances (HPV)"
@@ -1031,6 +1222,16 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                   <F label="Statut vaccinal HPV personnel">
                     <Sel options={HPV_VACCIN} {...register('hpv_statut_vaccinal', { valueAsNumber: true })} />
                   </F>
+                  {Number(watch('hpv_statut_vaccinal')) >= 1 && (
+                    <>
+                      <F label="Type de vaccin reçu">
+                        <Sel options={HPV_VACCIN_TYPE} {...register('hpv_vaccin_type')} />
+                      </F>
+                      <F label="Nombre de doses reçues">
+                        <input type="number" min={1} max={3} {...register('hpv_vaccin_nb_doses', { valueAsNumber: true })} className={cls()} />
+                      </F>
+                    </>
+                  )}
                   <F label="A des filles ?">
                     <label className="flex items-center gap-2 mt-2 text-sm">
                       <input type="checkbox" className="rounded text-indigo-600"
@@ -1038,18 +1239,20 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                       Oui
                     </label>
                   </F>
-                  {w.hpv_filles && (
+                  {watch('hpv_a_des_filles') && (
                     <>
                       <F label="Nombre total de filles">
-                        <input type="number" min={0} {...register('hpv_nb_filles_total')} className={cls()} />
+                        <input type="number" min={0} {...register('hpv_nb_filles_total', { valueAsNumber: true })} className={cls()} />
                       </F>
                       <F label="Nombre de filles âgées de 9 à 14 ans">
-                        <input type="number" min={0} {...register('hpv_nb_filles_9_14')} className={cls()} />
+                        <input type="number" min={0} {...register('hpv_nb_filles_9_14', { valueAsNumber: true })} className={cls()} />
                       </F>
-                      <F label="Nombre de filles vaccinées contre HPV">
-                        <input type="number" min={0} {...register('hpv_nb_filles_vaccinees')} className={cls()} />
-                      </F>
-                      {Number(w.hpv_vacc) < Number(w.hpv_filles914) && (
+                      {Number(watch('hpv_nb_filles_total')) > 0 && (
+                        <F label="Nombre de filles vaccinées contre HPV">
+                          <input type="number" min={0} {...register('hpv_nb_filles_vaccinees', { valueAsNumber: true })} className={cls()} />
+                        </F>
+                      )}
+                      {Number(watch('hpv_nb_filles_vaccinees')) < Number(watch('hpv_nb_filles_9_14')) && watch('hpv_nb_filles_9_14') > 0 && (
                         <F label="Raison(s) de non-vaccination des filles" col2>
                           <MultiCheck
                             options={[
@@ -1074,53 +1277,75 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
               </section>
             )}
 
-            {/* ═══════════════════════════════════════════════════
-            STEP 10 — CONSENTEMENTS (CON)
-        ═══════════════════════════════════════════════════ */}
-            {step === 10 && (
+            {/* ══════════════════════════════════════════════════
+            STEP 11 — SYNTHÈSE IA
+        ══════════════════════════════════════════════════ */}
+            {step === 11 && (
               <section className="fade-in">
-                <StepHeader code="L" title="Consentements éclairés (CON)"
-                  desc="Loi n° 2008-12 du 25 janvier 2008 — Protection données personnelles (CDP Sénégal) — Consentement libre, éclairé et révocable" />
-
-                <div className="bg-amber-50 border-2 border-amber-100 rounded-3xl p-8 mb-10 flex items-start gap-6">
-                  <div className="w-12 h-12 rounded-2xl bg-amber-200 flex items-center justify-center text-amber-700 flex-shrink-0">
-                    <span className="material-symbols-outlined text-3xl">warning</span>
-                  </div>
-                  <div>
-                    <h4 className="text-xl font-black text-amber-900 mb-1 uppercase tracking-tight">Attention Clinique Obligatoire</h4>
-                    <p className="text-amber-800 text-lg font-medium">Le consentement au dépistage est obligatoire avant toute procédure clinique. Vérifiez la signature papier.</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {[
-                    { field: 'con_depistage', label: 'Consentement au dépistage', required: true },
-                    { field: 'con_traitement', label: 'Consentement au traitement', required: false },
-                    { field: 'con_donnees_anonymisees', label: 'Utilisation des données anonymisées', required: true },
-                    { field: 'con_rappels_sms', label: 'Rappels SMS pour RDV', required: true },
-                    { field: 'con_signature_presente', label: 'Signature recueillie (papier)', required: true },
-                  ].map(({ field, label, required }) => (
-                    <label key={field} className="group flex items-center gap-6 p-6 rounded-3xl border-2 border-slate-100 hover:border-blue-500 hover:bg-blue-50/30 cursor-pointer transition-all duration-300">
-                      <div className="relative flex items-center justify-center">
-                        <input type="checkbox" className="peer appearance-none w-10 h-10 rounded-2xl border-2 border-slate-200 checked:bg-blue-600 checked:border-blue-600 transition-all duration-300"
-                          {...register(field as any, required ? { required: `${label} est obligatoire` } : {})} />
-                        <span className="material-symbols-outlined absolute text-white opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none font-black">check</span>
+                <StepHeader code="M" title="Synthèse Clinique assistée par IA"
+                  desc="Générez un résumé structuré des données saisies pour faciliter la validation médicale et la prise de décision." />
+                
+                <div className="bg-blue-50 border-2 border-blue-100 rounded-3xl p-8 mb-10">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-blue-200 flex items-center justify-center text-blue-700">
+                        <span className="material-symbols-outlined text-3xl">auto_awesome</span>
                       </div>
                       <div>
-                        <span className="text-xl font-black text-slate-800 group-hover:text-blue-600 transition-colors uppercase tracking-tight">{label}</span>
-                        {required && <span className="text-red-500 ml-1 font-bold text-xl">*</span>}
-                        {errors[field as keyof typeof errors] && (
-                          <p className="text-sm text-red-500 font-bold mt-1 uppercase tracking-wider">
-                            {(errors[field as keyof typeof errors] as any)?.message}
-                          </p>
-                        )}
+                        <h4 className="text-xl font-black text-blue-900 uppercase tracking-tight">Analyse en temps réel</h4>
+                        <p className="text-blue-700 font-medium">Mistral-7B analyse les antécédents et les résultats cliniques.</p>
                       </div>
-                    </label>
-                  ))}
-                  <div className="md:col-span-2">
-                    <F label="Date/heure précise du consentement">
-                      <input type="datetime-local" {...register('con_depistage_date')} className={cls()} />
-                    </F>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={generateAISummary}
+                      disabled={aiLoading}
+                      className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-blue-700 transition-all flex items-center gap-3 shadow-xl shadow-blue-500/20 disabled:opacity-50"
+                    >
+                      {aiLoading ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Génération...
+                        </>
+                      ) : (
+                        <>
+                          <span className="material-symbols-outlined">psychology</span>
+                          Générer la synthèse
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  <div className="bg-white border-2 border-blue-100 rounded-2xl p-6 min-h-[300px] relative overflow-hidden">
+                    {aiLoading && (
+                      <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center z-10">
+                        <div className="text-center">
+                          <div className="inline-flex gap-1 mb-3">
+                            <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                            <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                            <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
+                          </div>
+                          <p className="text-blue-900 font-black text-sm uppercase tracking-widest">Calcul clinique en cours</p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {aiSummary ? (
+                      <div className="prose prose-blue max-w-none">
+                        <textarea
+                          {...register('ai_synthese')}
+                          className="w-full h-[400px] border-none focus:ring-0 text-slate-800 font-medium text-lg leading-relaxed resize-none p-0"
+                          placeholder="La synthèse apparaîtra ici..."
+                        />
+                      </div>
+                    ) : (
+                      <div className="h-full flex flex-col items-center justify-center text-slate-400 py-20">
+                        <span className="material-symbols-outlined text-6xl mb-4 opacity-20">clinical_notes</span>
+                        <p className="font-bold uppercase tracking-widest text-sm text-center">
+                          Cliquez sur le bouton ci-dessus pour<br />analyser le dossier patiente
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </section>

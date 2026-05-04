@@ -55,6 +55,8 @@ export interface Patient {
   pat_age_estime?: boolean;
   num_phone?: string;
   pat_telephone_proche?: string;
+  pat_telephone_proche_2?: string;
+  pat_telephone_proche_3?: string;
   pat_adresse?: string;
   pat_nin?: string;
 
@@ -81,6 +83,9 @@ export interface Patient {
   gyn_parite?: number;
   gyn_nb_grossesses?: number;
   gyn_nb_accouchements?: number;
+  gyn_nb_avortements?: number;
+  gyn_nb_morts_nes?: number;
+  gyn_parite_simple?: number;
   gyn_age_premier_rapport?: number;
   gyn_age_premiere_grossesse?: number;
   gyn_nb_partenaires_vie?: number;
@@ -149,8 +154,9 @@ export interface Patient {
   personnel_pec?: number;
   resultat_examen?: number;
 
-  // G — STATUT PHYSIOLOGIQUE
+  // G — PHYSIOLOGIE
   phy_statut?: number;
+  phy_ddr?: string;
   phy_age_gestationnel?: number;
   phy_age_menopause?: number;
 
@@ -168,6 +174,9 @@ export interface Patient {
   dep_biopsie_indiquee?: boolean;
   dep_biopsie_realisee?: boolean;
   dep_biopsie_sites?: number;
+  dep_image_cervix?: any; // File or URL
+  dep_distance_capture?: number;
+  dep_ia_deep_learning_result?: string;
 
   // I — TRAITEMENT
   trt_eligible_immediat?: boolean;
@@ -195,6 +204,7 @@ export interface Patient {
   sui_rdv_36mois?: string;
   sui_reference?: boolean;
   sui_reference_structure?: string;
+  sui_reference_structure_autre?: string;
   sui_reference_motif?: string;
 
   // K — HPV / VACCINATION
@@ -202,6 +212,8 @@ export interface Patient {
   hpv_source_info?: string;
   hpv_source_info_autre?: string;
   hpv_statut_vaccinal?: number;
+  hpv_vaccin_type?: string;
+  hpv_vaccin_nb_doses?: number;
   hpv_a_des_filles?: boolean;
   hpv_nb_filles_total?: number;
   hpv_nb_filles_9_14?: number;
@@ -216,6 +228,10 @@ export interface Patient {
   con_donnees_anonymisees?: boolean;
   con_rappels_sms?: boolean;
   con_signature_presente?: boolean;
+
+  // M — SYNTHÈSE IA
+  ai_synthese?: string;
+  ai_synthese_date?: string;
 }
 
 // ============================================================
