@@ -168,8 +168,35 @@ const MedicalRecords: React.FC = () => {
           </BentoCard>
         </div>
 
-        {/* SECTION 3: ANTECEDENTS GYNECO (Bento large) */}
+        {/* SECTION 3: TRAITEMENT & DIAGNOSTIC AVANCÉ (NEW) */}
         <div className="md:col-span-12">
+          <h2 className="font-headline text-2xl text-on-surface mb-6 flex items-center gap-3">
+            <span className="material-symbols-outlined text-compassion-rose">medical_information</span>
+            Diagnostic & Traitement
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <BentoCard className="bg-white border-l-4 border-muted-gold">
+               <span className="block text-[10px] text-on-surface-variant uppercase font-bold mb-1">Méthode de Traitement</span>
+               <p className="text-xl font-bold text-on-surface">{patient?.trt_methode ? {1: 'Cryothérapie', 2: 'Thermo-ablation', 3: 'LEEP/LLETZ', 4: 'CKC', 5: 'Hystérectomie', 6: 'Chimio/Radio'}[patient.trt_methode] : 'Aucun traitement'}</p>
+               <p className="text-xs text-on-surface-variant mt-2">Date: {safeFormatDate(patient?.trt_date)}</p>
+            </BentoCard>
+            
+            <BentoCard className="bg-white border-l-4 border-compassion-rose">
+               <span className="block text-[10px] text-on-surface-variant uppercase font-bold mb-1">Anatomopathologie</span>
+               <p className="text-xl font-bold text-on-surface">{patient?.sui_anapath_resultat ? {1: 'Cervicite', 2: 'CIN1/LSIL', 3: 'CIN2', 4: 'CIN3/HSIL', 5: 'AIS', 6: 'Carcinome', 7: 'Adénocarcinome'}[patient.sui_anapath_resultat] : 'En attente'}</p>
+               <p className="text-xs text-on-surface-variant mt-2">Stade FIGO: {patient?.sui_stade_figo || 'N/A'}</p>
+            </BentoCard>
+
+            <BentoCard className="bg-white border-l-4 border-atlantic-sage">
+               <span className="block text-[10px] text-on-surface-variant uppercase font-bold mb-1">Cytologie</span>
+               <p className="text-xl font-bold text-on-surface">{patient?.dep_resultat_cytologie || 'Non réalisée'}</p>
+               <p className="text-xs text-on-surface-variant mt-2">Biopsie: {patient?.dep_biopsie_realisee ? 'Effectuée' : 'Non effectuée'}</p>
+            </BentoCard>
+          </div>
+        </div>
+
+        {/* SECTION 4: ANTECEDENTS GYNECO */}
+        <div className="md:col-span-12 mt-6">
           <h2 className="font-headline text-2xl text-on-surface mb-6 flex items-center gap-3">
             <span className="material-symbols-outlined text-compassion-rose">history_edu</span>
             Antécédents Gynécologiques & Obstétricaux
@@ -192,11 +219,30 @@ const MedicalRecords: React.FC = () => {
               <span className="text-xl font-bold text-on-surface">{patient?.gyn_age_premier_rapport || '--'} ans</span>
             </BentoCard>
           </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-6">
+             <div className="p-4 rounded-2xl bg-cream-silk/20 border border-sahara-rose text-center">
+                <p className="text-[10px] text-on-surface-variant font-bold uppercase mb-1">Premières Règles</p>
+                <p className="font-headline text-lg">{patient?.gyn_age_menstrue || '--'} ans</p>
+             </div>
+             <div className="p-4 rounded-2xl bg-cream-silk/20 border border-sahara-rose text-center">
+                <p className="text-[10px] text-on-surface-variant font-bold uppercase mb-1">Enfants Vivants</p>
+                <p className="font-headline text-lg">{patient?.gyn_nb_enfants_vivants || 0}</p>
+             </div>
+             <div className="p-4 rounded-2xl bg-cream-silk/20 border border-sahara-rose text-center">
+                <p className="text-[10px] text-on-surface-variant font-bold uppercase mb-1">ATCD Familiaux</p>
+                <p className="font-headline text-lg">{patient?.ris_atcd_familiaux_cancer ? 'Oui (Signalé)' : 'Aucun'}</p>
+             </div>
+             <div className="p-4 rounded-2xl bg-cream-silk/20 border border-sahara-rose text-center">
+                <p className="text-[10px] text-on-surface-variant font-bold uppercase mb-1">Contraception</p>
+                <p className="font-headline text-lg">{patient?.ris_contraception ? 'Active' : 'Inactive'}</p>
+             </div>
+          </div>
         </div>
 
-        {/* SECTION 4: INFOS SOCIO-DEMO */}
-        <div className="md:col-span-12 bg-cream-silk/30 p-8 rounded-3xl border border-sahara-rose">
-          <h3 className="font-headline text-xl text-on-surface mb-6">Informations Complémentaires</h3>
+        {/* SECTION 5: INFOS SOCIO-DEMO */}
+        <div className="md:col-span-12 bg-cream-silk/30 p-8 rounded-3xl border border-sahara-rose mt-6">
+          <h3 className="font-headline text-xl text-on-surface mb-6">Informations Socio-Démographiques</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="flex items-center gap-4">
               <IconBox icon="work" className="bg-white" />
@@ -206,32 +252,18 @@ const MedicalRecords: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <IconBox icon="home" className="bg-white" />
+              <IconBox icon="school" className="bg-white" />
               <div>
-                <p className="text-xs text-on-surface-variant font-bold">Adresse</p>
-                <p className="font-body font-bold">{patient?.pat_adresse || '--'}</p>
+                <p className="text-xs text-on-surface-variant font-bold">Instruction</p>
+                <p className="font-body font-bold">{patient?.soc_niveau_instruction ? {1: 'Aucun', 2: 'Primaire', 3: 'Moyen', 4: 'Secondaire', 5: 'Supérieur'}[patient.soc_niveau_instruction] : '--'}</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <IconBox icon="call" className="bg-white" />
+              <IconBox icon="family_restroom" className="bg-white" />
               <div>
-                <p className="text-xs text-on-surface-variant font-bold">Contact Proche</p>
-                <p className="font-body font-bold">{patient?.pat_telephone_proche || '--'}</p>
+                <p className="text-xs text-on-surface-variant font-bold">État Civil</p>
+                <p className="font-body font-bold">{patient?.soc_matrimoniale ? {1: 'Célibataire', 2: 'Mariée', 3: 'Divorcée', 4: 'Veuve'}[patient.soc_matrimoniale] : '--'}</p>
               </div>
-            </div>
-          </div>
-          
-          <div className="mt-8 pt-8 border-t border-sahara-rose/50 grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <p className="text-xs text-on-surface-variant font-bold mb-2 uppercase tracking-widest">Mode de Vie</p>
-              <div className="flex gap-4">
-                <span className="bg-white px-3 py-1 rounded-full text-xs font-bold border border-sahara-rose">Tabac: {patient?.ris_tabagisme === 0 ? 'Non-fumeuse' : 'Active/Sevrée'}</span>
-                <span className="bg-white px-3 py-1 rounded-full text-xs font-bold border border-sahara-rose">Contraception: {patient?.ris_contraception ? 'Oui' : 'Aucune'}</span>
-              </div>
-            </div>
-            <div>
-              <p className="text-xs text-on-surface-variant font-bold mb-2 uppercase tracking-widest">Instruction</p>
-              <p className="text-sm font-body italic text-on-surface-variant">"La connaissance est la première étape de la prévention."</p>
             </div>
           </div>
         </div>

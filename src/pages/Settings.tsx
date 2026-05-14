@@ -1,119 +1,133 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext.tsx';
-import { Cog6ToothIcon as CogIcon, UserIcon, BellIcon, ShieldCheckIcon, ServerIcon as DatabaseIcon } from '@heroicons/react/24/outline';
+import { 
+  UserIcon, 
+  ShieldCheckIcon, 
+  BellIcon, 
+  Cog6ToothIcon as CogIcon,
+  ServerIcon as DatabaseIcon,
+  CheckCircleIcon,
+  ExclamationCircleIcon
+} from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
 import { useLocation } from 'react-router-dom';
 import PatientLayout from '../components/PatientLayout.tsx';
-
-type Tab = {
-  id: string;
-  name: string;
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-};
-
-type CommonSettingsProps = {
-  onSave: () => void;
-  isLoading: boolean;
-};
+import { BentoCard, GlassPanel, IconBox } from '../components/ui/PatientUI.tsx';
+import LoadingSpinner from '../components/LoadingSpinner.tsx';
+import { authService } from '../services/authService.ts';
 
 const Settings: React.FC = () => {
-  const { user } = useAuth();
+  const { user, login } = useAuth();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const location = useLocation();
   const [activeTab, setActiveTab] = useState<string>(location.state?.defaultTab || 'profile');
 
   const isPatient = user?.role === 'patient';
 
-  const tabs: Tab[] = [
-    { id: 'profile', name: 'Profil', icon: UserIcon },
-    { id: 'security', name: 'Sécurité', icon: ShieldCheckIcon },
+  const tabs = [
+    { id: 'profile', name: 'Profil', icon: UserIcon, description: 'Gérez vos informations personnelles' },
+    { id: 'security', name: 'Sécurité', icon: ShieldCheckIcon, description: 'Protégez votre compte et vos données' },
   ];
 
   if (!isPatient) {
-    tabs.splice(1, 0, { id: 'notifications', name: 'Notifications', icon: BellIcon });
-    tabs.push({ id: 'system', name: 'Système', icon: CogIcon });
+    tabs.splice(1, 0, { id: 'notifications', name: 'Notifications', icon: BellIcon, description: 'Configurez vos alertes' });
+    tabs.push({ id: 'system', name: 'Système', icon: CogIcon, description: 'Paramètres généraux' });
     if (user?.role === 'admin') {
-      tabs.push({ id: 'database', name: 'Base de données', icon: DatabaseIcon });
+      tabs.push({ id: 'database', name: 'Base de données', icon: DatabaseIcon, description: 'Maintenance et sauvegardes' });
     }
   }
-
-  const handleSave = async () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      toast.success('Paramètres sauvegardés avec succès !');
-    }, 1000);
-  };
 
   const renderTabContent = () => {
     switch (activeTab) {
       case 'profile':
-        return <ProfileSettings user={user} onSave={handleSave} isLoading={isLoading} />;
-      case 'notifications':
-        return <NotificationSettings onSave={handleSave} isLoading={isLoading} />;
+        return <ProfileSettings user={user} onRefreshUser={login} />;
       case 'security':
-        return <SecuritySettings onSave={handleSave} isLoading={isLoading} />;
-      case 'system':
-        return <SystemSettings onSave={handleSave} isLoading={isLoading} />;
-      case 'database':
-        return <DatabaseSettings onSave={handleSave} isLoading={isLoading} />;
+        return <SecuritySettings />;
       default:
-        return null;
+        return (
+          <div className="flex flex-col items-center justify-center py-20 text-on-surface-variant/40">
+            <span className="material-symbols-outlined text-6xl mb-4">construction</span>
+            <p className="font-headline text-xl">En cours de développement</p>
+          </div>
+        );
     }
   };
 
   const renderContent = () => (
-    <div className="space-y-6">
+    <div className="max-w-6xl mx-auto space-y-10 pb-20">
       {/* Header */}
-      <div className={isPatient ? "animate-fade-in" : ""}>
-        <h1 className={`text-2xl font-bold ${isPatient ? 'font-headline text-compassion-rose' : 'text-gray-900'}`}>
-          Paramètres
-        </h1>
-        <p className={`text-gray-600 ${isPatient ? 'font-body' : ''}`}>Gérez vos préférences et configurations</p>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 animate-fade-in">
+        <div>
+          <h1 className="font-headline text-4xl text-compassion-rose mb-2">Paramètres</h1>
+          <p className="font-body text-on-surface-variant">Personnalisez votre expérience CerviCare+</p>
+        </div>
+        
+        {/* Quick Stats or Status */}
+        <div className="flex gap-4">
+          <GlassPanel className="py-3 px-6 rounded-2xl border-sahara-rose">
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full bg-wellness-green animate-pulse"></div>
+              <span className="text-xs font-bold text-on-surface uppercase tracking-wider">Compte Vérifié</span>
+            </div>
+          </GlassPanel>
+        </div>
       </div>
 
-      {/* Tabs */}
-      <div className="border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8 overflow-x-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        {/* Sidebar Nav */}
+        <div className="lg:col-span-4 space-y-4">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`
-                flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 whitespace-nowrap
+                w-full flex items-start gap-4 p-5 rounded-3xl transition-all duration-300 text-left border
                 ${activeTab === tab.id
-                  ? (isPatient ? 'border-compassion-rose text-compassion-rose' : 'border-primary-500 text-primary-600')
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'bg-white shadow-ultra-soft border-sahara-rose translate-x-2'
+                  : 'bg-transparent border-transparent hover:bg-sahara-rose/30 opacity-70 hover:opacity-100'
                 }
               `}
             >
-              <tab.icon className="w-5 h-5 mr-2" />
-              {tab.name}
+              <div className={`
+                p-3 rounded-2xl 
+                ${activeTab === tab.id ? 'bg-sahara-rose text-compassion-rose' : 'bg-surface-container-highest text-on-surface-variant'}
+              `}>
+                <tab.icon className="w-6 h-6" />
+              </div>
+              <div>
+                <p className={`font-headline text-lg ${activeTab === tab.id ? 'text-on-surface' : 'text-on-surface-variant'}`}>
+                  {tab.name}
+                </p>
+                <p className="text-xs text-on-surface-variant/60 font-body">{tab.description}</p>
+              </div>
             </button>
           ))}
-        </nav>
-      </div>
+        </div>
 
-      {/* Tab Content */}
-      <div className={isPatient ? "bg-white p-8 rounded-lg shadow-ultra-soft border border-sahara-rose" : "card"}>
-        {renderTabContent()}
+        {/* Main Content Area */}
+        <div className="lg:col-span-8 animate-slide-up">
+          <BentoCard className="min-h-[500px] relative overflow-hidden">
+            {/* Background decoration */}
+            <div className="absolute -top-24 -right-24 w-64 h-64 bg-sahara-rose/20 rounded-full blur-3xl"></div>
+            <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-atlantic-sage/20 rounded-full blur-3xl"></div>
+            
+            <div className="relative z-10">
+              {renderTabContent()}
+            </div>
+          </BentoCard>
+        </div>
       </div>
     </div>
   );
 
-  return isPatient ? <PatientLayout>{renderContent()}</PatientLayout> : renderContent();
+  return isPatient ? <PatientLayout>{renderContent()}</PatientLayout> : <div className="p-10">{renderContent()}</div>;
 };
 
 /* ========================= */
-/* PROFILE SETTINGS COMPONENT */
+/* PROFILE SETTINGS */
 /* ========================= */
-type ProfileSettingsProps = {
-  user: any;
-  onSave: () => void;
-  isLoading: boolean;
-};
-
-const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onSave, isLoading }) => {
+const ProfileSettings: React.FC<{ user: any, onRefreshUser: (user: any) => void }> = ({ user, onRefreshUser }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     first_name: user?.first_name || '',
     last_name: user?.last_name || '',
@@ -127,171 +141,96 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onSave, isLoadi
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  return (
-    <div className="space-y-8 animate-fade-in">
-      <div className="flex items-center gap-4 mb-8">
-        <div className="w-16 h-16 rounded-2xl bg-sahara-rose flex items-center justify-center">
-          <span className="material-symbols-outlined text-compassion-rose text-3xl">person</span>
-        </div>
-        <div>
-          <h3 className="font-headline text-2xl text-on-surface">Mon Profil</h3>
-          <p className="font-body text-sm text-on-surface-variant">Informations personnelles de votre compte</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <label className="font-body text-xs font-bold text-compassion-rose uppercase tracking-widest">Prénom</label>
-          <input 
-            type="text" 
-            name="first_name" 
-            value={formData.first_name} 
-            onChange={handleChange} 
-            className="w-full p-4 bg-cream-silk/30 border border-sahara-rose rounded-2xl focus:ring-2 focus:ring-compassion-rose outline-none font-body transition-all" 
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="font-body text-xs font-bold text-compassion-rose uppercase tracking-widest">Nom</label>
-          <input 
-            type="text" 
-            name="last_name" 
-            value={formData.last_name} 
-            onChange={handleChange} 
-            className="w-full p-4 bg-cream-silk/30 border border-sahara-rose rounded-2xl focus:ring-2 focus:ring-compassion-rose outline-none font-body transition-all" 
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="font-body text-xs font-bold text-compassion-rose uppercase tracking-widest">Email</label>
-          <input 
-            type="email" 
-            name="email" 
-            value={formData.email} 
-            onChange={handleChange} 
-            className="w-full p-4 bg-cream-silk/30 border border-sahara-rose rounded-2xl focus:ring-2 focus:ring-compassion-rose outline-none font-body transition-all" 
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="font-body text-xs font-bold text-compassion-rose uppercase tracking-widest">Téléphone</label>
-          <input 
-            type="tel" 
-            name="phone" 
-            value={formData.phone} 
-            onChange={handleChange} 
-            className="w-full p-4 bg-cream-silk/30 border border-sahara-rose rounded-2xl focus:ring-2 focus:ring-compassion-rose outline-none font-body transition-all" 
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="font-body text-xs font-bold text-compassion-rose uppercase tracking-widest">Région</label>
-          <select 
-            name="region" 
-            value={formData.region} 
-            onChange={handleChange} 
-            className="w-full p-4 bg-cream-silk/30 border border-sahara-rose rounded-2xl focus:ring-2 focus:ring-compassion-rose outline-none font-body transition-all"
-          >
-            <option value="">Sélectionner une région</option>
-            <option value="dakar">Dakar</option>
-            <option value="thiès">Thiès</option>
-            <option value="diourbel">Diourbel</option>
-            <option value="fatick">Fatick</option>
-            <option value="kaolack">Kaolack</option>
-          </select>
-        </div>
-        <div className="space-y-2">
-          <label className="font-body text-xs font-bold text-compassion-rose uppercase tracking-widest">Centre de santé</label>
-          <input 
-            type="text" 
-            name="center" 
-            value={formData.center} 
-            onChange={handleChange} 
-            className="w-full p-4 bg-cream-silk/30 border border-sahara-rose rounded-2xl focus:ring-2 focus:ring-compassion-rose outline-none font-body transition-all" 
-          />
-        </div>
-      </div>
-
-      <div className="flex justify-end pt-4">
-        <button 
-          onClick={onSave} 
-          disabled={isLoading} 
-          className="bg-compassion-rose text-white px-10 py-4 rounded-full font-body font-bold shadow-lg hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
-        >
-          {isLoading ? 'Sauvegarde...' : 'Enregistrer les modifications'}
-        </button>
-      </div>
-    </div>
-  );
-};
-
-/* ========================= */
-/* NOTIFICATION SETTINGS */
-/* ========================= */
-type NotificationSettingsProps = {
-  onSave: () => void;
-  isLoading: boolean;
-};
-
-const NotificationSettings: React.FC<NotificationSettingsProps> = ({ onSave, isLoading }) => {
-  const [settings, setSettings] = useState({
-    email_notifications: true,
-    sms_notifications: true,
-    push_notifications: false,
-    daily_summary: true,
-    weekly_reports: true,
-    alert_notifications: true,
-  });
-
-  const handleToggle = (key: keyof typeof settings) => {
-    setSettings({ ...settings, [key]: !settings[key] });
+  const handleSave = async () => {
+    setIsLoading(true);
+    try {
+      const updatedUser = await authService.updateProfile(formData);
+      onRefreshUser(updatedUser);
+      toast.success('Profil mis à jour avec succès !', {
+        style: {
+          borderRadius: '20px',
+          background: '#8f464c',
+          color: '#fff',
+          fontFamily: 'Nunito Sans'
+        }
+      });
+    } catch (error: any) {
+      toast.error('Erreur lors de la mise à jour : ' + (error.response?.data?.detail || 'Serveur indisponible'));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      <div className="flex items-center gap-4 mb-8">
-        <div className="w-16 h-16 rounded-2xl bg-sahara-rose flex items-center justify-center">
-          <span className="material-symbols-outlined text-compassion-rose text-3xl">notifications</span>
-        </div>
+    <div className="space-y-8">
+      <div className="flex items-center gap-4 mb-2">
+        <IconBox icon="person" variant="rose" className="w-14 h-14 rounded-2xl" />
         <div>
-          <h3 className="font-headline text-2xl text-on-surface">Notifications</h3>
-          <p className="font-body text-sm text-on-surface-variant">Gérez comment vous souhaitez être informé</p>
+          <h2 className="font-headline text-2xl text-on-surface">Informations Personnelles</h2>
+          <p className="text-sm text-on-surface-variant font-body">Ces informations sont utilisées pour votre dossier médical.</p>
         </div>
       </div>
 
-      <div className="space-y-4">
-        {Object.entries(settings).map(([key, value]) => (
-          <div key={key} className="bg-white p-6 rounded-3xl border border-sahara-rose flex items-center justify-between hover:shadow-md transition-shadow">
-            <div>
-              <p className="font-headline text-lg text-on-surface">
-                {{
-                  email_notifications: 'Emails',
-                  sms_notifications: 'SMS / Mobile',
-                  push_notifications: 'Notifications Push',
-                  daily_summary: 'Résumé Quotidien',
-                  weekly_reports: 'Rapports Hebdomadaires',
-                  alert_notifications: 'Alertes Critiques',
-                }[key as keyof typeof settings]}
-              </p>
-              <p className="text-sm text-on-surface-variant font-body">
-                Recevez des mises à jour régulières via ce canal.
-              </p>
-            </div>
-            <button
-              onClick={() => handleToggle(key as keyof typeof settings)}
-              className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-200 ${
-                value ? 'bg-compassion-rose' : 'bg-gray-200'
-              }`}
-            >
-              <span
-                className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-200 ${
-                  value ? 'translate-x-6' : 'translate-x-1'
-                }`}
-              />
-            </button>
-          </div>
-        ))}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+        <div className="space-y-2">
+          <label className="text-[10px] font-bold text-compassion-rose uppercase tracking-widest ml-1">Prénom</label>
+          <input 
+            type="text" name="first_name" value={formData.first_name} onChange={handleChange}
+            className="w-full p-4 bg-cream-silk/40 border border-sahara-rose rounded-2xl focus:ring-2 focus:ring-compassion-rose/30 outline-none font-body transition-all"
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-[10px] font-bold text-compassion-rose uppercase tracking-widest ml-1">Nom</label>
+          <input 
+            type="text" name="last_name" value={formData.last_name} onChange={handleChange}
+            className="w-full p-4 bg-cream-silk/40 border border-sahara-rose rounded-2xl focus:ring-2 focus:ring-compassion-rose/30 outline-none font-body transition-all"
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-[10px] font-bold text-compassion-rose uppercase tracking-widest ml-1">Email</label>
+          <input 
+            type="email" name="email" value={formData.email} onChange={handleChange}
+            className="w-full p-4 bg-cream-silk/40 border border-sahara-rose rounded-2xl focus:ring-2 focus:ring-compassion-rose/30 outline-none font-body transition-all"
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-[10px] font-bold text-compassion-rose uppercase tracking-widest ml-1">Téléphone</label>
+          <input 
+            type="tel" name="phone" value={formData.phone} onChange={handleChange}
+            className="w-full p-4 bg-cream-silk/40 border border-sahara-rose rounded-2xl focus:ring-2 focus:ring-compassion-rose/30 outline-none font-body transition-all"
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-[10px] font-bold text-compassion-rose uppercase tracking-widest ml-1">Région</label>
+          <select 
+            name="region" value={formData.region} onChange={handleChange}
+            className="w-full p-4 bg-cream-silk/40 border border-sahara-rose rounded-2xl focus:ring-2 focus:ring-compassion-rose/30 outline-none font-body transition-all appearance-none"
+          >
+            <option value="">Sélectionner...</option>
+            <option value="Dakar">Dakar</option>
+            <option value="Thiès">Thiès</option>
+            <option value="Kaolack">Kaolack</option>
+            <option value="Saint-Louis">Saint-Louis</option>
+          </select>
+        </div>
+        <div className="space-y-2">
+          <label className="text-[10px] font-bold text-compassion-rose uppercase tracking-widest ml-1">Centre Préféré</label>
+          <input 
+            type="text" name="center" value={formData.center} onChange={handleChange}
+            className="w-full p-4 bg-cream-silk/40 border border-sahara-rose rounded-2xl focus:ring-2 focus:ring-compassion-rose/30 outline-none font-body transition-all"
+            placeholder="Ex: Hôpital Principal"
+          />
+        </div>
       </div>
 
-      <div className="flex justify-end pt-4">
-        <button onClick={onSave} disabled={isLoading} className="bg-compassion-rose text-white px-10 py-4 rounded-full font-body font-bold shadow-lg hover:scale-105 transition-all">
-          Enregistrer les préférences
+      <div className="pt-6 flex justify-end">
+        <button 
+          onClick={handleSave}
+          disabled={isLoading}
+          className="bg-compassion-rose text-white px-12 py-4 rounded-full font-headline text-lg shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center gap-3"
+        >
+          {isLoading ? <LoadingSpinner size="sm" color="white" /> : <span className="material-symbols-outlined">save</span>}
+          Enregistrer les modifications
         </button>
       </div>
     </div>
@@ -301,171 +240,78 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ onSave, isL
 /* ========================= */
 /* SECURITY SETTINGS */
 /* ========================= */
-const SecuritySettings: React.FC<CommonSettingsProps> = ({ onSave, isLoading }) => {
+const SecuritySettings: React.FC = () => {
   return (
-    <div className="space-y-8 animate-fade-in">
-      <div className="flex items-center gap-4 mb-8">
-        <div className="w-16 h-16 rounded-2xl bg-sahara-rose flex items-center justify-center">
-          <span className="material-symbols-outlined text-compassion-rose text-3xl">lock</span>
-        </div>
+    <div className="space-y-10">
+      <div className="flex items-center gap-4 mb-2">
+        <IconBox icon="shield_lock" variant="green" className="w-14 h-14 rounded-2xl" />
         <div>
-          <h3 className="font-headline text-2xl text-on-surface">Sécurité</h3>
-          <p className="font-body text-sm text-on-surface-variant">Protégez l'accès à votre dossier de santé</p>
+          <h2 className="font-headline text-2xl text-on-surface">Sécurité & Confidentialité</h2>
+          <p className="text-sm text-on-surface-variant font-body">Protégez votre compte et vos données médicales.</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6">
-        <div className="bg-cream-silk/20 p-6 rounded-3xl border border-sahara-rose flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex-1">
-            <h4 className="font-headline text-xl text-on-surface mb-2">Mot de passe</h4>
-            <p className="font-body text-sm text-on-surface-variant">Dernière modification il y a 3 mois. Utilisez un mot de passe fort pour votre sécurité.</p>
+      <div className="space-y-4">
+        <div className="p-6 rounded-3xl border border-sahara-rose bg-cream-silk/20 hover:bg-white transition-colors group">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div className="flex gap-4">
+              <div className="w-12 h-12 rounded-xl bg-sahara-rose flex items-center justify-center text-compassion-rose group-hover:scale-110 transition-transform">
+                <span className="material-symbols-outlined">password</span>
+              </div>
+              <div>
+                <h4 className="font-headline text-lg text-on-surface">Mot de passe</h4>
+                <p className="text-xs text-on-surface-variant font-body">Dernière modification il y a 3 mois.</p>
+              </div>
+            </div>
+            <button className="px-6 py-2 rounded-full border-2 border-compassion-rose text-compassion-rose font-bold text-sm hover:bg-compassion-rose hover:text-white transition-all">
+              Changer
+            </button>
           </div>
-          <button className="bg-white text-compassion-rose border-2 border-compassion-rose px-6 py-2 rounded-full font-body font-bold hover:bg-compassion-rose hover:text-white transition-all">
-            Changer
-          </button>
         </div>
 
-        <div className="bg-cream-silk/20 p-6 rounded-3xl border border-sahara-rose flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex-1">
-            <h4 className="font-headline text-xl text-on-surface mb-2">Vérification en deux étapes</h4>
-            <p className="font-body text-sm text-on-surface-variant">Ajoutez un code de sécurité envoyé par SMS lors de la connexion.</p>
-          </div>
-          <button className="bg-wellness-green text-white px-6 py-2 rounded-full font-body font-bold hover:opacity-90 transition-all">
-            Activer
-          </button>
-        </div>
-
-        <div className="bg-cream-silk/20 p-6 rounded-3xl border border-sahara-rose flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex-1">
-            <h4 className="font-headline text-xl text-on-surface mb-2">Sessions actives</h4>
-            <p className="font-body text-sm text-on-surface-variant">Vous êtes actuellement connectée sur cet appareil.</p>
-          </div>
-          <button className="text-on-surface-variant hover:text-error font-body font-bold underline transition-colors">
-            Tout déconnecter
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-/* ========================= */
-/* SYSTEM SETTINGS */
-/* ========================= */
-const SystemSettings: React.FC<CommonSettingsProps> = ({ onSave, isLoading }) => {
-  return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-medium text-gray-900">Paramètres système</h3>
-        <p className="mt-1 text-sm text-gray-600">Configurez les paramètres généraux du système</p>
-      </div>
-
-      <div className="space-y-6">
-        <div>
-          <label className="form-label">Langue par défaut</label>
-          <select className="input-field">
-            <option value="fr">Français</option>
-            <option value="en">English</option>
-            <option value="wo">Wolof</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="form-label">Fuseau horaire</label>
-          <select className="input-field">
-            <option value="Africa/Dakar">Afrique/Dakar (GMT+0)</option>
-            <option value="UTC">UTC</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="form-label">Format de date</label>
-          <select className="input-field">
-            <option value="DD/MM/YYYY">JJ/MM/AAAA</option>
-            <option value="MM/DD/YYYY">MM/JJ/AAAA</option>
-            <option value="YYYY-MM-DD">AAAA-MM-JJ</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="form-label">Nombre d'éléments par page</label>
-          <select className="input-field">
-            <option value="10">10</option>
-            <option value="20">20</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-          </select>
-        </div>
-      </div>
-
-      <div className="flex justify-end">
-        <button onClick={onSave} disabled={isLoading} className="btn-primary">
-          {isLoading ? 'Sauvegarde...' : 'Sauvegarder'}
-        </button>
-      </div>
-    </div>
-  );
-};
-
-/* ========================= */
-/* DATABASE SETTINGS */
-/* ========================= */
-const DatabaseSettings: React.FC<CommonSettingsProps> = ({ onSave, isLoading }) => {
-  return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-medium text-gray-900">Gestion de la base de données</h3>
-        <p className="mt-1 text-sm text-gray-600">Outils d'administration de la base de données</p>
-      </div>
-
-      <div className="space-y-6">
-        <div>
-          <h4 className="text-md font-medium text-gray-900">Sauvegarde</h4>
-          <p className="text-sm text-gray-600 mb-4">Créez une sauvegarde complète de la base de données</p>
-          <button className="btn-secondary">Créer une sauvegarde</button>
-        </div>
-
-        <div>
-          <h4 className="text-md font-medium text-gray-900">Importation de données</h4>
-          <p className="text-sm text-gray-600 mb-4">Importez des données depuis un fichier CSV ou Excel</p>
-          <button className="btn-secondary">Importer des données</button>
-        </div>
-
-        <div>
-          <h4 className="text-md font-medium text-gray-900">Nettoyage</h4>
-          <p className="text-sm text-gray-600 mb-4">Nettoyez les données obsolètes et optimisez la base de données</p>
-          <button className="btn-warning">Nettoyer la base de données</button>
-        </div>
-
-        <div>
-          <h4 className="text-md font-medium text-gray-900">Statistiques</h4>
-          <div className="bg-gray-50 rounded-lg p-4 mt-2">
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="text-gray-600">Taille de la base:</span>
-                <span className="font-medium ml-2">2.3 GB</span>
+        <div className="p-6 rounded-3xl border border-sahara-rose bg-cream-silk/20 hover:bg-white transition-colors group">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div className="flex gap-4">
+              <div className="w-12 h-12 rounded-xl bg-atlantic-sage flex items-center justify-center text-wellness-green group-hover:scale-110 transition-transform">
+                <span className="material-symbols-outlined">verified_user</span>
               </div>
               <div>
-                <span className="text-gray-600">Nombre d'enregistrements:</span>
-                <span className="font-medium ml-2">15,234</span>
+                <h4 className="font-headline text-lg text-on-surface">Double Authentification (2FA)</h4>
+                <p className="text-xs text-on-surface-variant font-body">Ajoute une couche de sécurité par SMS.</p>
               </div>
-              <div>
-                <span className="text-gray-600">Dernière sauvegarde:</span>
-                <span className="font-medium ml-2">2024-01-15 14:30</span>
-              </div>
-              <div>
-                <span className="text-gray-600">Statut:</span>
-                <span className="font-medium ml-2 text-success-600">OK</span>
-              </div>
+            </div>
+            <div className="flex items-center gap-2">
+               <span className="text-xs font-bold text-on-surface-variant uppercase mr-2">Désactivé</span>
+               <button className="w-14 h-7 bg-surface-container-highest rounded-full relative transition-all">
+                 <div className="absolute left-1 top-1 w-5 h-5 bg-white rounded-full shadow-sm"></div>
+               </button>
             </div>
           </div>
         </div>
+
+        <div className="p-6 rounded-3xl border border-sahara-rose bg-cream-silk/20 hover:bg-white transition-colors group">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div className="flex gap-4">
+              <div className="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center text-on-surface-variant group-hover:scale-110 transition-transform">
+                <span className="material-symbols-outlined">devices</span>
+              </div>
+              <div>
+                <h4 className="font-headline text-lg text-on-surface">Appareils Connectés</h4>
+                <p className="text-xs text-on-surface-variant font-body">Vous êtes connectée sur ce navigateur.</p>
+              </div>
+            </div>
+            <button className="text-xs font-bold text-error underline hover:text-error/80 transition-colors uppercase tracking-widest">
+              Tout déconnecter
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className="flex justify-end">
-        <button onClick={onSave} disabled={isLoading} className="btn-primary">
-          {isLoading ? 'Sauvegarde...' : 'Sauvegarder'}
-        </button>
+      <div className="bg-wellness-green/5 p-6 rounded-3xl border border-wellness-green/20 flex gap-4">
+        <span className="material-symbols-outlined text-wellness-green">info</span>
+        <p className="text-xs text-wellness-green font-body leading-relaxed">
+          Vos données médicales sont cryptées et stockées conformément aux normes de protection des données de santé au Sénégal. Seul le personnel soignant autorisé peut y accéder avec votre consentement.
+        </p>
       </div>
     </div>
   );

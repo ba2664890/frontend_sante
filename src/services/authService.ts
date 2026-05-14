@@ -79,6 +79,16 @@ class AuthService {
     }
   }
 
+  async updateProfile(userData: Partial<User>): Promise<User> {
+    try {
+      const response = await api.patch('/accounts/users/me/', userData);
+      return response.data;
+    } catch (error) {
+      console.error('updateProfile error:', error);
+      throw error;
+    }
+  }
+
   async resetPassword(email: string): Promise<void> {
     try {
       await api.post('/auth/users/reset_password/', { email });
