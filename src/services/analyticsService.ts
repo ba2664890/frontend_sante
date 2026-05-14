@@ -121,23 +121,23 @@ class AnalyticsService {
       }
 
       return {
-        total_patients: data.total_patients || 0,
-        active_patients: data.active_patients || 0,
-        monthly_screenings: data.monthly_screenings || 0,
-        total_screened: data.total_screened || 0,
-        abnormal_results: data.abnormal_results || 0,
-        pending_followups: data.pending_followups || 0,
-        coverage_rate: data.coverage_rate || 0,
-        follow_up_rate: data.follow_up_rate || 0,
-        screening_trend: data.screening_trend || [],
+        total_patients: Number(data.total_patients) || 0,
+        active_patients: Number(data.active_patients) || 0,
+        monthly_screenings: Number(data.monthly_screenings) || 0,
+        total_screened: Number(data.total_screened) || 0,
+        abnormal_results: Number(data.abnormal_results) || 0,
+        pending_followups: Number(data.pending_followups) || 0,
+        coverage_rate: Number(data.coverage_rate) || 0,
+        follow_up_rate: Number(data.follow_up_rate) || 0,
+        screening_trend: Array.isArray(data.screening_trend) ? data.screening_trend : [],
         age_distribution: data.age_distribution || {},
-        geographic_data: data.geographic_data || [],
+        geographic_data: Array.isArray(data.geographic_data) ? data.geographic_data : [],
         patients_by_region: data.patients_by_region || {},
-        recent_patients: data.recent_patients || [],
-        recent_alerts: data.recent_alerts || [],
-        active_campaigns: data.active_campaigns || [],
-        pending_actions: data.pending_actions || [],
-        pending_alerts: data.pending_alerts || 0,
+        recent_patients: Array.isArray(data.recent_patients) ? data.recent_patients : [],
+        recent_alerts: Array.isArray(data.recent_alerts) ? data.recent_alerts : [],
+        active_campaigns: Array.isArray(data.active_campaigns) ? data.active_campaigns : [],
+        pending_actions: Array.isArray(data.pending_actions) ? data.pending_actions : [],
+        pending_alerts: Number(data.pending_alerts) || 0,
       };
     } catch (error: any) {
       throw new Error(handleApiError(error));
@@ -147,7 +147,15 @@ class AnalyticsService {
   async getPatientDashboardData(): Promise<PatientDashboardData> {
     try {
       const response = await api.get('/analytics/dashboard-metrics/patient-dashboard/');
-      return response.data;
+      const data = response.data || {};
+      
+      return {
+        my_screenings: Array.isArray(data.recent_results) ? data.recent_results : [],
+        upcoming_appointments: Array.isArray(data.upcoming_appointments) ? data.upcoming_appointments : [],
+        my_messages: [], // à adapter si le backend renvoie des messages
+        // Ajouter d'autres champs si nécessaire
+        ...data
+      } as any;
     } catch (error) {
       throw new Error(handleApiError(error));
     }

@@ -19,7 +19,9 @@ class PatientService {
   async getPatient(record_id: number): Promise<Patient> {
     try {
       const response = await api.get(`/patients/patients/${record_id}/`);
-      return response.data;
+      const patient = response.data;
+      // Normalisation optionnelle si nécessaire
+      return patient;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -47,7 +49,17 @@ class PatientService {
   async getPatientByUserId(user_id: number): Promise<Patient> {
     try {
       const response = await api.get(`/patients/patients/by-user/${user_id}/`);
-      return response.data;
+      const patient = response.data;
+      
+      // S'assurer que les champs essentiels existent pour éviter les crashs UI
+      if (patient) {
+        patient.id_patient = patient.id_patient || '';
+        patient.prenom = patient.prenom || '';
+        patient.nom = patient.nom || '';
+        // Ajouter d'autres champs par défaut ici si nécessaire
+      }
+      
+      return patient;
     } catch (error) {
       throw new Error(handleApiError(error));
     }

@@ -59,8 +59,14 @@ export const handleApiError = (error: any): string => {
   if (error.response?.data?.error) return error.response.data.error;
   if (error.response?.status === 400) return error.response.data || 'Requête invalide.';
   if (error.response?.status === 404) return 'Ressource non trouvée.';
-  if (error.response?.status === 500) return 'Erreur serveur.';
-  return 'Une erreur est survenue.';
+  if (error.response?.status === 500) {
+    console.error('Erreur Serveur 500:', error.response?.data);
+    return 'Le serveur rencontre une difficulté technique (base de données). Les données affichées peuvent être incomplètes.';
+  }
+  if (error.code === 'ECONNABORTED') return 'Le délai de réponse a été dépassé. Veuillez réessayer.';
+  if (!error.response) return 'Impossible de contacter le serveur. Vérifiez votre connexion.';
+  
+  return 'Une erreur inattendue est survenue.';
 };
 
 
