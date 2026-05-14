@@ -11,6 +11,11 @@ type Tab = {
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 };
 
+type CommonSettingsProps = {
+  onSave: () => void;
+  isLoading: boolean;
+};
+
 const Settings: React.FC = () => {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -211,6 +216,83 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onSave, isLoadi
           className="bg-compassion-rose text-white px-10 py-4 rounded-full font-body font-bold shadow-lg hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
         >
           {isLoading ? 'Sauvegarde...' : 'Enregistrer les modifications'}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+/* ========================= */
+/* NOTIFICATION SETTINGS */
+/* ========================= */
+type NotificationSettingsProps = {
+  onSave: () => void;
+  isLoading: boolean;
+};
+
+const NotificationSettings: React.FC<NotificationSettingsProps> = ({ onSave, isLoading }) => {
+  const [settings, setSettings] = useState({
+    email_notifications: true,
+    sms_notifications: true,
+    push_notifications: false,
+    daily_summary: true,
+    weekly_reports: true,
+    alert_notifications: true,
+  });
+
+  const handleToggle = (key: keyof typeof settings) => {
+    setSettings({ ...settings, [key]: !settings[key] });
+  };
+
+  return (
+    <div className="space-y-8 animate-fade-in">
+      <div className="flex items-center gap-4 mb-8">
+        <div className="w-16 h-16 rounded-2xl bg-sahara-rose flex items-center justify-center">
+          <span className="material-symbols-outlined text-compassion-rose text-3xl">notifications</span>
+        </div>
+        <div>
+          <h3 className="font-headline text-2xl text-on-surface">Notifications</h3>
+          <p className="font-body text-sm text-on-surface-variant">Gérez comment vous souhaitez être informé</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {Object.entries(settings).map(([key, value]) => (
+          <div key={key} className="bg-white p-6 rounded-3xl border border-sahara-rose flex items-center justify-between hover:shadow-md transition-shadow">
+            <div>
+              <p className="font-headline text-lg text-on-surface">
+                {{
+                  email_notifications: 'Emails',
+                  sms_notifications: 'SMS / Mobile',
+                  push_notifications: 'Notifications Push',
+                  daily_summary: 'Résumé Quotidien',
+                  weekly_reports: 'Rapports Hebdomadaires',
+                  alert_notifications: 'Alertes Critiques',
+                }[key as keyof typeof settings]}
+              </p>
+              <p className="text-sm text-on-surface-variant font-body">
+                Recevez des mises à jour régulières via ce canal.
+              </p>
+            </div>
+            <button
+              onClick={() => handleToggle(key as keyof typeof settings)}
+              className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-200 ${
+                value ? 'bg-compassion-rose' : 'bg-gray-200'
+              }`}
+            >
+              <span
+                className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-200 ${
+                  value ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex justify-end pt-4">
+        <button onClick={onSave} disabled={isLoading} className="bg-compassion-rose text-white px-10 py-4 rounded-full font-body font-bold shadow-lg hover:scale-105 transition-all">
+          Enregistrer les préférences
         </button>
       </div>
     </div>

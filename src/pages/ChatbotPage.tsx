@@ -211,4 +211,7 @@ const ChatbotPage: React.FC = () => {
     </div>
   );
 
+  return isPatient ? <PatientLayout>{renderContent()}</PatientLayout> : renderContent();
+};
+
 export default ChatbotPage;
