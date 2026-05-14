@@ -43,6 +43,17 @@ const Appointments: React.FC = () => {
     );
   }
 
+  const safeFormatDate = (dateStr?: string, formatStr: string = 'dd MMM yyyy') => {
+    if (!dateStr) return '--';
+    try {
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return '--';
+      return format(date, formatStr, { locale: fr });
+    } catch (e) {
+      return '--';
+    }
+  };
+
   const nextAppt = dashboardData?.next_appointment;
   
   // Calcul de l'étape actuelle (Fleur de Santé)
@@ -191,7 +202,7 @@ const Appointments: React.FC = () => {
                   <div>
                     <h4 className="font-body text-lg font-bold">{followUp.follow_up_type_display}</h4>
                     <p className="font-body text-sm text-on-surface-variant">
-                      {format(new Date(followUp.scheduled_date), 'dd MMMM yyyy', { locale: fr })} • {followUp.location || 'Centre de Santé'}
+                      {safeFormatDate(followUp.scheduled_date, 'dd MMMM yyyy')} • {followUp.location || 'Centre de Santé'}
                     </p>
                   </div>
                 </div>

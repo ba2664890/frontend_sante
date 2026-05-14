@@ -27,7 +27,7 @@ const ChatbotPage: React.FC = () => {
     {
       role: 'assistant',
       content:
-        "Bonjour ! Je suis votre assistant médical spécialisé en santé féminine et cancer du col de l'utérus. Comment puis-je vous aider aujourd'hui ?",
+        "Dalal ak jàmm ! Je suis Njariñu, votre assistant CerviCare+. Je suis là pour répondre à vos questions sur votre santé, vos examens ou vos prochains rendez-vous. Comment puis-je vous aider ?",
     },
   ]);
   const [input, setInput] = useState('');
@@ -85,65 +85,81 @@ const ChatbotPage: React.FC = () => {
   }, [messages]);
 
   const renderContent = () => (
-    <div className={`max-w-5xl mx-auto ${isPatient ? '' : 'p-6'} space-y-6`}>
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 bg-sahara-rose rounded-full flex items-center justify-center">
-            <ChatBubbleLeftRightIcon className="w-6 h-6 text-compassion-rose" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-headline font-bold text-gray-900">Assistant Médical</h1>
-            <p className="text-sm font-body text-gray-600">
-              Spécialisé en santé féminine et cancer du col de l'utérus
-            </p>
+    <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8 animate-fade-in">
+      {/* Sidebar Gauche - Infos & Conseils */}
+      <aside className="lg:w-1/3 flex flex-col gap-6">
+        <div className="bg-white p-8 rounded-3xl shadow-ultra-soft border border-sahara-rose relative overflow-hidden group">
+          <div className="absolute -top-10 -right-10 w-32 h-32 bg-sahara-rose/20 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+          <h2 className="font-headline text-2xl text-compassion-rose mb-6 relative z-10">Njariñu IA</h2>
+          <div className="space-y-6 relative z-10">
+            <div className="flex gap-4">
+              <div className="w-10 h-10 rounded-full bg-sahara-rose flex-shrink-0 flex items-center justify-center">
+                <span className="material-symbols-outlined text-compassion-rose text-sm">lightbulb</span>
+              </div>
+              <div>
+                <h4 className="font-bold text-sm text-on-surface">Conseil du jour</h4>
+                <p className="text-sm text-on-surface-variant">L'examen IVA est simple, rapide et indolore. Il permet de vous protéger efficacement.</p>
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <div className="w-10 h-10 rounded-full bg-wellness-green/20 flex-shrink-0 flex items-center justify-center">
+                <span className="material-symbols-outlined text-wellness-green text-sm">shield_moon</span>
+              </div>
+              <div>
+                <h4 className="font-bold text-sm text-on-surface">Votre Protection</h4>
+                <p className="text-sm text-on-surface-variant">Vos données de santé sont cryptées et accessibles uniquement par vous et votre médecin.</p>
+              </div>
+            </div>
           </div>
         </div>
-        <button onClick={() => setShowHistory(true)} className="flex items-center gap-2 text-compassion-rose font-bold hover:underline">
-          <ClockIcon className="w-4 h-4" />
-          Historique
-        </button>
-      </div>
 
-      {/* Patient Selector (Hidden for patients) */}
-      {!isPatient && (
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Patiente (optionnel) :
-          </label>
-          <select
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-compassion-rose focus:border-compassion-rose"
-            onChange={(e) => setSelectedPatientId(e.target.value ? Number(e.target.value) : null)}
-          >
-            <option value="">Aucune patiente sélectionnée</option>
-            {patients.map((p) => (
-              <option key={p.record_id} value={p.record_id}>
-                {p.full_name || `Patiente #${p.record_id}`}
-              </option>
-            ))}
-          </select>
+        <div className="bg-compassion-rose text-white p-8 rounded-3xl shadow-ultra-soft flex flex-col gap-6">
+          <h3 className="font-headline text-xl">Questions Fréquentes</h3>
+          <ul className="space-y-4">
+            <li className="text-sm bg-white/10 p-3 rounded-xl cursor-pointer hover:bg-white/20 transition-colors">C'est quoi un test HPV ?</li>
+            <li className="text-sm bg-white/10 p-3 rounded-xl cursor-pointer hover:bg-white/20 transition-colors">Quand est mon prochain RDV ?</li>
+            <li className="text-sm bg-white/10 p-3 rounded-xl cursor-pointer hover:bg-white/20 transition-colors">Comment lire mes résultats ?</li>
+          </ul>
         </div>
-      )}
+      </aside>
 
-      {/* Chat Area */}
-      <div className="bg-white p-6 rounded-lg shadow-ultra-soft border border-sahara-rose space-y-4">
-        <div className="h-96 overflow-y-auto space-y-4 p-4 bg-cream-silk/30 rounded-lg">
+      {/* Zone de Chat Principale */}
+      <div className="lg:w-2/3 flex flex-col h-[70vh] bg-white rounded-3xl shadow-ultra-soft border border-sahara-rose overflow-hidden">
+        {/* Chat Header */}
+        <header className="p-6 border-b border-sahara-rose flex justify-between items-center bg-cream-silk/20">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-sahara-rose flex items-center justify-center">
+              <span className="material-symbols-outlined text-compassion-rose text-2xl">smart_toy</span>
+            </div>
+            <div>
+              <h2 className="font-headline text-xl text-on-surface">Assistant Médical</h2>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-wellness-green animate-pulse"></span>
+                <span className="text-xs text-on-surface-variant font-bold">En ligne • Njariñu</span>
+              </div>
+            </div>
+          </div>
+          <button onClick={() => setShowHistory(true)} className="p-2 hover:bg-sahara-rose rounded-full transition-colors">
+            <span className="material-symbols-outlined text-compassion-rose">history</span>
+          </button>
+        </header>
+
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-cream-silk/10">
           {messages.map((msg, idx) => (
-            <div
-              key={idx}
-              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div
-                className={`max-w-xs px-4 py-2 rounded-2xl text-sm ${msg.role === 'user'
-                  ? 'bg-compassion-rose text-white shadow-md'
-                  : 'bg-white text-gray-800 border border-sahara-rose shadow-sm'
-                  }`}
-              >
-                {msg.content}
+            <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-[80%] flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                <div className={`px-5 py-3 rounded-2xl text-sm shadow-sm ${
+                  msg.role === 'user' 
+                    ? 'bg-compassion-rose text-white rounded-tr-none' 
+                    : 'bg-white text-on-surface border border-sahara-rose rounded-tl-none'
+                }`}>
+                  {msg.content}
+                </div>
                 {msg.created_at && (
-                  <div className="text-[10px] text-right mt-1 opacity-70">
+                  <span className="text-[10px] text-on-surface-variant mt-1 px-1">
                     {format(new Date(msg.created_at), 'HH:mm', { locale: fr })}
-                  </div>
+                  </span>
                 )}
               </div>
             </div>
@@ -151,39 +167,48 @@ const ChatbotPage: React.FC = () => {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input */}
-        <div className="flex items-center space-x-3">
-          <input
-            type="text"
-            className="flex-1 p-3 border border-sahara-rose rounded-full focus:ring-2 focus:ring-compassion-rose focus:border-transparent outline-none shadow-inner"
-            placeholder="Posez votre question ici (français ou wolof)..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-          />
-          <button 
-            onClick={sendMessage} 
-            className="bg-compassion-rose text-white p-3 rounded-full hover:opacity-90 transition-opacity shadow-md"
-          >
-            <PaperAirplaneIcon className="w-5 h-5" />
-          </button>
-        </div>
+        {/* Input Area */}
+        <footer className="p-6 bg-white border-t border-sahara-rose">
+          {!isPatient && (
+            <div className="mb-4">
+              <select
+                className="w-full p-2 text-xs border border-sahara-rose rounded-xl focus:ring-compassion-rose outline-none"
+                onChange={(e) => setSelectedPatientId(e.target.value ? Number(e.target.value) : null)}
+              >
+                <option value="">Agent: Sélectionner une patiente</option>
+                {patients.map((p) => (
+                  <option key={p.record_id} value={p.record_id}>{p.full_name}</option>
+                ))}
+              </select>
+            </div>
+          )}
+          <div className="flex items-center gap-4 bg-cream-silk/30 p-2 rounded-full border border-sahara-rose">
+            <input
+              type="text"
+              className="flex-1 bg-transparent px-4 py-2 outline-none font-body text-sm"
+              placeholder="Posez votre question en français ou wolof..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+            />
+            <button 
+              onClick={sendMessage}
+              className="w-12 h-12 rounded-full bg-compassion-rose text-white flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-md"
+            >
+              <span className="material-symbols-outlined">send</span>
+            </button>
+          </div>
+        </footer>
       </div>
 
-      {/* Modal Historique */}
-      <Modal
-        isOpen={showHistory}
-        onClose={() => setShowHistory(false)}
-        title="Historique des conversations"
-      >
-        <p className="text-gray-600 text-sm italic">
-          Fonctionnalité à venir : liste de vos échanges passés avec l'assistant.
-        </p>
+      {/* Modal History */}
+      <Modal isOpen={showHistory} onClose={() => setShowHistory(false)} title="Historique">
+        <div className="p-8 text-center">
+          <IconBox icon="history" className="mx-auto mb-4" />
+          <p className="text-on-surface-variant italic">L'historique de vos conversations sera disponible prochainement.</p>
+        </div>
       </Modal>
     </div>
   );
-
-  return isPatient ? <PatientLayout>{renderContent()}</PatientLayout> : renderContent();
-};
 
 export default ChatbotPage;

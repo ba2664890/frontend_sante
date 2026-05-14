@@ -38,24 +38,23 @@ const App: React.FC = () => (
           {/* Main Dashboard Dispatcher */}
           <Route path="/dashboard" element={<Dashboard />} />
 
-          {/* Patient Specific Routes (Using PatientLayout internally) */}
+          {/* Patient Specific Routes */}
           <Route path="/acceuil_patient" element={<PatientDashboard />} />
           <Route path="/patient/records" element={<MedicalRecords />} />
           <Route path="/patient/appointments" element={<PatientAppointments />} />
+          <Route path="/chatbot" element={<ChatbotPage />} />
+          <Route path="/settings" element={<Settings />} />
 
-          {/* Admin & Health Agent Routes (Using Sidebar Layout) */}
+          {/* Admin & Health Agent Routes (With Sidebar) */}
           <Route element={<Layout />}>
             <Route path="/reports" element={<ReportsPage />} />
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />           
             <Route path="/patients" element={<Patients />} />
             <Route path="/accueil" element={<Campaigns />} />
             <Route path="/appointments/:id" element={<Appointments />} />
-            <Route path="/chatbot" element={<ChatbotPage />} />
             <Route path="/admin" element={<AdminRedirect />} />
             <Route path="/patients/:id" element={<PatientDetail />} />
             <Route path="/statistics" element={<Statistics />} />
             <Route path="/notifications" element={<Notifications />} />
-            <Route path="/settings" element={<Settings />} />
           </Route>
         </Route>
 

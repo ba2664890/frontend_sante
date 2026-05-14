@@ -109,6 +109,7 @@ type ProfileSettingsProps = {
 };
 
 const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onSave, isLoading }) => {
+  const isPatient = user?.role === 'patient';
   const [formData, setFormData] = useState({
     first_name: user?.first_name || '',
     last_name: user?.last_name || '',
@@ -123,32 +124,66 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onSave, isLoadi
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-medium text-gray-900">Informations personnelles</h3>
-        <p className="mt-1 text-sm text-gray-600">Mettez à jour vos informations de profil</p>
+    <div className="space-y-8 animate-fade-in">
+      <div className="flex items-center gap-4 mb-8">
+        <div className="w-16 h-16 rounded-2xl bg-sahara-rose flex items-center justify-center">
+          <span className="material-symbols-outlined text-compassion-rose text-3xl">person</span>
+        </div>
+        <div>
+          <h3 className="font-headline text-2xl text-on-surface">Mon Profil</h3>
+          <p className="font-body text-sm text-on-surface-variant">Informations personnelles de votre compte</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="form-label">Prénom</label>
-          <input type="text" name="first_name" value={formData.first_name} onChange={handleChange} className="input-field" />
+        <div className="space-y-2">
+          <label className="font-body text-xs font-bold text-compassion-rose uppercase tracking-widest">Prénom</label>
+          <input 
+            type="text" 
+            name="first_name" 
+            value={formData.first_name} 
+            onChange={handleChange} 
+            className="w-full p-4 bg-cream-silk/30 border border-sahara-rose rounded-2xl focus:ring-2 focus:ring-compassion-rose outline-none font-body transition-all" 
+          />
         </div>
-        <div>
-          <label className="form-label">Nom</label>
-          <input type="text" name="last_name" value={formData.last_name} onChange={handleChange} className="input-field" />
+        <div className="space-y-2">
+          <label className="font-body text-xs font-bold text-compassion-rose uppercase tracking-widest">Nom</label>
+          <input 
+            type="text" 
+            name="last_name" 
+            value={formData.last_name} 
+            onChange={handleChange} 
+            className="w-full p-4 bg-cream-silk/30 border border-sahara-rose rounded-2xl focus:ring-2 focus:ring-compassion-rose outline-none font-body transition-all" 
+          />
         </div>
-        <div>
-          <label className="form-label">Email</label>
-          <input type="email" name="email" value={formData.email} onChange={handleChange} className="input-field" />
+        <div className="space-y-2">
+          <label className="font-body text-xs font-bold text-compassion-rose uppercase tracking-widest">Email</label>
+          <input 
+            type="email" 
+            name="email" 
+            value={formData.email} 
+            onChange={handleChange} 
+            className="w-full p-4 bg-cream-silk/30 border border-sahara-rose rounded-2xl focus:ring-2 focus:ring-compassion-rose outline-none font-body transition-all" 
+          />
         </div>
-        <div>
-          <label className="form-label">Téléphone</label>
-          <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="input-field" />
+        <div className="space-y-2">
+          <label className="font-body text-xs font-bold text-compassion-rose uppercase tracking-widest">Téléphone</label>
+          <input 
+            type="tel" 
+            name="phone" 
+            value={formData.phone} 
+            onChange={handleChange} 
+            className="w-full p-4 bg-cream-silk/30 border border-sahara-rose rounded-2xl focus:ring-2 focus:ring-compassion-rose outline-none font-body transition-all" 
+          />
         </div>
-        <div>
-          <label className="form-label">Région</label>
-          <select name="region" value={formData.region} onChange={handleChange} className="input-field">
+        <div className="space-y-2">
+          <label className="font-body text-xs font-bold text-compassion-rose uppercase tracking-widest">Région</label>
+          <select 
+            name="region" 
+            value={formData.region} 
+            onChange={handleChange} 
+            className="w-full p-4 bg-cream-silk/30 border border-sahara-rose rounded-2xl focus:ring-2 focus:ring-compassion-rose outline-none font-body transition-all"
+          >
             <option value="">Sélectionner une région</option>
             <option value="dakar">Dakar</option>
             <option value="thiès">Thiès</option>
@@ -157,94 +192,25 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onSave, isLoadi
             <option value="kaolack">Kaolack</option>
           </select>
         </div>
-        <div>
-          <label className="form-label">Centre de santé</label>
-          <input type="text" name="center" value={formData.center} onChange={handleChange} className="input-field" />
+        <div className="space-y-2">
+          <label className="font-body text-xs font-bold text-compassion-rose uppercase tracking-widest">Centre de santé</label>
+          <input 
+            type="text" 
+            name="center" 
+            value={formData.center} 
+            onChange={handleChange} 
+            className="w-full p-4 bg-cream-silk/30 border border-sahara-rose rounded-2xl focus:ring-2 focus:ring-compassion-rose outline-none font-body transition-all" 
+          />
         </div>
       </div>
 
-      <div className="flex justify-end">
-        <button onClick={onSave} disabled={isLoading} className="btn-primary">
-          {isLoading ? 'Sauvegarde...' : 'Sauvegarder'}
-        </button>
-      </div>
-    </div>
-  );
-};
-
-/* ========================= */
-/* NOTIFICATION SETTINGS */
-/* ========================= */
-type NotificationSettingsProps = {
-  onSave: () => void;
-  isLoading: boolean;
-};
-
-const NotificationSettings: React.FC<NotificationSettingsProps> = ({ onSave, isLoading }) => {
-  const [settings, setSettings] = useState({
-    email_notifications: true,
-    sms_notifications: true,
-    push_notifications: false,
-    daily_summary: true,
-    weekly_reports: true,
-    alert_notifications: true,
-  });
-
-  const handleToggle = (key: keyof typeof settings) => {
-    setSettings({ ...settings, [key]: !settings[key] });
-  };
-
-  return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-medium text-gray-900">Préférences de notification</h3>
-        <p className="mt-1 text-sm text-gray-600">Choisissez comment vous souhaitez recevoir les notifications</p>
-      </div>
-
-      <div className="space-y-4">
-        {Object.entries(settings).map(([key, value]) => (
-          <div key={key} className="flex items-center justify-between">
-            <div>
-              <p className="font-medium text-gray-900">
-                {{
-                  email_notifications: 'Notifications par email',
-                  sms_notifications: 'Notifications par SMS',
-                  push_notifications: 'Notifications push',
-                  daily_summary: 'Résumé quotidien',
-                  weekly_reports: 'Rapports hebdomadaires',
-                  alert_notifications: 'Alertes importantes',
-                }[key as keyof typeof settings]}
-              </p>
-              <p className="text-sm text-gray-600">
-                {{
-                  email_notifications: 'Recevez les notifications par email',
-                  sms_notifications: 'Recevez les notifications par SMS',
-                  push_notifications: 'Notifications dans le navigateur',
-                  daily_summary: 'Résumé quotidien des activités',
-                  weekly_reports: 'Rapports hebdomadaires par email',
-                  alert_notifications: 'Alertes pour les événements critiques',
-                }[key as keyof typeof settings]}
-              </p>
-            </div>
-            <button
-              onClick={() => handleToggle(key as keyof typeof settings)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${
-                value ? 'bg-primary-600' : 'bg-gray-200'
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
-                  value ? 'translate-x-6' : 'translate-x-1'
-                }`}
-              />
-            </button>
-          </div>
-        ))}
-      </div>
-
-      <div className="flex justify-end">
-        <button onClick={onSave} disabled={isLoading} className="btn-primary">
-          {isLoading ? 'Sauvegarde...' : 'Sauvegarder'}
+      <div className="flex justify-end pt-4">
+        <button 
+          onClick={onSave} 
+          disabled={isLoading} 
+          className="bg-compassion-rose text-white px-10 py-4 rounded-full font-body font-bold shadow-lg hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
+        >
+          {isLoading ? 'Sauvegarde...' : 'Enregistrer les modifications'}
         </button>
       </div>
     </div>
@@ -254,40 +220,49 @@ const NotificationSettings: React.FC<NotificationSettingsProps> = ({ onSave, isL
 /* ========================= */
 /* SECURITY SETTINGS */
 /* ========================= */
-type CommonSettingsProps = { onSave: () => void; isLoading: boolean };
-
 const SecuritySettings: React.FC<CommonSettingsProps> = ({ onSave, isLoading }) => {
   return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-medium text-gray-900">Sécurité du compte</h3>
-        <p className="mt-1 text-sm text-gray-600">Gérez la sécurité de votre compte</p>
-      </div>
-
-      <div className="space-y-6">
-        <div>
-          <h4 className="text-md font-medium text-gray-900">Changer le mot de passe</h4>
-          <p className="text-sm text-gray-600 mb-4">Mettez à jour régulièrement votre mot de passe pour sécuriser votre compte</p>
-          <button className="btn-secondary">Changer le mot de passe</button>
+    <div className="space-y-8 animate-fade-in">
+      <div className="flex items-center gap-4 mb-8">
+        <div className="w-16 h-16 rounded-2xl bg-sahara-rose flex items-center justify-center">
+          <span className="material-symbols-outlined text-compassion-rose text-3xl">lock</span>
         </div>
-
         <div>
-          <h4 className="text-md font-medium text-gray-900">Authentification à deux facteurs</h4>
-          <p className="text-sm text-gray-600 mb-4">Ajoutez une couche de sécurité supplémentaire à votre compte</p>
-          <button className="btn-secondary">Activer la 2FA</button>
-        </div>
-
-        <div>
-          <h4 className="text-md font-medium text-gray-900">Sessions actives</h4>
-          <p className="text-sm text-gray-600 mb-4">Gérez vos sessions de connexion actives</p>
-          <button className="btn-secondary">Voir les sessions</button>
+          <h3 className="font-headline text-2xl text-on-surface">Sécurité</h3>
+          <p className="font-body text-sm text-on-surface-variant">Protégez l'accès à votre dossier de santé</p>
         </div>
       </div>
 
-      <div className="flex justify-end">
-        <button onClick={onSave} disabled={isLoading} className="btn-primary">
-          {isLoading ? 'Sauvegarde...' : 'Sauvegarder'}
-        </button>
+      <div className="grid grid-cols-1 gap-6">
+        <div className="bg-cream-silk/20 p-6 rounded-3xl border border-sahara-rose flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex-1">
+            <h4 className="font-headline text-xl text-on-surface mb-2">Mot de passe</h4>
+            <p className="font-body text-sm text-on-surface-variant">Dernière modification il y a 3 mois. Utilisez un mot de passe fort pour votre sécurité.</p>
+          </div>
+          <button className="bg-white text-compassion-rose border-2 border-compassion-rose px-6 py-2 rounded-full font-body font-bold hover:bg-compassion-rose hover:text-white transition-all">
+            Changer
+          </button>
+        </div>
+
+        <div className="bg-cream-silk/20 p-6 rounded-3xl border border-sahara-rose flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex-1">
+            <h4 className="font-headline text-xl text-on-surface mb-2">Vérification en deux étapes</h4>
+            <p className="font-body text-sm text-on-surface-variant">Ajoutez un code de sécurité envoyé par SMS lors de la connexion.</p>
+          </div>
+          <button className="bg-wellness-green text-white px-6 py-2 rounded-full font-body font-bold hover:opacity-90 transition-all">
+            Activer
+          </button>
+        </div>
+
+        <div className="bg-cream-silk/20 p-6 rounded-3xl border border-sahara-rose flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex-1">
+            <h4 className="font-headline text-xl text-on-surface mb-2">Sessions actives</h4>
+            <p className="font-body text-sm text-on-surface-variant">Vous êtes actuellement connectée sur cet appareil.</p>
+          </div>
+          <button className="text-on-surface-variant hover:text-error font-body font-bold underline transition-colors">
+            Tout déconnecter
+          </button>
+        </div>
       </div>
     </div>
   );
