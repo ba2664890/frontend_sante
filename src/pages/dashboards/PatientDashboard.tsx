@@ -43,7 +43,7 @@ const PatientDashboard: React.FC = () => {
     if (patientDetails && !aiSummary && !aiSummaryMutation.isLoading) {
       aiSummaryMutation.mutate(patientDetails);
     }
-  }, [patientDetails, aiSummary]); // Retrait de aiSummaryMutation des dépendances
+  }, [patientDetails, aiSummary, aiSummaryMutation]); // Ajout de aiSummaryMutation pour satisfaire ESLint
 
   if (isDashboardLoading || !user) {
     return (
