@@ -39,10 +39,11 @@ const PatientDashboard: React.FC = () => {
   );
 
   useEffect(() => {
-    if (patientDetails) {
+    // On ne génère le résumé que si on a les détails ET qu'on n'a pas encore de résumé
+    if (patientDetails && !aiSummary && !aiSummaryMutation.isLoading) {
       aiSummaryMutation.mutate(patientDetails);
     }
-  }, [patientDetails, aiSummaryMutation]);
+  }, [patientDetails, aiSummary]); // Retrait de aiSummaryMutation des dépendances
 
   if (isDashboardLoading || !user) {
     return (
