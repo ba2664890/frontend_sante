@@ -4,7 +4,6 @@ import { useQuery } from 'react-query';
 import { patientService } from '../services/patientService.ts';
 import { Patient } from '../types';
 import Modal from '../components/Modal.tsx';
-import { chatService } from '../services/chatService.ts';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { toast } from 'react-hot-toast';
