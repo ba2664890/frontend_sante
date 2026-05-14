@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext.tsx';
 import { 
   UserIcon, 
@@ -6,8 +6,6 @@ import {
   BellIcon, 
   Cog6ToothIcon as CogIcon,
   ServerIcon as DatabaseIcon,
-  CheckCircleIcon,
-  ExclamationCircleIcon
 } from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
 import { useLocation } from 'react-router-dom';
@@ -18,7 +16,6 @@ import { authService } from '../services/authService.ts';
 
 const Settings: React.FC = () => {
   const { user, login } = useAuth();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const location = useLocation();
   const [activeTab, setActiveTab] = useState<string>(location.state?.defaultTab || 'profile');
 
