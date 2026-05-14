@@ -227,6 +227,16 @@ class PatientService {
       throw new Error(handleApiError(error));
     }
   }
+
+  // ================= IA & SYNTHÈSE =================
+  async getAiSummary(patientData: any): Promise<{ synthese: string }> {
+    try {
+      const response = await api.post('/patients/patients/ai-summary/', patientData);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
 }
 
 export const patientService = new PatientService();

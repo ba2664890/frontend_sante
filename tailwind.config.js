@@ -17,7 +17,21 @@ module.exports = {
           700: '#6d28d9',
           800: '#5b21b6',
           900: '#4c1d95',
+          DEFAULT: '#8f464c', // compassion-rose
         },
+        // Nouveau design system colors
+        "compassion-rose": "#8f464c",
+        "wellness-green": "#066a5f",
+        "sahara-rose": "#F9E8E8",
+        "atlantic-sage": "#E8F5EE",
+        "cream-silk": "#FDFAF7",
+        "muted-gold": "#C5A059",
+        "on-surface": "#1b1c1a",
+        "on-surface-variant": "#534343",
+        "surface-container": "#f0edea",
+        "surface-container-highest": "#e5e2df",
+        "error": "#ba1a1a",
+        
         secondary: {
           50: '#fefce8',
           100: '#fef9c3',
@@ -54,21 +68,20 @@ module.exports = {
           800: '#92400e',
           900: '#78350f',
         },
-        error: {
-          50: '#fef2f2',
-          100: '#fee2e2',
-          200: '#fecaca',
-          300: '#fca5a5',
-          400: '#f87171',
-          500: '#ef4444',
-          600: '#dc2626',
-          700: '#b91c1c',
-          800: '#991b1b',
-          900: '#7f1d1d',
-        },
       },
       fontFamily: {
-        'sans': ['Inter', 'system-ui', 'sans-serif'],
+        'sans': ['Nunito Sans', 'Inter', 'system-ui', 'sans-serif'],
+        'headline': ['Playfair Display', 'serif'],
+        'body': ['Nunito Sans', 'sans-serif'],
+      },
+      spacing: {
+        'container-padding': '40px',
+        'section-gap': '80px',
+        'element-gap': '24px',
+        'max-width': '1280px',
+      },
+      boxShadow: {
+        'ultra-soft': '0 12px 24px rgba(200, 100, 100, 0.06)',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',

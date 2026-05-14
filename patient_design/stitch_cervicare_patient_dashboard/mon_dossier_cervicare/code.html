@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&amp;family=Nunito+Sans:wght@400;700&amp;family=DM+Serif+Display&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#e5e2df",
+                        "error": "#ba1a1a",
+                        "outline-variant": "#d8c1c1",
+                        "surface-variant": "#e5e2df",
+                        "outline": "#867273",
+                        "secondary-fixed-dim": "#85d5c7",
+                        "inverse-on-surface": "#f3f0ed",
+                        "on-surface-variant": "#534343",
+                        "on-tertiary-container": "#fffbff",
+                        "primary-container": "#ac5d63",
+                        "primary": "#8f464c",
+                        "on-primary-container": "#fffbff",
+                        "surface-container-low": "#f6f3f0",
+                        "on-tertiary": "#ffffff",
+                        "secondary-container": "#a1f2e2",
+                        "on-background": "#1b1c1a",
+                        "on-tertiary-fixed-variant": "#4f4444",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#f0edea",
+                        "secondary-fixed": "#a1f2e2",
+                        "surface-tint": "#92484e",
+                        "tertiary": "#655959",
+                        "on-secondary-fixed": "#00201c",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#31302f",
+                        "on-surface": "#1b1c1a",
+                        "secondary": "#066a5f",
+                        "surface": "#fcf9f6",
+                        "tertiary-container": "#7e7272",
+                        "primary-fixed-dim": "#ffb2b6",
+                        "on-tertiary-fixed": "#22191a",
+                        "inverse-primary": "#ffb2b6",
+                        "on-error": "#ffffff",
+                        "background": "#fcf9f6",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed": "#ffdadb",
+                        "surface-dim": "#dcdad7",
+                        "surface-bright": "#fcf9f6",
+                        "tertiary-fixed-dim": "#d3c3c3",
+                        "surface-container-high": "#eae8e5",
+                        "on-primary-fixed": "#3c060f",
+                        "on-primary-fixed-variant": "#753138",
+                        "on-secondary-fixed-variant": "#005047",
+                        "tertiary-fixed": "#efdfdf",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "on-secondary-container": "#157165"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-padding": "40px",
+                        "section-gap": "80px",
+                        "element-gap": "24px",
+                        "grid-columns": "12",
+                        "base": "8px",
+                        "max-width": "1280px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Playfair Display"],
+                        "body-md": ["Nunito Sans"],
+                        "headline-xl": ["Playfair Display"],
+                        "body-lg": ["Nunito Sans"],
+                        "headline-lg": ["Playfair Display"],
+                        "label-md": ["Nunito Sans"],
+                        "dm-serif": ["DM Serif Display"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #fcf9f6; /* Cream base */
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-surface">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-surface/80 backdrop-blur-md shadow-[0_10px_30px_rgba(200,116,122,0.08)]">
+<div class="flex justify-between items-center px-container-padding py-4 max-w-max-width mx-auto w-full">
+<div class="font-headline-md text-headline-md font-bold text-primary">CerviCare+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Accueil</a>
+<a class="text-primary border-b-2 border-primary pb-1 font-bold font-body-md text-body-md" href="#">Mon Dossier</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Assistant</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Profil</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-all duration-300">
+<span class="material-symbols-outlined text-primary" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-all duration-300">
+<span class="material-symbols-outlined text-primary" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<main class="pt-32 pb-section-gap px-container-padding max-w-max-width mx-auto">
+<!-- Hero Branding/Intro -->
+<div class="mb-section-gap text-center">
+<h1 class="font-dm-serif text-headline-xl text-primary mb-4">Mes Résultats Médicaux</h1>
+<p class="text-body-lg text-on-surface-variant max-w-2xl mx-auto">
+                Retrouvez ici le suivi complet de votre parcours de santé. Vos données sont sécurisées et traitées avec le plus grand soin.
+            </p>
+</div>
+<!-- Results Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-element-gap mb-section-gap">
+<!-- Result Card 1 -->
+<div class="bg-white p-8 rounded-lg shadow-[0_10px_30px_rgba(200,116,122,0.06)] border-l-8 border-[#85d5c7] flex flex-col justify-between h-full hover:scale-[1.02] transition-transform duration-300">
+<div>
+<div class="flex justify-between items-start mb-6">
+<span class="bg-secondary-container text-on-secondary-container px-4 py-1 rounded-full font-label-md text-label-md">Dépistage</span>
+<span class="material-symbols-outlined text-secondary" data-icon="verified_user">verified_user</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2">IVA</h3>
+<p class="text-body-md text-on-surface-variant mb-6">Inspection visuelle après application d'acide acétique.</p>
+</div>
+<div class="flex items-end justify-between">
+<div>
+<span class="block text-label-md font-label-md text-outline uppercase tracking-wider">Résultat</span>
+<span class="text-headline-md font-bold text-secondary">Négatif</span>
+</div>
+<span class="text-label-md text-outline">12 Oct 2023</span>
+</div>
+</div>
+<!-- Result Card 2 -->
+<div class="bg-white p-8 rounded-lg shadow-[0_10px_30px_rgba(200,116,122,0.06)] border-l-8 border-[#ffd48a] flex flex-col justify-between h-full hover:scale-[1.02] transition-transform duration-300">
+<div>
+<div class="flex justify-between items-start mb-6">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant px-4 py-1 rounded-full font-label-md text-label-md">Laboratoire</span>
+<span class="material-symbols-outlined text-primary" data-icon="biotech">biotech</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2">HPV</h3>
+<p class="text-body-md text-on-surface-variant mb-6">Test de détection du Papillomavirus Humain à haut risque.</p>
+</div>
+<div class="flex items-end justify-between">
+<div>
+<span class="block text-label-md font-label-md text-outline uppercase tracking-wider">Résultat</span>
+<span class="text-headline-md font-bold text-primary">Type 16</span>
+</div>
+<span class="text-label-md text-outline">15 Jan 2024</span>
+</div>
+</div>
+<!-- Result Card 3 -->
+<div class="bg-white p-8 rounded-lg shadow-[0_10px_30px_rgba(200,116,122,0.06)] border-l-8 border-[#85d5c7] flex flex-col justify-between h-full hover:scale-[1.02] transition-transform duration-300">
+<div>
+<div class="flex justify-between items-start mb-6">
+<span class="bg-secondary-container text-on-secondary-container px-4 py-1 rounded-full font-label-md text-label-md">Frottis</span>
+<span class="material-symbols-outlined text-secondary" data-icon="microscope">magnification_small</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2">Cytologie</h3>
+<p class="text-body-md text-on-surface-variant mb-6">Analyse morphologique des cellules du col de l'utérus.</p>
+</div>
+<div class="flex items-end justify-between">
+<div>
+<span class="block text-label-md font-label-md text-outline uppercase tracking-wider">Résultat</span>
+<span class="text-headline-md font-bold text-secondary">Normal</span>
+</div>
+<span class="text-label-md text-outline">22 Mar 2024</span>
+</div>
+</div>
+</div>
+<!-- History Timeline Section -->
+<section class="max-w-3xl mx-auto">
+<h2 class="font-dm-serif text-headline-lg text-primary mb-12 text-center">Historique des interventions</h2>
+<div class="relative">
+<!-- Timeline Vertical Line -->
+<div class="absolute left-1/2 -translate-x-1/2 w-0.5 h-full bg-outline-variant/30"></div>
+<!-- Timeline Item 1 -->
+<div class="relative flex items-center justify-between mb-16 w-full">
+<div class="w-5/12 text-right pr-8">
+<span class="inline-block bg-surface-container text-on-secondary-container px-3 py-1 rounded-full font-label-md text-label-md mb-2">22 Mars 2024</span>
+<h4 class="font-headline-md text-headline-md text-on-surface">Consultation de suivi</h4>
+<p class="text-body-md text-on-surface-variant">Vérification de routine annuelle effectuée au Centre de Santé de Dakar.</p>
+</div>
+<div class="absolute left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-secondary-fixed border-4 border-white shadow-md flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-secondary text-sm" data-icon="medical_services">medical_services</span>
+</div>
+<div class="w-5/12 pl-8">
+<div class="rounded-lg overflow-hidden shadow-sm">
+<img alt="Cabinet médical" class="w-full h-32 object-cover" data-alt="A warm and inviting modern doctor's office in a healthcare facility, featuring soft cream walls and natural wood furniture. The lighting is diffused and calming, creating a space for professional care and empathy. A minimalist digital wellness aesthetic with sage green and rose accents is visible in the decor." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZ9F9Kfo3CyJjDBC4OP74UqY9cSh8ycDBziphYx_95ojSqFLG1O9KpYdPcAyjkkczkqzjzsKy7jq27GbH9rjQavwBKGz49C8v-SK7ksf5_DrlTut-Pn_9iO7tTm3xjZr1Z4R6pA36wff27b7nxmCVjejOCl3x9HEgJjNZJoZ_qdq_pWOK6HotsDfL3QNj_9xq6vC4uODE1Uz_M-rE7g2X4CA6Hzz3jzYJ7KauZCHkVGikGr1bfAjd-a3hGwR5ebTmOCRV5aFJlU6Y"/>
+</div>
+</div>
+</div>
+<!-- Timeline Item 2 -->
+<div class="relative flex items-center justify-between mb-16 w-full flex-row-reverse">
+<div class="w-5/12 text-left pl-8">
+<span class="inline-block bg-surface-container text-on-secondary-container px-3 py-1 rounded-full font-label-md text-label-md mb-2">15 Janvier 2024</span>
+<h4 class="font-headline-md text-headline-md text-on-surface">Prélèvement Labo</h4>
+<p class="text-body-md text-on-surface-variant">Test HPV moléculaire transmis au laboratoire central pour analyse approfondie.</p>
+</div>
+<div class="absolute left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-primary-fixed border-4 border-white shadow-md flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="science">science</span>
+</div>
+<div class="w-5/12 pr-8 text-right">
+<div class="rounded-lg overflow-hidden shadow-sm">
+<img alt="Laboratoire" class="w-full h-32 object-cover" data-alt="A sterile but welcoming high-tech medical laboratory setup. Close-up of glass equipment on a clean white surface with soft teal and dusty rose highlights. The lighting is bright and crisp, conveying precision and modern scientific excellence in a calm healthcare environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCL7hY6VvDlzNADF-97CnNOKoIq3jPVMUPeDUqWe_EnB1T1YH-e8RlGrFT_5Ps80TIPtWG2NvvAO0aZrOcPTJyKBciym839Qr1j-1SzuTCpA7QDQb2xlmg1dGUf82IWsf0JasyFmB3kSlqDq8FsXgXLHJIRdvOL-zKnBtyTCRi5fDFocAex-yn1ENf68vlfXIhgUPguf8pK1NYOAzd7SGu6I4sNw06SSpNHMEov5yu2EMJyqlXXGzqbMxTfGCjN5TMrPFr42dsKvE"/>
+</div>
+</div>
+</div>
+<!-- Timeline Item 3 -->
+<div class="relative flex items-center justify-between w-full">
+<div class="w-5/12 text-right pr-8">
+<span class="inline-block bg-surface-container text-on-secondary-container px-3 py-1 rounded-full font-label-md text-label-md mb-2">12 Octobre 2023</span>
+<h4 class="font-headline-md text-headline-md text-on-surface">Dépistage initial</h4>
+<p class="text-body-md text-on-surface-variant">Première visite de sensibilisation et test IVA gratuit lors de la campagne Octobre Rose.</p>
+</div>
+<div class="absolute left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-secondary-fixed border-4 border-white shadow-md flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-secondary text-sm" data-icon="event">event</span>
+</div>
+<div class="w-5/12 pl-8">
+<div class="rounded-lg overflow-hidden shadow-sm">
+<img alt="Consultation" class="w-full h-32 object-cover" data-alt="A compassionate medical interaction where a healthcare professional is gently talking to a patient in a warm, cream-colored clinic. The atmosphere is soft and reassuring, with golden hour sunlight filtering through. The visual style is organic and empathetic, using a palette of sage green and soft rose." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdXrqB4io3ooXJGWHGzXCTR5uJWLleUUkHeOD5YAitT7s1SKiOm8ywstiSW3Z8D-tuWUN5gvCbCpCIW2hlm0izbGPah9KxVfumUROprhdo9i3TqLMec3L06LVL-iG6yYYiX3kImDUdp1k1QapZWY9PAX7ID3jJ8mnQOrEFN80xHCEE9JPszS0C8qNbyrb_Vk34k4UaQ_-7hm3iQQTuoG5zaMjcFRe95yWermrB5tYjqrpTZItYwiePKJ-K8dKNIux__PttUUrZPfs"/>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container border-none full-width rounded-t-lg">
+<div class="flex flex-col md:flex-row justify-between items-center px-container-padding py-element-gap gap-base max-w-max-width mx-auto w-full">
+<div class="font-headline-md text-headline-md text-primary">CerviCare+</div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="text-on-surface-variant font-label-md text-label-md hover:text-secondary transition-colors underline" href="#">Confidentialité</a>
+<a class="text-on-surface-variant font-label-md text-label-md hover:text-secondary transition-colors underline" href="#">Conditions d'utilisation</a>
+<a class="text-on-surface-variant font-label-md text-label-md hover:text-secondary transition-colors underline" href="#">Contactez-nous</a>
+<a class="text-on-surface-variant font-label-md text-label-md hover:text-secondary transition-colors underline" href="#">Aide</a>
+</div>
+<p class="text-secondary font-body-md text-body-md">© 2024 CerviCare+. Accompagnement avec bienveillance.</p>
+</div>
+</footer>
+</body></html>
