@@ -75,11 +75,6 @@ const MedicalRecords: React.FC = () => {
     return val.split(',').map(v => map[v.trim()] || v).join(', ');
   };
 
-  const getCytologyResult = (val?: number) => {
-    const map: Record<number, string> = { 1: 'NILM (Normal)', 2: 'ASC-US', 3: 'ASC-H', 4: 'LSIL', 5: 'HSIL', 6: 'AGC' };
-    return val ? map[val] : 'Non réalisé';
-  };
-
   const getVihStatut = (val?: number) => {
     const map: Record<number, string> = { 1: 'Négatif', 2: 'Positif (TARV+)', 3: 'Positif (TARV-)', 9: 'Inconnu' };
     return val ? map[val] : '--';

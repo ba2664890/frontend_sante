@@ -114,7 +114,6 @@ type ProfileSettingsProps = {
 };
 
 const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onSave, isLoading }) => {
-  const isPatient = user?.role === 'patient';
   const [formData, setFormData] = useState({
     first_name: user?.first_name || '',
     last_name: user?.last_name || '',
