@@ -6,7 +6,6 @@ import { useAuth } from '../../contexts/AuthContext.tsx';
 import PatientLayout from '../../components/PatientLayout.tsx';
 import { BentoCard, GlassPanel, IconBox } from '../../components/ui/PatientUI.tsx';
 import LoadingSpinner from '../../components/LoadingSpinner.tsx';
-import toast from 'react-hot-toast';
 
 const PatientDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -40,7 +39,7 @@ const PatientDashboard: React.FC = () => {
     if (patientDetails) {
       aiSummaryMutation.mutate(patientDetails);
     }
-  }, [patientDetails]);
+  }, [patientDetails, aiSummaryMutation]);
 
   if (isDashboardLoading || !user) {
     return (
@@ -292,6 +291,7 @@ const PatientDashboard: React.FC = () => {
             <div className="aspect-video">
               <iframe
                 src={selectedVideo.url}
+                title={selectedVideo.title}
                 className="w-full h-full"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
