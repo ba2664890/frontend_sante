@@ -12,6 +12,8 @@ import {
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { toast } from 'react-hot-toast';
+import { useAuth } from '../contexts/AuthContext.tsx';
+import PatientLayout from '../components/PatientLayout.tsx';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -20,6 +22,7 @@ type Message = {
 };
 
 const ChatbotPage: React.FC = () => {
+  const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
@@ -33,13 +36,16 @@ const ChatbotPage: React.FC = () => {
   const [showHistory, setShowHistory] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Charger liste patientes
+  const isPatient = user?.role === 'patient';
+
+  // Charger liste patientes (uniquement pour les agents)
   const { data: patients = [] } = useQuery<Patient[]>(
     ['patients-for-chat'],
     async () => {
       const res = await patientService.getPatients({}, 1);
       return res.results || [];
-    }
+    },
+    { enabled: !isPatient }
   );
 
   // Envoi message
@@ -53,7 +59,7 @@ const ChatbotPage: React.FC = () => {
     try {
       const res = await patientService.sendChatbotMessage({
         question: input,
-        patient_id: selectedPatientId || undefined,
+        patient_id: isPatient ? undefined : (selectedPatientId || undefined),
         conversation_id: conversationId || undefined,
       });
 
@@ -78,62 +84,64 @@ const ChatbotPage: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  return (
-    <div className="max-w-5xl mx-auto p-6 space-y-6">
+  const renderContent = () => (
+    <div className={`max-w-5xl mx-auto ${isPatient ? '' : 'p-6'} space-y-6`}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
-            <ChatBubbleLeftRightIcon className="w-6 h-6 text-primary-600" />
+          <div className="w-12 h-12 bg-sahara-rose rounded-full flex items-center justify-center">
+            <ChatBubbleLeftRightIcon className="w-6 h-6 text-compassion-rose" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Chatbot Médical</h1>
-            <p className="text-sm text-gray-600">
-              Assistant spécialisé en santé féminine et cancer du col de l'utérus
+            <h1 className="text-2xl font-headline font-bold text-gray-900">Assistant Médical</h1>
+            <p className="text-sm font-body text-gray-600">
+              Spécialisé en santé féminine et cancer du col de l'utérus
             </p>
           </div>
         </div>
-        <button onClick={() => setShowHistory(true)} className="btn-secondary">
-          <ClockIcon className="w-4 h-4 mr-2" />
+        <button onClick={() => setShowHistory(true)} className="flex items-center gap-2 text-compassion-rose font-bold hover:underline">
+          <ClockIcon className="w-4 h-4" />
           Historique
         </button>
       </div>
 
-      {/* Patient Selector */}
-      <div className="card">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Patiente (optionnel) :
-        </label>
-        <select
-          className="input"
-          onChange={(e) => setSelectedPatientId(e.target.value ? Number(e.target.value) : null)}
-        >
-          <option value="">Aucune patiente sélectionnée</option>
-          {patients.map((p) => (
-            <option key={p.record_id} value={p.record_id}>
-              {p.full_name || `Patiente #${p.record_id}`}
-            </option>
-          ))}
-        </select>
-      </div>
+      {/* Patient Selector (Hidden for patients) */}
+      {!isPatient && (
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Patiente (optionnel) :
+          </label>
+          <select
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-compassion-rose focus:border-compassion-rose"
+            onChange={(e) => setSelectedPatientId(e.target.value ? Number(e.target.value) : null)}
+          >
+            <option value="">Aucune patiente sélectionnée</option>
+            {patients.map((p) => (
+              <option key={p.record_id} value={p.record_id}>
+                {p.full_name || `Patiente #${p.record_id}`}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {/* Chat Area */}
-      <div className="card space-y-4">
-        <div className="h-96 overflow-y-auto space-y-4 p-4 bg-gray-50 rounded-lg">
+      <div className="bg-white p-6 rounded-lg shadow-ultra-soft border border-sahara-rose space-y-4">
+        <div className="h-96 overflow-y-auto space-y-4 p-4 bg-cream-silk/30 rounded-lg">
           {messages.map((msg, idx) => (
             <div
               key={idx}
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-xs px-4 py-2 rounded-lg text-sm ${msg.role === 'user'
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-white text-gray-800 border'
+                className={`max-w-xs px-4 py-2 rounded-2xl text-sm ${msg.role === 'user'
+                  ? 'bg-compassion-rose text-white shadow-md'
+                  : 'bg-white text-gray-800 border border-sahara-rose shadow-sm'
                   }`}
               >
                 {msg.content}
                 {msg.created_at && (
-                  <div className="text-xs text-right mt-1 opacity-70">
+                  <div className="text-[10px] text-right mt-1 opacity-70">
                     {format(new Date(msg.created_at), 'HH:mm', { locale: fr })}
                   </div>
                 )}
@@ -147,13 +155,16 @@ const ChatbotPage: React.FC = () => {
         <div className="flex items-center space-x-3">
           <input
             type="text"
-            className="input flex-1"
+            className="flex-1 p-3 border border-sahara-rose rounded-full focus:ring-2 focus:ring-compassion-rose focus:border-transparent outline-none shadow-inner"
             placeholder="Posez votre question ici (français ou wolof)..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
           />
-          <button onClick={sendMessage} className="btn-primary">
+          <button 
+            onClick={sendMessage} 
+            className="bg-compassion-rose text-white p-3 rounded-full hover:opacity-90 transition-opacity shadow-md"
+          >
             <PaperAirplaneIcon className="w-5 h-5" />
           </button>
         </div>
@@ -165,12 +176,14 @@ const ChatbotPage: React.FC = () => {
         onClose={() => setShowHistory(false)}
         title="Historique des conversations"
       >
-        <p className="text-gray-600 text-sm">
-          Fonctionnalité à venir : liste des conversations passées.
+        <p className="text-gray-600 text-sm italic">
+          Fonctionnalité à venir : liste de vos échanges passés avec l'assistant.
         </p>
       </Modal>
     </div>
   );
+
+  return isPatient ? <PatientLayout>{renderContent()}</PatientLayout> : renderContent();
 };
 
 export default ChatbotPage;

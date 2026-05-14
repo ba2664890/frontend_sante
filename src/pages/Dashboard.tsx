@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext.tsx';
 import AdminDashboard from './dashboards/AdminDashboard.tsx';
 import HealthAgentDashboard from './dashboards/HealthAgentDashboard.tsx';
 import PatientDashboard from './dashboards/PatientDashboard.tsx';
+import Layout from '../components/Layout.tsx';
 
 const Dashboard: React.FC = () => {
   const { user, loading } = useAuth();
@@ -15,17 +16,28 @@ const Dashboard: React.FC = () => {
   if (!user) {
     return <div className="p-4 text-center">Non authentifié</div>;
   }
-  console.log('Dashboard - rendering for role:', user.role);
 
   switch (user.role) {
     case 'admin':
-      return <AdminDashboard />;
+      return (
+        <Layout>
+          <AdminDashboard />
+        </Layout>
+      );
     case 'health_agent':
-      return <HealthAgentDashboard />;
+      return (
+        <Layout>
+          <HealthAgentDashboard />
+        </Layout>
+      );
     case 'patient':
       return <PatientDashboard />;
     default:
-      return <div className="p-4 text-center">Rôle inconnu</div>;
+      return (
+        <Layout>
+          <div className="p-4 text-center">Rôle inconnu</div>
+        </Layout>
+      );
   }
 };
 

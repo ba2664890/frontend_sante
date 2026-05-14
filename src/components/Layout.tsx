@@ -4,7 +4,11 @@ import Sidebar from './Sidebar.tsx';
 import Header from './Header.tsx';
 import bgImage from '../assets/background.jpg';
 
-const Layout: React.FC = () => {
+interface LayoutProps {
+  children?: React.ReactNode;
+}
+
+const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div
       className="min-h-screen bg-cover  bg-no-repeat flex"
@@ -15,7 +19,7 @@ const Layout: React.FC = () => {
         <Header />
         <main className="flex-1 p-6">
           <div className="max-w-7xl mx-auto">
-            <Outlet />
+            {children || <Outlet />}
           </div>
         </main>
       </div>

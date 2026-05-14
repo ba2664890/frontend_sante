@@ -35,13 +35,18 @@ const App: React.FC = () => (
 
         {/* protected routes */}
         <Route element={<ProtectedRoute />}>
+          {/* Main Dashboard Dispatcher */}
+          <Route path="/dashboard" element={<Dashboard />} />
+
+          {/* Patient Specific Routes (Using PatientLayout internally) */}
+          <Route path="/acceuil_patient" element={<PatientDashboard />} />
+          <Route path="/patient/records" element={<MedicalRecords />} />
+          <Route path="/patient/appointments" element={<PatientAppointments />} />
+
+          {/* Admin & Health Agent Routes (Using Sidebar Layout) */}
           <Route element={<Layout />}>
-            <Route path="/acceuil_patient" element={<PatientDashboard />} />
-            <Route path="/patient/records" element={<MedicalRecords />} />
-            <Route path="/patient/appointments" element={<PatientAppointments />} />
             <Route path="/reports" element={<ReportsPage />} />
             <Route path="/" element={<Navigate to="/dashboard" replace />} />           
-            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/patients" element={<Patients />} />
             <Route path="/accueil" element={<Campaigns />} />
             <Route path="/appointments/:id" element={<Appointments />} />

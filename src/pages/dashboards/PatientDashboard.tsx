@@ -7,8 +7,11 @@ import PatientLayout from '../../components/PatientLayout.tsx';
 import { BentoCard, GlassPanel, IconBox } from '../../components/ui/PatientUI.tsx';
 import LoadingSpinner from '../../components/LoadingSpinner.tsx';
 
+import { useNavigate } from 'react-router-dom';
+
 const PatientDashboard: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [selectedVideo, setSelectedVideo] = useState<any>(null);
 
   // Données du tableau de bord
@@ -119,7 +122,10 @@ const PatientDashboard: React.FC = () => {
                 </h3>
               </div>
             </div>
-            <button className="bg-compassion-rose text-white px-8 py-3 rounded-full font-body text-sm font-bold hover:opacity-90 transition-opacity">
+            <button 
+              onClick={() => navigate('/patient/appointments')}
+              className="bg-compassion-rose text-white px-8 py-3 rounded-full font-body text-sm font-bold hover:opacity-90 transition-opacity"
+            >
               Modifier
             </button>
           </div>
@@ -140,8 +146,10 @@ const PatientDashboard: React.FC = () => {
           </div>
         </BentoCard>
 
-        {/* Support Card */}
-        <div className="md:col-span-4 bg-wellness-green text-white p-8 rounded-lg shadow-ultra-soft flex flex-col justify-between group cursor-pointer hover:translate-y-[-4px] transition-all">
+        <div 
+          onClick={() => window.location.href = 'tel:+221770000000'}
+          className="md:col-span-4 bg-wellness-green text-white p-8 rounded-lg shadow-ultra-soft flex flex-col justify-between group cursor-pointer hover:translate-y-[-4px] transition-all"
+        >
           <span className="material-symbols-outlined text-3xl opacity-80">support_agent</span>
           <div>
             <h3 className="font-headline text-2xl mb-2">Besoin d'aide ?</h3>
@@ -247,7 +255,7 @@ const PatientDashboard: React.FC = () => {
 
         {/* Quick Links */}
         <div className="md:col-span-4">
-          <BentoCard onClick={() => {}} className="flex flex-col gap-4 group hover:bg-sahara-rose/20 transition-colors h-full">
+          <BentoCard onClick={() => navigate('/patient/records')} className="flex flex-col gap-4 group hover:bg-sahara-rose/20 transition-colors h-full">
             <IconBox icon="analytics" />
             <div>
               <h3 className="font-headline text-xl text-on-surface">Mes résultats</h3>
@@ -257,7 +265,7 @@ const PatientDashboard: React.FC = () => {
           </BentoCard>
         </div>
         <div className="md:col-span-4">
-          <BentoCard onClick={() => {}} className="flex flex-col gap-4 group hover:bg-atlantic-sage/20 transition-colors h-full">
+          <BentoCard onClick={() => navigate('/chatbot')} className="flex flex-col gap-4 group hover:bg-atlantic-sage/20 transition-colors h-full">
             <IconBox icon="forum" variant="green" />
             <div>
               <h3 className="font-headline text-xl text-on-surface">Forum Entraide</h3>
@@ -267,7 +275,7 @@ const PatientDashboard: React.FC = () => {
           </BentoCard>
         </div>
         <div className="md:col-span-4">
-          <BentoCard onClick={() => {}} className="flex flex-col gap-4 group hover:bg-surface-container/20 transition-colors h-full">
+          <BentoCard onClick={() => navigate('/patient/appointments')} className="flex flex-col gap-4 group hover:bg-surface-container/20 transition-colors h-full">
             <IconBox icon="history" variant="highest" />
             <div>
               <h3 className="font-headline text-xl text-on-surface">Historique</h3>

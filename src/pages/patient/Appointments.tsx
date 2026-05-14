@@ -9,8 +9,11 @@ import LoadingSpinner from '../../components/LoadingSpinner.tsx';
 import { format, differenceInMonths } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
+import { useNavigate } from 'react-router-dom';
+
 const Appointments: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const { data: dashboardData, isLoading: isDashboardLoading } = useQuery(
     ['patient-dashboard', user?.id],
@@ -113,7 +116,7 @@ const Appointments: React.FC = () => {
 
         {/* Quick Actions Side */}
         <aside className="md:col-span-4 flex flex-col gap-6">
-          <BentoCard className="bg-secondary-container text-on-secondary-container hover:scale-[1.02] transition-transform flex items-center gap-6 group">
+          <BentoCard onClick={() => navigate('/chatbot')} className="bg-secondary-container text-on-secondary-container hover:scale-[1.02] transition-transform flex items-center gap-6 group">
             <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center">
               <span className="material-symbols-outlined text-3xl">add_circle</span>
             </div>
@@ -123,7 +126,7 @@ const Appointments: React.FC = () => {
             </div>
           </BentoCard>
 
-          <BentoCard className="bg-tertiary-fixed text-on-tertiary-fixed-variant hover:scale-[1.02] transition-transform flex items-center gap-6 group">
+          <BentoCard onClick={() => window.location.href = 'tel:+221770000000'} className="bg-tertiary-fixed text-on-tertiary-fixed-variant hover:scale-[1.02] transition-transform flex items-center gap-6 group">
             <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center">
               <span className="material-symbols-outlined text-3xl">contact_support</span>
             </div>

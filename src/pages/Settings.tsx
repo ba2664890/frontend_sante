@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext.tsx';
 import { Cog6ToothIcon as CogIcon, UserIcon, BellIcon, ShieldCheckIcon, ServerIcon as DatabaseIcon } from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
-// Settings.tsx (ajout en haut)
 import { useLocation } from 'react-router-dom';
-
-
+import PatientLayout from '../components/PatientLayout.tsx';
 
 type Tab = {
   id: string;
@@ -19,15 +17,19 @@ const Settings: React.FC = () => {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState<string>(location.state?.defaultTab || 'profile');
 
+  const isPatient = user?.role === 'patient';
+
   const tabs: Tab[] = [
     { id: 'profile', name: 'Profil', icon: UserIcon },
-    { id: 'notifications', name: 'Notifications', icon: BellIcon },
     { id: 'security', name: 'Sécurité', icon: ShieldCheckIcon },
-    { id: 'system', name: 'Système', icon: CogIcon },
   ];
 
-  if (user?.role === 'admin') {
-    tabs.push({ id: 'database', name: 'Base de données', icon: DatabaseIcon });
+  if (!isPatient) {
+    tabs.splice(1, 0, { id: 'notifications', name: 'Notifications', icon: BellIcon });
+    tabs.push({ id: 'system', name: 'Système', icon: CogIcon });
+    if (user?.role === 'admin') {
+      tabs.push({ id: 'database', name: 'Base de données', icon: DatabaseIcon });
+    }
   }
 
   const handleSave = async () => {
@@ -55,25 +57,27 @@ const Settings: React.FC = () => {
     }
   };
 
-  return (
+  const renderContent = () => (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Paramètres</h1>
-        <p className="text-gray-600">Gérez vos préférences et configurations</p>
+      <div className={isPatient ? "animate-fade-in" : ""}>
+        <h1 className={`text-2xl font-bold ${isPatient ? 'font-headline text-compassion-rose' : 'text-gray-900'}`}>
+          Paramètres
+        </h1>
+        <p className={`text-gray-600 ${isPatient ? 'font-body' : ''}`}>Gérez vos préférences et configurations</p>
       </div>
 
       {/* Tabs */}
       <div className="border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8">
+        <nav className="-mb-px flex space-x-8 overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`
-                flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200
+                flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 whitespace-nowrap
                 ${activeTab === tab.id
-                  ? 'border-primary-500 text-primary-600'
+                  ? (isPatient ? 'border-compassion-rose text-compassion-rose' : 'border-primary-500 text-primary-600')
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }
               `}
@@ -86,11 +90,13 @@ const Settings: React.FC = () => {
       </div>
 
       {/* Tab Content */}
-      <div className="card">
+      <div className={isPatient ? "bg-white p-8 rounded-lg shadow-ultra-soft border border-sahara-rose" : "card"}>
         {renderTabContent()}
       </div>
     </div>
   );
+
+  return isPatient ? <PatientLayout>{renderContent()}</PatientLayout> : renderContent();
 };
 
 /* ========================= */
