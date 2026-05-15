@@ -7,14 +7,13 @@ import { patientService } from '../../services/patientService.ts';
 import { notificationService } from '../../services/notificationService.ts';
 import { DashboardStats } from '../../types/analytics.ts';
 import { Patient } from '../../types';
-import LoadingSpinner from '../../components/LoadingSpinner.tsx';
 import { useAuth } from '../../contexts/AuthContext.tsx';
 
 const HealthAgentDashboard: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const { data: dashboardData, isLoading } = useQuery<DashboardStats>(
+  const { data: dashboardData } = useQuery<DashboardStats>(
     'health-agent-dashboard',
     () => analyticsService.getDashboardData(),
     { 
