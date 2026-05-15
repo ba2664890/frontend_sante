@@ -9,8 +9,6 @@ import { DashboardStats } from '../../types/analytics.ts';
 import { Patient } from '../../types';
 import LoadingSpinner from '../../components/LoadingSpinner.tsx';
 import { useAuth } from '../../contexts/AuthContext.tsx';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
 
 const HealthAgentDashboard: React.FC = () => {
   const { user } = useAuth();
