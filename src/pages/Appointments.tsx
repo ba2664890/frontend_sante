@@ -1,290 +1,17 @@
+// src/pages/Appointments.tsx — Version "Clinical Precision" & "Silk" COMPLETE
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { patientService } from '../services/patientService.ts';
 import { PatientFollowUp } from '../types';
 import { useAuth } from '../contexts/AuthContext.tsx';
-import {
-  CalendarIcon,
-  ClockIcon,
-  MapPinIcon,
-  CheckCircleIcon,
-  ExclamationCircleIcon,
-  XCircleIcon,
-  PhoneIcon,
-  InformationCircleIcon,
-} from '@heroicons/react/24/outline';
 import { format, isPast, isFuture, isToday, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import LoadingSpinner from '../components/LoadingSpinner.tsx';
 import Modal from '../components/Modal.tsx';
 import { toast } from 'react-hot-toast';
-import { useParams } from 'react-router-dom';
+import PatientLayout from '../components/PatientLayout.tsx';
+import { BentoCard, IconBox } from '../components/ui/PatientUI.tsx';
 
-// Types
-interface AppointmentDetailsModalProps {
-  appointment: PatientFollowUp | null;
-  isOpen: boolean;
-  onClose: () => void;
-  onCancel?: (id: number) => void;
-}
-
-// Composant Modal de détails
-const AppointmentDetailsModal: React.FC<AppointmentDetailsModalProps> = ({
-  appointment,
-  isOpen,
-  onClose,
-  onCancel,
-}) => {
-  // ⚡ Hooks appelés en premier, sans condition
-  const { id } = useParams<{ id: string }>();
-  console.log('AppointmentDetailsModal appointment:', id);
-  const { data: patientByUser } = useQuery(
-    ['patient-by-user', id],
-    () => patientService.getPatientByUserId(Number(id)),
-    { enabled: !!id }
-  );
-
-  const patientId = patientByUser?.record_id;
-  console.log('AppointmentDetailsModal appointment record_id:', patientByUser?.id_patient);
-  
-  console.log('AppointmentDetailsModal patientId:', patientId);
-  const { data: followUps } = useQuery(
-    ['patient-followups', patientId],
-    () => patientService.getFollowUps({ patient: patientByUser?.id_patient }),
-    { enabled: !!patientId }
-  );
-
-  // Ensuite, tu peux faire un return conditionnel
-  if (!appointment) return null;
-
-  const appointmentDate = parseISO(appointment.scheduled_date);
-  const canCancel = isFuture(appointmentDate) && appointment.status === 'scheduled';
-
-  const getFollowUpTypeLabel = (type: string) => {
-    const types: Record<string, string> = {
-      screening: 'Dépistage',
-      follow_up_90: 'Suivi à 90 jours',
-      follow_up_180: 'Suivi à 180 jours',
-      annual: 'Suivi annuel',
-      symptomatic: 'Consultation symptomatique',
-    };
-    return types[type] || type;
-  };
-  console.log(followUps);
-  
-
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Détails du rendez-vous" size="lg">
-      <div className="space-y-6">
-        {/* En-tête avec statut */}
-        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-primary-100 rounded-lg">
-              <CalendarIcon className="w-6 h-6 text-primary-600" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900">
-                {getFollowUpTypeLabel(appointment.follow_up_type)}
-              </h3>
-              <p className="text-sm text-gray-600">
-                {format(appointmentDate, 'EEEE d MMMM yyyy', { locale: fr })}
-              </p>
-            </div>
-          </div>
-          <StatusBadge status={appointment.status} />
-        </div>
-
-        {/* Informations principales */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex items-start space-x-3">
-            <ClockIcon className="w-5 h-5 text-gray-400 mt-0.5" />
-            <div>
-              <p className="text-sm font-medium text-gray-700">Heure</p>
-              <p className="text-gray-900">
-                {appointment.scheduled_time || 'À confirmer'}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start space-x-3">
-            <MapPinIcon className="w-5 h-5 text-gray-400 mt-0.5" />
-            <div>
-              <p className="text-sm font-medium text-gray-700">Lieu</p>
-              <p className="text-gray-900">
-                {appointment.location || 'Centre de santé'}
-              </p>
-            </div>
-          </div>
-
-          {appointment.agent_name && (
-            <div className="flex items-start space-x-3">
-              <PhoneIcon className="w-5 h-5 text-gray-400 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-gray-700">Agent</p>
-                <p className="text-gray-900">{appointment.agent_name}</p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Notes */}
-        {appointment.notes && (
-          <div className="p-4 bg-blue-50 rounded-lg">
-            <div className="flex items-start space-x-2">
-              <InformationCircleIcon className="w-5 h-5 text-blue-600 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-blue-900">Notes importantes</p>
-                <p className="text-sm text-blue-800 mt-1">{appointment.notes}</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Instructions */}
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <h4 className="font-medium text-gray-900 mb-2">Préparation</h4>
-          <ul className="text-sm text-gray-600 space-y-1">
-            <li>• Arrivez 15 minutes avant l'heure prévue</li>
-            <li>• Apportez votre carte d'identité</li>
-            <li>• Apportez vos précédents résultats si disponibles</li>
-            <li>• En cas d'empêchement, prévenez au moins 24h à l'avance</li>
-          </ul>
-        </div>
-
-        {/* Actions */}
-        <div className="flex items-center justify-end space-x-3 pt-4 border-t">
-          <button onClick={onClose} className="btn-secondary">
-            Fermer
-          </button>
-          {canCancel && onCancel && (
-            <button
-              onClick={() => {
-                onCancel(appointment.id);
-                onClose();
-              }}
-              className="btn-danger"
-            >
-              Annuler le rendez-vous
-            </button>
-          )}
-        </div>
-      </div>
-    </Modal>
-  );
-};
-
-// Composant Badge de statut
-const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
-  const badges: Record<string, { label: string; className: string; icon: any }> = {
-    scheduled: {
-      label: 'Programmé',
-      className: 'bg-blue-100 text-blue-800',
-      icon: ClockIcon,
-    },
-    completed: {
-      label: 'Effectué',
-      className: 'bg-green-100 text-green-800',
-      icon: CheckCircleIcon,
-    },
-    missed: {
-      label: 'Manqué',
-      className: 'bg-red-100 text-red-800',
-      icon: XCircleIcon,
-    },
-    cancelled: {
-      label: 'Annulé',
-      className: 'bg-gray-100 text-gray-800',
-      icon: XCircleIcon,
-    },
-  };
-
-  const badge = badges[status] || badges.scheduled;
-  const Icon = badge.icon;
-
-  return (
-    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${badge.className}`}>
-      <Icon className="w-3.5 h-3.5 mr-1.5" />
-      {badge.label}
-    </span>
-  );
-};
-
-// Composant Card de rendez-vous
-const AppointmentCard: React.FC<{
-  appointment: PatientFollowUp;
-  onClick: () => void;
-}> = ({ appointment, onClick }) => {
-  const appointmentDate = parseISO(appointment.scheduled_date);
-  const isTodayAppointment = isToday(appointmentDate);
-
-  const getFollowUpTypeLabel = (type: string) => {
-    const types: Record<string, string> = {
-      screening: 'Dépistage',
-      follow_up_90: 'Suivi à 90 jours',
-      follow_up_180: 'Suivi à 180 jours',
-      annual: 'Suivi annuel',
-      symptomatic: 'Consultation symptomatique',
-    };
-    return types[type] || type;
-  };
-
-  return (
-    <div
-      onClick={onClick}
-      className={`card cursor-pointer transition-all hover:shadow-lg hover:-translate-y-1 ${
-        isTodayAppointment ? 'border-2 border-primary-500' : ''
-      }`}
-    >
-      {isTodayAppointment && (
-        <div className="mb-3 px-3 py-1 bg-primary-100 text-primary-800 text-xs font-semibold rounded-full inline-flex items-center">
-          <ExclamationCircleIcon className="w-4 h-4 mr-1" />
-          Aujourd'hui
-        </div>
-      )}
-
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            {getFollowUpTypeLabel(appointment.follow_up_type)}
-          </h3>
-
-          <div className="space-y-2">
-            <div className="flex items-center text-gray-600">
-              <CalendarIcon className="w-4 h-4 mr-2" />
-              <span className="text-sm">
-                {format(appointmentDate, 'EEEE d MMMM yyyy', { locale: fr })}
-              </span>
-            </div>
-
-            {appointment.scheduled_time && (
-              <div className="flex items-center text-gray-600">
-                <ClockIcon className="w-4 h-4 mr-2" />
-                <span className="text-sm">{appointment.scheduled_time}</span>
-              </div>
-            )}
-
-            {appointment.location && (
-              <div className="flex items-center text-gray-600">
-                <MapPinIcon className="w-4 h-4 mr-2" />
-                <span className="text-sm">{appointment.location}</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <StatusBadge status={appointment.status} />
-      </div>
-
-      {appointment.notes && (
-        <div className="mt-3 pt-3 border-t border-gray-200">
-          <p className="text-sm text-gray-600 line-clamp-2">{appointment.notes}</p>
-        </div>
-      )}
-    </div>
-  );
-};
-
-// Composant principal
 const Appointments: React.FC = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -292,218 +19,206 @@ const Appointments: React.FC = () => {
   const [selectedAppointment, setSelectedAppointment] = useState<PatientFollowUp | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
-  // Récupérer les rendez-vous du patient
+  const isPatient = user?.role === 'patient';
+
+  // Récupérer les rendez-vous
   const { data: followUpsData, isLoading } = useQuery(
-    ['patient-appointments', user?.id],
-    () => patientService.getFollowUps({ patient: user?.id }),
-    {
-      enabled: !!user?.id,
-      refetchInterval: 60000, // Rafraîchir toutes les minutes
-    }
+    ['appointments', user?.id],
+    () => patientService.getFollowUps({ patient: isPatient ? user?.id : undefined }),
+    { enabled: !!user?.id, refetchInterval: 60000 }
   );
 
-  // Mutation pour annuler un rendez-vous
   const cancelMutation = useMutation(
     (id: number) => patientService.updateFollowUp(id, { status: 'cancelled' }),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(['patient-appointments']);
-        toast.success('Rendez-vous annulé avec succès');
+        queryClient.invalidateQueries(['appointments']);
+        toast.success('Rendez-vous annulé.');
       },
-      onError: () => {
-        toast.error("Erreur lors de l'annulation du rendez-vous");
-      },
+      onError: () => toast.error("Erreur lors de l'annulation"),
     }
   );
-
-  const handleCancelAppointment = async (id: number) => {
-    if (window.confirm('Êtes-vous sûr de vouloir annuler ce rendez-vous ?')) {
-      await cancelMutation.mutateAsync(id);
-    }
-  };
-
-  const handleAppointmentClick = (appointment: PatientFollowUp) => {
-    setSelectedAppointment(appointment);
-    setShowDetailsModal(true);
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
 
   const appointments = followUpsData?.results || [];
 
-  // Filtrer les rendez-vous
   const filteredAppointments = appointments.filter((apt) => {
     const aptDate = parseISO(apt.scheduled_date);
-    if (filter === 'upcoming') {
-      return isFuture(aptDate) || isToday(aptDate);
-    } else if (filter === 'past') {
-      return isPast(aptDate) && !isToday(aptDate);
-    }
+    if (filter === 'upcoming') return isFuture(aptDate) || isToday(aptDate);
+    if (filter === 'past') return isPast(aptDate) && !isToday(aptDate);
     return true;
   });
 
-  // Statistiques
-  const upcomingCount = appointments.filter((apt) => {
+  const getStatusLabel = (status: string) => {
+    const s: Record<string, { label: string, color: string, bg: string }> = {
+      scheduled: { label: 'Programmé', color: isPatient ? '#9a4523' : '#006669', bg: isPatient ? '#fff5f2' : '#dcf1fb' },
+      completed: { label: 'Effectué', color: '#2a7f82', bg: '#e4f7ff' },
+      missed: { label: 'Manqué', color: '#ba1a1a', bg: '#ffdad6' },
+      cancelled: { label: 'Annulé', color: '#6f7979', bg: '#f2fbff' },
+    };
+    return s[status] || s.scheduled;
+  };
+
+  const renderCard = (apt: PatientFollowUp) => {
+    const status = getStatusLabel(apt.status);
     const aptDate = parseISO(apt.scheduled_date);
-    return isFuture(aptDate) || isToday(aptDate);
-  }).length;
-
-  const todayCount = appointments.filter((apt) => {
-    return isToday(parseISO(apt.scheduled_date));
-  }).length;
-
-  const missedCount = appointments.filter((apt) => apt.status === 'missed').length;
-
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Mes Rendez-vous</h1>
-        <p className="text-gray-600 mt-1">
-          Consultez et gérez vos rendez-vous de suivi médical
-        </p>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="card">
-          <div className="flex items-center">
-            <div className="p-3 bg-primary-100 rounded-lg">
-              <CalendarIcon className="w-6 h-6 text-primary-600" />
+    
+    return (
+      <div 
+        key={apt.id}
+        onClick={() => { setSelectedAppointment(apt); setShowDetailsModal(true); }}
+        className={`group p-6 rounded-3xl border transition-all cursor-pointer ${
+          isPatient 
+            ? 'bg-white border-sahara-rose/30 hover:shadow-xl hover:shadow-compassion-rose/5' 
+            : 'bg-white border-[#bec9c9]/10 hover:shadow-xl hover:border-[#006669]/20'
+        }`}
+      >
+        <div className="flex justify-between items-start mb-4">
+          <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest`} style={{ color: status.color, backgroundColor: status.bg }}>
+            {status.label}
+          </div>
+          {isToday(aptDate) && (
+            <div className="flex items-center gap-1 text-amber-600 animate-pulse">
+              <span className="material-symbols-outlined text-sm">event_upcoming</span>
+              <span className="text-[10px] font-bold uppercase">Aujourd'hui</span>
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">À venir</p>
-              <p className="text-2xl font-bold text-gray-900">{upcomingCount}</p>
-            </div>
+          )}
+        </div>
+
+        <h3 className={`text-xl font-bold mb-4 ${isPatient ? 'text-on-surface' : 'text-[#091e25]'}`} style={{ fontFamily: isPatient ? 'inherit' : 'Literata, serif' }}>
+          {apt.follow_up_type === 'screening' ? 'Dépistage Préventif' : 'Consultation de Suivi'}
+        </h3>
+
+        <div className="space-y-3">
+          <div className="flex items-center gap-3 text-[#6f7979]">
+            <span className="material-symbols-outlined text-[18px]">calendar_today</span>
+            <span className="text-sm font-medium">{format(aptDate, 'EEEE d MMMM yyyy', { locale: fr })}</span>
+          </div>
+          <div className="flex items-center gap-3 text-[#6f7979]">
+            <span className="material-symbols-outlined text-[18px]">schedule</span>
+            <span className="text-sm font-medium">{apt.scheduled_time || 'Heure à confirmer'}</span>
+          </div>
+          <div className="flex items-center gap-3 text-[#6f7979]">
+            <span className="material-symbols-outlined text-[18px]">location_on</span>
+            <span className="text-sm font-medium line-clamp-1">{apt.location || 'Centre de santé CerviCare'}</span>
           </div>
         </div>
 
-        <div className="card">
-          <div className="flex items-center">
-            <div className="p-3 bg-warning-100 rounded-lg">
-              <ExclamationCircleIcon className="w-6 h-6 text-warning-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Aujourd'hui</p>
-              <p className="text-2xl font-bold text-gray-900">{todayCount}</p>
-            </div>
-          </div>
+        <div className="mt-6 flex justify-end">
+          <span className={`material-symbols-outlined transition-transform group-hover:translate-x-1 ${isPatient ? 'text-compassion-rose' : 'text-[#006669]'}`}>arrow_forward</span>
         </div>
+      </div>
+    );
+  };
 
-        <div className="card">
-          <div className="flex items-center">
-            <div className="p-3 bg-error-100 rounded-lg">
-              <XCircleIcon className="w-6 h-6 text-error-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Manqués</p>
-              <p className="text-2xl font-bold text-gray-900">{missedCount}</p>
-            </div>
-          </div>
+  const renderContent = () => (
+    <div className="space-y-8 animate-fade-in pb-10">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <h1 className={`text-3xl font-semibold ${isPatient ? 'text-compassion-rose font-headline' : 'text-[#091e25]'}`} style={{ fontFamily: isPatient ? '' : 'Literata, serif' }}>
+            {isPatient ? 'Mes Rendez-vous' : 'Gestion des Suivis'}
+          </h1>
+          <p className="text-[#6f7979] text-sm mt-1">Consultez et organisez les consultations de dépistage.</p>
+        </div>
+        
+        <div className={`p-1 rounded-2xl flex gap-1 ${isPatient ? 'bg-sahara-rose/20' : 'bg-[#f2fbff]'}`}>
+          {[
+            { id: 'upcoming', label: 'À venir' },
+            { id: 'past', label: 'Passés' },
+            { id: 'all', label: 'Tous' }
+          ].map(f => (
+            <button
+              key={f.id}
+              onClick={() => setFilter(f.id as any)}
+              className={`px-6 py-2 rounded-xl text-xs font-bold transition-all ${
+                filter === f.id 
+                  ? (isPatient ? 'bg-compassion-rose text-white shadow-md' : 'bg-[#006669] text-white shadow-md')
+                  : 'text-[#6f7979] hover:bg-white'
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Filtres */}
-      <div className="flex items-center justify-between">
-        <div className="inline-flex rounded-lg border border-gray-200 p-1">
-          <button
-            onClick={() => setFilter('upcoming')}
-            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-              filter === 'upcoming'
-                ? 'bg-primary-600 text-white'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            À venir
-          </button>
-          <button
-            onClick={() => setFilter('past')}
-            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-              filter === 'past'
-                ? 'bg-primary-600 text-white'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            Passés
-          </button>
-          <button
-            onClick={() => setFilter('all')}
-            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-              filter === 'all'
-                ? 'bg-primary-600 text-white'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            Tous
-          </button>
-        </div>
-
-        <div className="text-sm text-gray-600">
-          {filteredAppointments.length} rendez-vous
-        </div>
-      </div>
-
-      {/* Liste des rendez-vous */}
-      {filteredAppointments.length === 0 ? (
-        <div className="card text-center py-12">
-          <CalendarIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            Aucun rendez-vous
-          </h3>
-          <p className="text-gray-600">
-            {filter === 'upcoming'
-              ? 'Vous n\'avez pas de rendez-vous à venir'
-              : filter === 'past'
-              ? 'Vous n\'avez pas de rendez-vous passés'
-              : 'Vous n\'avez aucun rendez-vous enregistré'}
-          </p>
+      {isLoading ? (
+        <div className="flex items-center justify-center py-20"><LoadingSpinner size="lg" /></div>
+      ) : filteredAppointments.length === 0 ? (
+        <div className="bg-white rounded-3xl p-20 border border-[#bec9c9]/10 shadow-sm text-center">
+          <div className={`w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center ${isPatient ? 'bg-sahara-rose/20 text-compassion-rose' : 'bg-[#dcf1fb] text-[#006669]'}`}>
+            <span className="material-symbols-outlined text-[40px]">calendar_month</span>
+          </div>
+          <h3 className="text-xl font-bold text-[#091e25]">Aucun rendez-vous</h3>
+          <p className="text-[#6f7979] mt-2">Vous n'avez pas de rendez-vous enregistré pour cette période.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filteredAppointments.map((appointment) => (
-            <AppointmentCard
-              key={appointment.id}
-              appointment={appointment}
-              onClick={() => handleAppointmentClick(appointment)}
-            />
-          ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredAppointments.map(renderCard)}
         </div>
       )}
 
-      {/* Modal de détails */}
-      <AppointmentDetailsModal
-        appointment={selectedAppointment}
-        isOpen={showDetailsModal}
-        onClose={() => {
-          setShowDetailsModal(false);
-          setSelectedAppointment(null);
-        }}
-        onCancel={handleCancelAppointment}
-      />
-
-      {/* Info supplémentaire */}
-      <div className="card bg-blue-50 border-blue-200">
-        <div className="flex items-start space-x-3">
-          <InformationCircleIcon className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <h4 className="font-medium text-blue-900 mb-1">
-              Besoin d'aide ?
-            </h4>
-            <p className="text-sm text-blue-800">
-              Pour toute question ou modification de rendez-vous, contactez votre centre de santé.
-              En cas d'urgence, composez le 15.
-            </p>
-          </div>
+      {/* Info Card */}
+      <div className={`p-6 rounded-3xl border flex gap-4 ${isPatient ? 'bg-sahara-rose/10 border-sahara-rose/30' : 'bg-[#f2fbff] border-[#006669]/10'}`}>
+        <span className={`material-symbols-outlined ${isPatient ? 'text-compassion-rose' : 'text-[#006669]'}`}>info</span>
+        <div>
+          <h4 className={`font-bold text-sm ${isPatient ? 'text-on-surface' : 'text-[#091e25]'}`}>Note de service</h4>
+          <p className="text-xs text-[#6f7979] mt-1">En cas d'empêchement, merci d'annuler au moins 24h à l'avance pour libérer le créneau pour une autre patiente. La santé de toutes est notre priorité.</p>
         </div>
       </div>
+
+      {/* Details Modal */}
+      <Modal isOpen={showDetailsModal} onClose={() => setShowDetailsModal(false)} title="Détails de la consultation" size="lg">
+        {selectedAppointment && (
+          <div className="space-y-8 p-2">
+            <div className="flex items-center gap-4 bg-[#f2fbff] p-6 rounded-3xl border border-[#bec9c9]/10">
+              <IconBox icon="medical_services" variant={isPatient ? 'rose' : 'teal'} className="w-14 h-14 rounded-2xl" />
+              <div>
+                <p className="text-[10px] font-bold text-[#6f7979] uppercase tracking-widest">Type de consultation</p>
+                <h3 className="text-xl font-bold text-[#091e25]">
+                  {selectedAppointment.follow_up_type === 'screening' ? 'Dépistage Cancer du Col' : 'Suivi Clinique'}
+                </h3>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold text-[#6f7979] uppercase">Date & Heure</p>
+                <p className="font-bold text-[#091e25]">{format(parseISO(selectedAppointment.scheduled_date), 'dd MMMM yyyy', { locale: fr })}</p>
+                <p className="text-sm text-[#6f7979]">{selectedAppointment.scheduled_time || 'À confirmer'}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold text-[#6f7979] uppercase">Lieu</p>
+                <p className="font-bold text-[#091e25]">{selectedAppointment.location || 'Centre CerviCare+'}</p>
+                <p className="text-sm text-[#6f7979]">Zone régionale {user?.region || 'Dakar'}</p>
+              </div>
+            </div>
+
+            {selectedAppointment.notes && (
+              <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100 italic text-sm text-amber-800">
+                "{selectedAppointment.notes}"
+              </div>
+            )}
+
+            <div className="pt-4 flex justify-end gap-3">
+              <button onClick={() => setShowDetailsModal(false)} className="px-6 py-2.5 text-[#6f7979] font-bold">Fermer</button>
+              {selectedAppointment.status === 'scheduled' && (
+                <button 
+                  onClick={() => { if(window.confirm('Annuler ?')) cancelMutation.mutate(selectedAppointment.id); setShowDetailsModal(false); }}
+                  className="px-8 py-2.5 bg-[#ba1a1a] text-white rounded-xl font-bold shadow-lg shadow-[#ba1a1a]/20"
+                >
+                  Annuler le RDV
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
+
+  if (isPatient) return <PatientLayout>{renderContent()}</PatientLayout>;
+  
+  return renderContent();
 };
 
 export default Appointments;

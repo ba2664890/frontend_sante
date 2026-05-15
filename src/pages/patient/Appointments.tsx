@@ -1,4 +1,5 @@
-import React from 'react';
+// src/pages/patient/Appointments.tsx
+import React, { useState } from 'react';
 import { useQuery } from 'react-query';
 import { patientService } from '../../services/patientService.ts';
 import { analyticsService } from '../../services/analyticsService.ts';
@@ -6,14 +7,16 @@ import { useAuth } from '../../contexts/AuthContext.tsx';
 import PatientLayout from '../../components/PatientLayout.tsx';
 import { BentoCard, IconBox } from '../../components/ui/PatientUI.tsx';
 import LoadingSpinner from '../../components/LoadingSpinner.tsx';
+import Modal from '../../components/Modal.tsx';
 import { format, differenceInMonths } from 'date-fns';
 import { fr } from 'date-fns/locale';
-
+import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
 const Appointments: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [showRequestModal, setShowRequestModal] = useState(false);
 
   const { data: dashboardData, isLoading: isDashboardLoading } = useQuery(
     ['patient-dashboard', user?.id],
@@ -55,8 +58,6 @@ const Appointments: React.FC = () => {
   };
 
   const nextAppt = dashboardData?.next_appointment;
-  
-  // Calcul de l'étape actuelle (Fleur de Santé)
   const monthsSinceEnrollment = patient ? differenceInMonths(new Date(), new Date(patient.created_at)) : 0;
   
   const milestones = [
@@ -69,6 +70,27 @@ const Appointments: React.FC = () => {
 
   return (
     <PatientLayout>
+      {/* Modal de demande de RDV */}
+      <Modal isOpen={showRequestModal} onClose={() => setShowRequestModal(false)} title="Demander un rendez-vous" size="md">
+        <form onSubmit={(e) => { e.preventDefault(); toast.success('Demande envoyée à votre centre !'); setShowRequestModal(false); }} className="space-y-6 p-2">
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-compassion-rose uppercase tracking-widest ml-1">Type de consultation</label>
+            <select className="w-full p-4 bg-cream-silk/30 border border-sahara-rose/40 rounded-2xl outline-none focus:border-compassion-rose transition-all font-body">
+              <option>Dépistage périodique</option>
+              <option>Suivi post-traitement</option>
+              <option>Consultation symptomatique</option>
+            </select>
+          </div>
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-compassion-rose uppercase tracking-widest ml-1">Période souhaitée</label>
+            <input type="date" className="w-full p-4 bg-cream-silk/30 border border-sahara-rose/40 rounded-2xl outline-none focus:border-compassion-rose transition-all font-body" />
+          </div>
+          <button type="submit" className="w-full bg-compassion-rose text-white py-4 rounded-full font-headline text-lg shadow-lg hover:-translate-y-1 transition-all">
+            Envoyer ma demande
+          </button>
+        </form>
+      </Modal>
+
       {/* Page Header */}
       <header className="mb-12 animate-fade-in">
         <h1 className="font-headline text-4xl md:text-5xl text-compassion-rose mb-2">Mon Suivi & Mes Rendez-vous</h1>
@@ -111,7 +133,7 @@ const Appointments: React.FC = () => {
             </div>
             
             <div className="flex flex-wrap gap-4">
-              <button className="bg-compassion-rose text-white px-8 py-3 rounded-full font-body text-sm font-bold hover:opacity-90 transition-all flex items-center gap-2">
+              <button onClick={() => toast.success('Contactez votre centre au 15 pour toute modification.')} className="bg-compassion-rose text-white px-8 py-3 rounded-full font-body text-sm font-bold hover:opacity-90 transition-all flex items-center gap-2">
                 <span className="material-symbols-outlined text-sm">edit</span> Modifier
               </button>
             </div>
@@ -127,7 +149,7 @@ const Appointments: React.FC = () => {
 
         {/* Quick Actions Side */}
         <aside className="md:col-span-4 flex flex-col gap-6">
-          <BentoCard onClick={() => navigate('/chatbot')} className="bg-secondary-container text-on-secondary-container hover:scale-[1.02] transition-transform flex items-center gap-6 group">
+          <BentoCard onClick={() => setShowRequestModal(true)} className="bg-secondary-container text-on-secondary-container hover:scale-[1.02] transition-transform flex items-center gap-6 group cursor-pointer">
             <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center">
               <span className="material-symbols-outlined text-3xl">add_circle</span>
             </div>
@@ -137,7 +159,7 @@ const Appointments: React.FC = () => {
             </div>
           </BentoCard>
 
-          <BentoCard onClick={() => window.location.href = 'tel:+221770000000'} className="bg-tertiary-fixed text-on-tertiary-fixed-variant hover:scale-[1.02] transition-transform flex items-center gap-6 group">
+          <BentoCard onClick={() => window.location.href = 'tel:+221770000000'} className="bg-tertiary-fixed text-on-tertiary-fixed-variant hover:scale-[1.02] transition-transform flex items-center gap-6 group cursor-pointer">
             <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center">
               <span className="material-symbols-outlined text-3xl">contact_support</span>
             </div>
@@ -161,7 +183,6 @@ const Appointments: React.FC = () => {
           </header>
           
           <div className="relative flex items-center justify-between min-w-[800px] px-8 py-12">
-            {/* Progress Line */}
             <div className="absolute h-1 bg-sahara-rose w-full left-0 top-1/2 -translate-y-1/2"></div>
             <div 
               className="absolute h-1 bg-compassion-rose transition-all duration-1000 left-0 top-1/2 -translate-y-1/2" 
@@ -179,11 +200,6 @@ const Appointments: React.FC = () => {
                   {ms.label}
                 </p>
                 <p className="text-xs text-on-surface-variant">Mois {ms.month}</p>
-                {monthsSinceEnrollment >= ms.month && monthsSinceEnrollment < (milestones[milestones.indexOf(ms) + 1]?.month || 999) && (
-                  <div className="absolute -top-12 bg-compassion-rose text-white text-[10px] px-3 py-1 rounded-full uppercase font-bold whitespace-nowrap">
-                    Vous êtes ici
-                  </div>
-                )}
               </div>
             ))}
           </div>
@@ -212,10 +228,6 @@ const Appointments: React.FC = () => {
                 </div>
               </div>
             ))}
-            
-            {(!followUps || followUps.results.filter(f => f.status === 'completed').length === 0) && (
-              <p className="text-center py-12 text-on-surface-variant font-body italic">Aucune visite passée enregistrée pour le moment.</p>
-            )}
           </div>
         </section>
       </div>

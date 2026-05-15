@@ -41,6 +41,8 @@ const App: React.FC = () => (
           <Route path="/patient/appointments" element={<PatientAppointments />} />
           <Route path="/chatbot" element={<ChatbotPage />} />
 
+          <Route path="/settings" element={<Settings />} />
+
           {/* Admin & Health Agent Routes (With Sidebar) — ESPACE AGENT */}
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<Dashboard />} />
@@ -52,7 +54,6 @@ const App: React.FC = () => (
             <Route path="/patients/:id" element={<PatientDetail />} />
             <Route path="/statistics" element={<Statistics />} />
             <Route path="/notifications" element={<Notifications />} />
-            <Route path="/settings" element={<Settings />} />
             <Route path="/agent/chatbot" element={<AgentChatbotPage />} />
           </Route>
         </Route>

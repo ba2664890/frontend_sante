@@ -154,22 +154,14 @@ const Sidebar: React.FC = () => {
         <div className="p-4 border-t border-[#bec9c9]/20 space-y-1 flex-shrink-0">
           <Link
             to="/settings"
-            className={`flex items-center gap-3 px-3 py-2.5 text-[#3e4949] text-sm font-semibold transition-all rounded-xl ${
-              isAgent 
-                ? 'hover:text-[#006669] hover:bg-[#dcf1fb]' 
-                : 'hover:text-compassion-rose hover:bg-sahara-rose/30'
-            }`}
+            className="flex items-center gap-3 px-3 py-2.5 text-[#3e4949] text-sm font-semibold transition-all rounded-xl hover:text-[#006669] hover:bg-[#dcf1fb]"
           >
             <span className="material-symbols-outlined text-[20px]">settings</span>
-            <span>{isAgent ? 'Paramètres' : 'Mon Profil'}</span>
+            <span>Paramètres</span>
           </Link>
           <button
             onClick={logout}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 text-[#3e4949] text-sm font-semibold transition-all rounded-xl ${
-              isAgent 
-                ? 'hover:text-[#ba1a1a] hover:bg-[#ffdad6]/40' 
-                : 'hover:text-compassion-rose hover:bg-sahara-rose/30'
-            }`}
+            className="w-full flex items-center gap-3 px-3 py-2.5 text-[#3e4949] text-sm font-semibold transition-all rounded-xl hover:text-[#ba1a1a] hover:bg-[#ffdad6]/40"
           >
             <span className="material-symbols-outlined text-[20px]">logout</span>
             <span>Déconnexion</span>
