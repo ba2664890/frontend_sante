@@ -5,7 +5,6 @@ import {
   PlusIcon, 
   MagnifyingGlassIcon as SearchIcon, 
   ArrowDownTrayIcon as DownloadIcon,
-  FunnelIcon,
   AdjustmentsHorizontalIcon,
   UserCircleIcon,
   ChevronRightIcon

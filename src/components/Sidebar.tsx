@@ -13,7 +13,6 @@ import {
   DocumentTextIcon as DocumentReportIcon,
   CalendarIcon,
   BeakerIcon,
-  ClipboardIcon,
   ChatBubbleBottomCenterTextIcon,
   QuestionMarkCircleIcon,
   PlusIcon

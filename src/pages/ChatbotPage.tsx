@@ -4,7 +4,6 @@ import { useQuery } from 'react-query';
 import { patientService } from '../services/patientService.ts';
 import { Patient } from '../types';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext.tsx';
 import { 

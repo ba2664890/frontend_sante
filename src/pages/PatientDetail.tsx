@@ -6,20 +6,14 @@ import LoadingSpinner from '../components/LoadingSpinner.tsx';
 import Modal from '../components/Modal.tsx';
 import PatientForm from '../components/PatientForm.tsx';
 import FollowUpForm from '../components/FollowUpForm.tsx';
-import { useAuth } from '../contexts/AuthContext.tsx';
 import { 
-  UserIcon, 
-  MapPinIcon,
   BeakerIcon,
   ShieldCheckIcon,
   DocumentTextIcon,
-  HeartIcon,
   CheckIcon,
-  ExclamationCircleIcon,
   LightBulbIcon,
   MagnifyingGlassPlusIcon
 } from '@heroicons/react/24/outline';
-import { format } from 'date-fns';
 import { toast } from 'react-hot-toast';
 
 const PatientDetail: React.FC = () => {
@@ -28,7 +22,6 @@ const PatientDetail: React.FC = () => {
   const [showFollowUpForm, setShowFollowUpForm] = useState(false);
   const [activeStep, setActiveStep] = useState(2); // Étape "Résumé IA" par défaut
   
-  const { user } = useAuth();
   const recordId = Number(id);
   
   const { data: patient, isLoading, refetch } = useQuery(
