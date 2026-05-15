@@ -46,7 +46,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#fcf9f6] text-[#1b1c1a] min-h-screen selection:bg-[#8f464c]/20 selection:text-[#8f464c] overflow-hidden font-['Nunito_Sans']">
+    <div className="bg-[#fcf9f6] text-[#1b1c1a] min-h-screen selection:bg-[#8f464c]/20 selection:text-[#8f464c] overflow-hidden">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&family=Playfair+Display:wght@600;700&display=swap');
         
@@ -64,32 +64,38 @@ const Login: React.FC = () => {
             filter: blur(100px);
             z-index: -1;
         }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
         .input-field {
             background-color: #f6f3f0;
             border: 1px solid #d8c1c1;
             border-radius: 9999px;
-            padding: 1rem 1rem 1rem 3rem;
+            padding: 1.25rem 1rem 1.25rem 3.5rem;
             transition: all 0.3s ease;
+            font-family: 'Nunito Sans', sans-serif;
         }
         .input-field:focus {
             outline: none;
             border-color: #8f464c;
-            box-shadow: 0 0 0 2px rgba(143, 70, 76, 0.1);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(143, 70, 76, 0.05);
         }
         .btn-primary {
             background-color: #8f464c;
             color: white;
             border-radius: 9999px;
-            padding: 1rem;
+            padding: 1.25rem;
             font-weight: 700;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.2em;
             text-transform: uppercase;
-            box-shadow: 0 10px 20px rgba(143, 70, 76, 0.2);
-            transition: all 0.3s ease;
+            box-shadow: 0 12px 24px rgba(143, 70, 76, 0.25);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .btn-primary:hover {
             background-color: #753138;
-            transform: scale(1.01);
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 15px 30px rgba(143, 70, 76, 0.3);
         }
         .text-headline-xl {
             font-size: 48px;
@@ -103,9 +109,9 @@ const Login: React.FC = () => {
             font-weight: 600;
         }
         .text-label-md {
-            font-size: 14px;
+            font-size: 13px;
             line-height: 1.4;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
             font-weight: 700;
         }
       `}</style>
@@ -118,26 +124,27 @@ const Login: React.FC = () => {
       </div>
 
       <main className="relative min-h-screen grid grid-cols-1 lg:grid-cols-2">
+        {/* Left Section: Form */}
         <div className="flex flex-col justify-center items-center p-6 lg:p-12 z-10">
-          <div className="soft-panel w-full max-w-[520px] p-8 md:p-14">
-            {/* Brand */}
-            <div className="flex items-center gap-3 mb-12">
+          <div className="soft-panel w-full max-w-[540px] p-10 md:p-16">
+            {/* Brand Anchor */}
+            <div className="flex items-center gap-4 mb-14">
               <div className="w-12 h-12 bg-[#8f464c]/10 rounded-full flex items-center justify-center">
                 <span className="material-symbols-outlined text-[#8f464c] text-3xl">clinical_notes</span>
               </div>
-              <span className="font-headline text-headline-md text-[#8f464c]">CerviCare+</span>
+              <span className="font-headline text-headline-md text-[#8f464c] tracking-tight">CerviCare+</span>
             </div>
 
-            <div className="mb-10">
-              <h1 className="font-headline text-headline-xl text-[#1b1c1a] mb-4">Bienvenue sur CerviCare+</h1>
-              <p className="text-lg text-[#534343] leading-relaxed">Connectez-vous pour accéder à votre espace santé sécurisé.</p>
+            <div className="mb-12">
+              <h1 className="font-headline text-headline-xl text-[#1b1c1a] mb-6">Bienvenue sur CerviCare+</h1>
+              <p className="font-body text-lg text-[#534343] leading-relaxed opacity-80">Connectez-vous pour accéder à votre espace santé sécurisé.</p>
             </div>
 
-            <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-              <div className="space-y-2">
-                <label className="text-label-md text-[#8f464c]/80 ml-1 uppercase">Utilisateur ou Email</label>
+            <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
+              <div className="space-y-3">
+                <label className="text-label-md text-[#8f464c]/70 ml-1 uppercase">Utilisateur ou Email</label>
                 <div className="relative group">
-                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#867273] group-focus-within:text-[#8f464c] transition-colors">person</span>
+                  <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-[#867273] group-focus-within:text-[#8f464c] transition-colors">person</span>
                   <input 
                     {...register('username', { required: true })}
                     className="input-field w-full text-base placeholder:text-[#d8c1c1]" 
@@ -145,16 +152,16 @@ const Login: React.FC = () => {
                     type="text"
                   />
                 </div>
-                {errors.username && <p className="text-[10px] text-[#ba1a1a] ml-4 font-bold uppercase tracking-wider">Ce champ est requis</p>}
+                {errors.username && <p className="text-[11px] text-[#ba1a1a] ml-5 font-bold uppercase tracking-wider">Ce champ est requis</p>}
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div className="flex justify-between items-center px-1">
-                  <label className="text-label-md text-[#8f464c]/80 uppercase">Mot de passe</label>
-                  <a className="text-xs text-[#066a5f] hover:text-[#8f464c] transition-colors underline underline-offset-4" href="/login">Mot de passe oublié ?</a>
+                  <label className="text-label-md text-[#8f464c]/70 uppercase">Mot de passe</label>
+                  <a className="text-xs font-bold text-[#066a5f] hover:text-[#8f464c] transition-colors underline underline-offset-4" href="/login">Mot de passe oublié ?</a>
                 </div>
                 <div className="relative group">
-                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#867273] group-focus-within:text-[#8f464c] transition-colors">lock</span>
+                  <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-[#867273] group-focus-within:text-[#8f464c] transition-colors">lock</span>
                   <input 
                     {...register('password', { required: true })}
                     className="input-field w-full text-base placeholder:text-[#d8c1c1]" 
@@ -162,13 +169,13 @@ const Login: React.FC = () => {
                     type="password"
                   />
                 </div>
-                {errors.password && <p className="text-[10px] text-[#ba1a1a] ml-4 font-bold uppercase tracking-wider">Ce champ est requis</p>}
+                {errors.password && <p className="text-[11px] text-[#ba1a1a] ml-5 font-bold uppercase tracking-wider">Ce champ est requis</p>}
               </div>
 
               <button 
                 type="submit"
                 disabled={isLoading}
-                className="btn-primary w-full disabled:opacity-70 flex items-center justify-center gap-2"
+                className="btn-primary w-full disabled:opacity-70 flex items-center justify-center gap-3"
               >
                 {isLoading ? (
                   <span className="animate-spin material-symbols-outlined">progress_activity</span>
@@ -178,72 +185,73 @@ const Login: React.FC = () => {
               </button>
             </form>
 
-            <div className="relative my-10 text-center">
+            <div className="relative my-12 text-center">
               <span className="absolute inset-0 flex items-center"><span className="w-full border-t border-[#d8c1c1]/40"></span></span>
-              <span className="relative bg-[#fcf9f6] px-4 text-[10px] text-[#867273] uppercase tracking-widest font-bold">Ou continuer avec</span>
+              <span className="relative bg-[#fcf9f6] px-6 text-[11px] text-[#867273] uppercase tracking-[0.2em] font-bold">Ou continuer avec</span>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <button className="flex items-center justify-center gap-2 py-4 rounded-full border border-[#d8c1c1] hover:border-[#8f464c] hover:bg-[#8f464c]/5 transition-all group">
+            <div className="grid grid-cols-2 gap-5">
+              <button className="flex items-center justify-center gap-3 py-4 rounded-full border border-[#d8c1c1] hover:border-[#8f464c] hover:bg-[#8f464c]/5 transition-all group">
                 <span className="material-symbols-outlined text-[#8f464c] group-hover:scale-110 transition-transform">fingerprint</span>
-                <span className="text-xs font-bold text-[#1b1c1a]">Biométrie</span>
+                <span className="font-body text-xs font-bold text-[#1b1c1a]">Biométrie</span>
               </button>
-              <button className="flex items-center justify-center gap-2 py-4 rounded-full border border-[#d8c1c1] hover:border-[#066a5f] hover:bg-[#066a5f]/5 transition-all group">
+              <button className="flex items-center justify-center gap-3 py-4 rounded-full border border-[#d8c1c1] hover:border-[#066a5f] hover:bg-[#066a5f]/5 transition-all group">
                 <span className="material-symbols-outlined text-[#066a5f] group-hover:scale-110 transition-transform">shield_person</span>
-                <span className="text-xs font-bold text-[#1b1c1a]">Passkey</span>
+                <span className="font-body text-xs font-bold text-[#1b1c1a]">Passkey</span>
               </button>
             </div>
 
-            <div className="mt-12 lg:hidden flex justify-center gap-8 opacity-60">
+            <div className="mt-14 lg:hidden flex justify-center gap-10 opacity-60">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-xl text-[#066a5f]">security</span>
-                <span className="text-[10px] text-[#1b1c1a] uppercase tracking-tight font-bold">100% Sécurisé</span>
+                <span className="text-[11px] text-[#1b1c1a] uppercase tracking-wider font-bold">100% Sécurisé</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-xl text-[#8f464c]">health_and_safety</span>
-                <span className="text-[10px] text-[#1b1c1a] uppercase tracking-tight font-bold">Santé France</span>
+                <span className="text-[11px] text-[#1b1c1a] uppercase tracking-wider font-bold">Santé France</span>
               </div>
             </div>
           </div>
         </div>
 
+        {/* Right Section: Visual */}
         <div className="hidden lg:flex relative overflow-hidden bg-[#f6f3f0]">
           <div className="absolute inset-0">
             <img 
               alt="Atmospheric Medical Wellness" 
-              className="w-full h-full object-cover opacity-30 mix-blend-multiply" 
-              src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=1000"
+              className="w-full h-full object-cover opacity-40 mix-blend-multiply" 
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFMcE94wRKdyGqfiEUc7uFZ7plXiGdtmxTxloeZfkdgXo0FREHVUh8LaFbqD_Z4BPPPGPuVJpDde2kkU_Wf2KYfX3u06v64pZyVVDpnB-UHZ50U63jpWoaR3OGrgEbXP2tnG1FN95zdwLXKauScOI1ZuXgsvFYuyV7Cn6y36Cv--H1kjNa9UbRs5pGxbWOE6gDeQLzNSBrU6oK3j0yLfDmN-fjV0tsiFPlCXtgN7Kn88IoZe7m_SaOOEwmOlZY_LR5WEvGHlRzrIg"
             />
           </div>
-          <div className="absolute inset-0 bg-gradient-to-tr from-[#fcf9f6] via-[#fcf9f6]/40 to-transparent"></div>
-          <div className="relative z-10 flex flex-col justify-end p-20 w-full">
+          <div className="absolute inset-0 bg-gradient-to-tr from-[#fcf9f6] via-[#fcf9f6]/30 to-transparent"></div>
+          <div className="relative z-10 flex flex-col justify-end p-24 w-full">
             <div className="max-w-lg">
-              <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white border border-[#d8c1c1] text-[#066a5f] text-xs font-bold mb-8 shadow-sm">
+              <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white border border-[#d8c1c1] text-[#066a5f] text-xs font-bold mb-10 shadow-sm">
                 <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                 Technologie médicale de pointe
               </div>
-              <h2 className="font-headline text-headline-xl text-[#1b1c1a] mb-8">Prendre soin de vous, avec <span className="text-[#8f464c] italic">bienveillance</span>.</h2>
-              <p className="text-lg text-[#534343] mb-12 max-w-md leading-relaxed">
+              <h2 className="font-headline text-headline-xl text-[#1b1c1a] mb-10 leading-[1.05]">Prendre soin de vous, avec <span className="text-[#8f464c] italic">bienveillance</span>.</h2>
+              <p className="font-body text-xl text-[#534343] mb-14 max-w-md leading-relaxed opacity-90">
                 Notre plateforme allie expertise clinique et intelligence artificielle pour un accompagnement personnalisé de votre santé féminine.
               </p>
               
-              <div className="flex gap-12 border-t border-[#d8c1c1]/30 pt-10">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-white border border-[#d8c1c1] flex items-center justify-center shadow-sm">
-                    <span className="material-symbols-outlined text-[#066a5f] text-2xl">gpp_maybe</span>
+              <div className="flex gap-14 border-t border-[#d8c1c1]/40 pt-12">
+                <div className="flex items-center gap-5">
+                  <div className="w-14 h-14 rounded-full bg-white border border-[#d8c1c1] flex items-center justify-center shadow-md">
+                    <span className="material-symbols-outlined text-[#066a5f] text-3xl">gpp_maybe</span>
                   </div>
                   <div>
-                    <p className="text-[10px] text-[#867273] uppercase tracking-wider font-bold">Certifié par</p>
-                    <p className="text-sm text-[#1b1c1a] font-bold">Ministère de la Santé</p>
+                    <p className="text-[11px] text-[#867273] uppercase tracking-[0.15em] font-bold">Certifié par</p>
+                    <p className="text-base text-[#1b1c1a] font-bold">Ministère de la Santé</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-white border border-[#d8c1c1] flex items-center justify-center shadow-sm">
-                    <span className="material-symbols-outlined text-[#8f464c] text-2xl">encrypted</span>
+                <div className="flex items-center gap-5">
+                  <div className="w-14 h-14 rounded-full bg-white border border-[#d8c1c1] flex items-center justify-center shadow-md">
+                    <span className="material-symbols-outlined text-[#8f464c] text-3xl">encrypted</span>
                   </div>
                   <div>
-                    <p className="text-[10px] text-[#867273] uppercase tracking-wider font-bold">Confidentialité</p>
-                    <p className="text-sm text-[#1b1c1a] font-bold">Chiffrement AES-256</p>
+                    <p className="text-[11px] text-[#867273] uppercase tracking-[0.15em] font-bold">Confidentialité</p>
+                    <p className="text-base text-[#1b1c1a] font-bold">Chiffrement AES-256</p>
                   </div>
                 </div>
               </div>
