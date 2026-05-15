@@ -4,10 +4,12 @@ import { LoginRequest, LoginResponse, User } from '../types';
 class AuthService {
   async login(username: string, password: string): Promise<LoginResponse> {
     const loginData: LoginRequest = { username, password };
+    console.log('AuthService - Attempting login with payload:', { username, password: '***' });
     
     try {
       // 1. Authentification JWT
       const response = await api.post('/auth/jwt/create/', loginData);
+      console.log('AuthService - Login successful, tokens received');
       const { access, refresh } = response.data;
 
       // 2. Récupérer les informations de l'utilisateur connecté
@@ -15,12 +17,16 @@ class AuthService {
         headers: { Authorization: `Bearer ${access}` },
       });
 
-      const user: User = userResponse.data; // <-- directement data, pas de results
-      console.log('AuthService - getCurrentUser response:', user);
+      const user: User = userResponse.data;
+      console.log('AuthService - User profile retrieved:', user);
 
       return { access, refresh, user };
-    } catch (error) {
-      console.error('Login error:', error);
+    } catch (error: any) {
+      console.error('AuthService - LOGIN ERROR DETAILS:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      });
       throw error;
     }
   }
