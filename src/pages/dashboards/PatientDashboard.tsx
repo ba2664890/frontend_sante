@@ -184,7 +184,7 @@ const PatientDashboard: React.FC = () => {
 
         {/* Pure Immersive Background Video Section */}
         <div className="lg:col-span-12 mt-12 animate-fade-in delay-200 pointer-events-none">
-          <section className="relative w-full aspect-[16/6] md:aspect-[21/7] rounded-[50px] overflow-hidden shadow-2xl border border-sahara-rose/30">
+          <section className="relative w-full aspect-[16/9] md:aspect-[16/7] rounded-[50px] overflow-hidden shadow-2xl border border-sahara-rose/30">
             {/* Vidéo en boucle (Pure Visual) */}
             <video 
               autoPlay 
