@@ -182,37 +182,28 @@ const PatientDashboard: React.FC = () => {
           </GlassPanel>
         </div>
 
-        {/* Pure Video Demo Section */}
-        <div className="lg:col-span-12 mt-8 animate-fade-in delay-200">
-          <section className="relative w-full aspect-[21/9] md:aspect-[25/9] rounded-[40px] overflow-hidden shadow-2xl group cursor-pointer border border-sahara-rose/30"
-            onClick={() => setSelectedVideo({ title: "Démo de l'application", url: "/demo-app.mp4" })}
-          >
-            {/* Vidéo en boucle (Full Cover) */}
+        {/* Pure Immersive Background Video Section */}
+        <div className="lg:col-span-12 mt-12 animate-fade-in delay-200 pointer-events-none">
+          <section className="relative w-full aspect-[16/6] md:aspect-[21/7] rounded-[50px] overflow-hidden shadow-2xl border border-sahara-rose/30">
+            {/* Vidéo en boucle (Pure Visual) */}
             <video 
               autoPlay 
               loop 
               muted 
               playsInline 
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-105"
-              poster="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=1200"
+              className="absolute inset-0 w-full h-full object-cover"
+              poster="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=1600"
             >
               <source src="/demo-app.mp4" type="video/mp4" />
             </video>
 
-            {/* Subtle Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40 opacity-60 group-hover:opacity-40 transition-opacity"></div>
+            {/* Subtle Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/30 opacity-40"></div>
             
-            {/* Play Button Overlay */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-24 h-24 bg-white/10 backdrop-blur-xl text-white rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-all duration-500 border border-white/20">
-                <span className="material-symbols-outlined text-6xl">play_arrow</span>
-              </div>
-            </div>
-
-            {/* Bottom Badge */}
-            <div className="absolute bottom-8 left-8 flex items-center gap-3 bg-black/20 backdrop-blur-md px-6 py-3 rounded-full border border-white/10">
-              <span className="w-3 h-3 bg-red-500 rounded-full animate-pulse shadow-[0_0_12px_rgba(239,68,68,0.8)]"></span>
-              <span className="text-xs font-black uppercase tracking-[0.2em] text-white">Aperçu Dynamique CerviCare+</span>
+            {/* Bottom Badge - Discret */}
+            <div className="absolute bottom-10 left-10 flex items-center gap-3 bg-black/10 backdrop-blur-lg px-6 py-2 rounded-full border border-white/5">
+              <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/80 italic">Njariñu Live Preview</span>
             </div>
           </section>
         </div>
