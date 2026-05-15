@@ -132,11 +132,11 @@ const AgentChatbotPage: React.FC = () => {
             <div className="grid grid-cols-2 gap-3 mb-4">
               <div className="bg-[#f2fbff] p-3 rounded-xl border border-[#bec9c9]/10">
                 <p className="text-[10px] text-[#3e4949] uppercase font-bold mb-1">Dépistages</p>
-                <p className="font-mono text-xl text-[#006669] font-semibold">—</p>
+                <p className="font-mono text-xl text-[#006669] font-semibold">{patients.length || '—'}</p>
               </div>
               <div className="bg-[#f2fbff] p-3 rounded-xl border border-[#bec9c9]/10">
-                <p className="text-[10px] text-[#3e4949] uppercase font-bold mb-1">Précision</p>
-                <p className="font-mono text-xl text-[#9a4523] font-semibold">99.4%</p>
+                <p className="text-[10px] text-[#3e4949] uppercase font-bold mb-1">Activité</p>
+                <p className="font-mono text-xl text-[#9a4523] font-semibold">Récent</p>
               </div>
             </div>
           </div>

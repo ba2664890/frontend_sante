@@ -4,7 +4,6 @@ import { useAuth } from '../contexts/AuthContext.tsx';
 import { toast } from 'react-hot-toast';
 import { useLocation } from 'react-router-dom';
 import PatientLayout from '../components/PatientLayout.tsx';
-import Layout from '../components/Layout.tsx';
 import { BentoCard, GlassPanel, IconBox } from '../components/ui/PatientUI.tsx';
 import LoadingSpinner from '../components/LoadingSpinner.tsx';
 import { authService } from '../services/authService.ts';
@@ -54,7 +53,6 @@ const Settings: React.FC = () => {
   }
 
   const renderContent = () => {
-    // THÈME AGENT (Teal/Terracotta)
     if (!isPatient) {
       return (
         <div className="h-full flex flex-col space-y-8 animate-fade-in">
@@ -64,7 +62,6 @@ const Settings: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1 min-h-0">
-            {/* Sidebar Tabs */}
             <div className="lg:col-span-3 space-y-2">
               {tabs.map(tab => (
                 <button
@@ -85,7 +82,6 @@ const Settings: React.FC = () => {
               ))}
             </div>
 
-            {/* Content Area */}
             <div className="lg:col-span-9 bg-white rounded-3xl p-8 border border-[#bec9c9]/10 shadow-sm overflow-y-auto">
               {activeTab === 'profile' ? (
                 <div className="space-y-8">
@@ -127,7 +123,6 @@ const Settings: React.FC = () => {
       );
     }
 
-    // THÈME PATIENT (Rose/Silk) — On garde la structure existante
     return (
       <div className="max-w-6xl mx-auto space-y-10 pb-20">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 animate-fade-in">
@@ -142,7 +137,6 @@ const Settings: React.FC = () => {
             </div>
           </GlassPanel>
         </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           <div className="lg:col-span-4 space-y-4">
             {tabs.map((tab) => (
@@ -187,11 +181,8 @@ const Settings: React.FC = () => {
 
   if (isPatient) return <PatientLayout>{renderContent()}</PatientLayout>;
   
-  return (
-    <Layout>
-      {renderContent()}
-    </Layout>
-  );
+  // Pour les agents, on ne rend plus le Layout ici car il est géré par App.tsx
+  return renderContent();
 };
 
 export default Settings;

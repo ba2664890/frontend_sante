@@ -150,11 +150,47 @@ const ReportsPage: React.FC = () => {
         <div className="fixed inset-0 z-50 flex justify-end">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setDrawerOpen(false)}></div>
           <div className="relative w-full max-w-md bg-white h-full shadow-2xl animate-slide-left p-8 overflow-y-auto">
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-bold text-[#091e25]" style={{ fontFamily: 'Literata, serif' }}>Nouveau Rapport</h2>
-              <button onClick={() => setDrawerOpen(false)} className="text-[#6f7979] hover:text-[#ba1a1a]"><span className="material-symbols-outlined">close</span></button>
-            </div>
-            <p className="italic text-sm text-[#3e4949]">Formulaire de création de rapport en cours de finalisation...</p>
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              try {
+                const report = await analyticsService.createReport({
+                  name: formData.get('name') as string,
+                  report_type: formData.get('report_type') as any,
+                  region: formData.get('region') as string || undefined
+                });
+                toast.success('Rapport créé !');
+                setDrawerOpen(false);
+                queryClient.invalidateQueries('reports');
+              } catch {
+                toast.error('Erreur lors de la création');
+              }
+            }} className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-[#006669] uppercase tracking-widest">Nom du rapport</label>
+                <input name="name" required className="w-full p-3.5 bg-[#f2fbff] border border-[#bec9c9]/20 rounded-xl outline-none focus:ring-2 focus:ring-[#006669]/20" placeholder="Ex: Rapport Hebdomadaire Dakar" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-[#006669] uppercase tracking-widest">Périodicité</label>
+                <select name="report_type" className="w-full p-3.5 bg-[#f2fbff] border border-[#bec9c9]/20 rounded-xl outline-none">
+                  <option value="daily">Quotidien</option>
+                  <option value="weekly">Hebdomadaire</option>
+                  <option value="monthly">Mensuel</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-[#006669] uppercase tracking-widest">Région ciblée</label>
+                <select name="region" className="w-full p-3.5 bg-[#f2fbff] border border-[#bec9c9]/20 rounded-xl outline-none">
+                  <option value="">Toutes les régions</option>
+                  {REGIONS.filter(r => r !== 'Toutes').map(r => <option key={r} value={r}>{r}</option>)}
+                </select>
+              </div>
+              <div className="pt-6">
+                <button type="submit" className="w-full py-4 bg-[#006669] text-white rounded-xl font-bold shadow-lg shadow-[#006669]/20 hover:bg-[#2a7f82] transition-all">
+                  Générer le rapport
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

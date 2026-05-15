@@ -34,11 +34,16 @@ const Login: React.FC = () => {
       toast.success('Connexion réussie !');
       navigate('/dashboard');
     } catch (error: any) {
-      const errorMessage = error.response?.data?.detail || 
-                          error.response?.data?.message || 
-                          'Identifiants invalides';
+      console.error('Login error:', error);
+      let errorMessage = 'Identifiants invalides';
+      
+      if (error.code === 'ERR_NETWORK' || error.response?.status === 502) {
+        errorMessage = 'Le serveur est temporairement indisponible. Veuillez réessayer dans quelques minutes.';
+      } else if (error.response?.data?.detail || error.response?.data?.message) {
+        errorMessage = error.response.data.detail || error.response.data.message;
+      }
+      
       toast.error(errorMessage);
-
     } finally {
       setIsLoading(false);
     }

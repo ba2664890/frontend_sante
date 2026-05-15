@@ -191,9 +191,62 @@ const Campaigns: React.FC = () => {
         </div>
       </div>
 
-      <Modal isOpen={showModal} onClose={() => setShowModal(false)} title={selectedCampaign ? 'Modifier la campagne' : 'Nouvelle campagne'} size="xl">
-        {/* Formulaire simplifié ici ou composant dédié */}
-        <div className="p-4 text-center italic text-[#3e4949]">Formulaire de campagne en cours d'adaptation...</div>
+      <Modal isOpen={showModal} onClose={() => { setShowModal(false); setSelectedCampaign(undefined); }} title={selectedCampaign ? 'Modifier la campagne' : 'Nouvelle campagne'} size="xl">
+        <form onSubmit={async (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.currentTarget);
+          const data = Object.fromEntries(formData.entries());
+          try {
+            if (selectedCampaign) {
+              await analyticsService.updateCampaign(selectedCampaign.id, data as any);
+              toast.success('Campagne mise à jour !');
+            } else {
+              await analyticsService.createCampaign(data as any);
+              toast.success('Campagne créée !');
+            }
+            setShowModal(false);
+            setSelectedCampaign(undefined);
+            queryClient.invalidateQueries('campaigns');
+          } catch {
+            toast.error('Erreur lors de l\'enregistrement');
+          }
+        }} className="space-y-6 p-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-[#006669] uppercase">Nom de la campagne</label>
+              <input name="name" defaultValue={selectedCampaign?.name} required className="w-full p-3 bg-[#f2fbff] border border-[#bec9c9]/20 rounded-xl outline-none focus:ring-2 focus:ring-[#006669]/20" placeholder="Ex: Mission Touba 2024" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-[#006669] uppercase">Région</label>
+              <select name="region" defaultValue={selectedCampaign?.region || 'Dakar'} className="w-full p-3 bg-[#f2fbff] border border-[#bec9c9]/20 rounded-xl outline-none focus:ring-2 focus:ring-[#006669]/20">
+                <option value="Dakar">Dakar</option>
+                <option value="Thiès">Thiès</option>
+                <option value="Saint-Louis">Saint-Louis</option>
+                <option value="Diourbel">Diourbel</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-[#006669] uppercase">Date de début</label>
+              <input type="date" name="start_date" defaultValue={selectedCampaign?.start_date} required className="w-full p-3 bg-[#f2fbff] border border-[#bec9c9]/20 rounded-xl outline-none" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-[#006669] uppercase">Date de fin</label>
+              <input type="date" name="end_date" defaultValue={selectedCampaign?.end_date} required className="w-full p-3 bg-[#f2fbff] border border-[#bec9c9]/20 rounded-xl outline-none" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-[#006669] uppercase">Population cible</label>
+              <input type="number" name="target_population" defaultValue={selectedCampaign?.target_population} required className="w-full p-3 bg-[#f2fbff] border border-[#bec9c9]/20 rounded-xl outline-none" placeholder="Ex: 500" />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-[#006669] uppercase">Description</label>
+            <textarea name="description" defaultValue={selectedCampaign?.description} rows={3} className="w-full p-3 bg-[#f2fbff] border border-[#bec9c9]/20 rounded-xl outline-none" placeholder="Objectifs de la mission..." />
+          </div>
+          <div className="flex justify-end gap-3 pt-4">
+            <button type="button" onClick={() => setShowModal(false)} className="px-6 py-2.5 text-[#6f7979] font-bold">Annuler</button>
+            <button type="submit" className="px-8 py-2.5 bg-[#006669] text-white rounded-xl font-bold shadow-lg shadow-[#006669]/20">Confirmer</button>
+          </div>
+        </form>
       </Modal>
     </div>
   );

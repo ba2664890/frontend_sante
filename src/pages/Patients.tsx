@@ -1,7 +1,7 @@
 // src/pages/Patients.tsx — Design "Clinical Precision" Bento
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from 'react-query';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { patientService } from '../services/patientService.ts';
 import { Patient, PatientFilters } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner.tsx';
@@ -11,10 +11,19 @@ import { toast } from 'react-hot-toast';
 
 const Patients: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showForm, setShowForm] = useState(false);
   const [filters, setFilters] = useState<PatientFilters>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    if (location.state?.openForm) {
+      setShowForm(true);
+      // Nettoyer l'état pour éviter de réouvrir au refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   // Récupérer la liste des patientes
   const { data, isLoading, refetch } = useQuery(
