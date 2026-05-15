@@ -113,7 +113,7 @@ const Login: React.FC = () => {
               <div className="space-y-2">
                 <div className="flex justify-between items-center px-1">
                   <label className="font-body text-sm font-bold text-[#8f464c]/80 uppercase tracking-widest">Mot de passe</label>
-                  <a className="font-body text-xs text-[#066a5f] hover:text-[#8f464c] transition-colors underline underline-offset-4" href="#">Mot de passe oublié ?</a>
+                  <a className="font-body text-xs text-[#066a5f] hover:text-[#8f464c] transition-colors underline underline-offset-4" href="/login">Mot de passe oublié ?</a>
                 </div>
                 <div className="relative group">
                   <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#867273] group-focus-within:text-[#8f464c] transition-colors">lock</span>

@@ -69,7 +69,7 @@ const HomePage: React.FC = () => {
           <Link to="/" className="font-headline text-3xl font-bold text-[#E28B7A] tracking-tight">CerviCare+</Link>
           <div className="hidden md:flex gap-8 items-center font-semibold">
             <Link to="/" className="text-[#E28B7A] border-b-2 border-[#E28B7A] pb-1">Éducation</Link>
-            <Link to="/accueil" className="text-[#7A6C69] hover:text-[#E28B7A] transition-colors">Campagnes</Link>
+            <Link to="/accueil" className="text-[#7A6C69] hover:text-[#E28B7A] transition-colors">Centres de dépistage</Link>
             <a href="#testimonials" className="text-[#7A6C69] hover:text-[#E28B7A] transition-colors">Témoignages</a>
             <Link to="/" className="text-[#7A6C69] hover:text-[#E28B7A] transition-colors">À propos</Link>
           </div>
@@ -291,22 +291,22 @@ const HomePage: React.FC = () => {
 
       {/* BottomNavBar (Mobile Only) */}
       <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-8 pt-3 md:hidden bg-white/90 backdrop-blur-xl border-t border-[#D1C2BE]/10 shadow-2xl">
-        <div className="flex flex-col items-center justify-center text-[#E28B7A]">
+        <Link to="/" className="flex flex-col items-center justify-center text-[#E28B7A]">
           <span className="material-symbols-outlined text-2xl">home</span>
           <span className="text-[10px] font-bold mt-1 uppercase tracking-tighter">Accueil</span>
-        </div>
-        <div className="flex flex-col items-center justify-center text-[#7A6C69] opacity-70">
+        </Link>
+        <Link to="/accueil" className="flex flex-col items-center justify-center text-[#7A6C69] opacity-70 hover:opacity-100 transition-opacity">
           <span className="material-symbols-outlined text-2xl">menu_book</span>
           <span className="text-[10px] font-bold mt-1 uppercase tracking-tighter">Savoir</span>
-        </div>
-        <div className="flex flex-col items-center justify-center text-[#7A6C69] opacity-70">
+        </Link>
+        <Link to="/accueil" className="flex flex-col items-center justify-center text-[#7A6C69] opacity-70 hover:opacity-100 transition-opacity">
           <span className="material-symbols-outlined text-2xl">location_on</span>
           <span className="text-[10px] font-bold mt-1 uppercase tracking-tighter">Carte</span>
-        </div>
-        <div className="flex flex-col items-center justify-center text-[#7A6C69] opacity-70">
+        </Link>
+        <Link to={user ? (user.role === 'patient' ? "/acceuil_patient" : "/dashboard") : "/login"} className="flex flex-col items-center justify-center text-[#7A6C69] opacity-70 hover:opacity-100 transition-opacity">
           <span className="material-symbols-outlined text-2xl">account_circle</span>
           <span className="text-[10px] font-bold mt-1 uppercase tracking-tighter">Profil</span>
-        </div>
+        </Link>
       </nav>
     </div>
   );
