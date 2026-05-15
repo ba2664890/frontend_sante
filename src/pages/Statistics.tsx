@@ -8,18 +8,34 @@ import Chart from '../components/Chart.tsx';
 import SenegalMap from '../components/SenegalMap.tsx';
 
 const Statistics: React.FC = () => {
+  const { user } = useAuth();
   const [dateRange, setDateRange] = useState('last-6-months');
   const [selectedRegion, setSelectedRegion] = useState('all');
 
-  const { data: stats, isLoading: statsLoading } = useQuery(
+  const isAgent = user?.role === 'health_agent';
+
+  const { data: stats, isLoading: statsLoading, error: statsError } = useQuery(
     ['patient-stats'],
-    () => patientService.getPatientStats()
+    () => patientService.getPatientStats(),
+    { enabled: !isAgent } // Désactiver pour les agents
   );
 
-  const { data: dashboardData, isLoading: dashboardLoading } = useQuery(
+  const { data: dashboardData, isLoading: dashboardLoading, error: dashError } = useQuery(
     'dashboard-data',
     () => analyticsService.getDashboardData()
   );
+
+  if (isAgent) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center bg-white rounded-3xl p-12 text-center border border-[#bec9c9]/10 shadow-sm">
+        <div className="w-20 h-20 bg-[#ffdad6] text-[#ba1a1a] rounded-full flex items-center justify-center mb-6">
+          <span className="material-symbols-outlined text-4xl">lock</span>
+        </div>
+        <h2 className="text-2xl font-bold text-[#091e25] mb-2" style={{ fontFamily: 'Literata, serif' }}>Accès Restreint</h2>
+        <p className="text-[#6f7979] max-w-md">Les statistiques globales sont réservées aux superviseurs. Votre dashboard personnel contient toutes les données relatives à votre zone.</p>
+      </div>
+    );
+  }
 
   if (statsLoading || dashboardLoading) {
     return (

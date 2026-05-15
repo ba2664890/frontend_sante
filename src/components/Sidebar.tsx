@@ -36,10 +36,9 @@ const Sidebar: React.FC = () => {
       case 'health_agent':
         return [
           { name: 'Dashboard', href: '/dashboard', icon: 'dashboard' },
-          { name: 'File de patientes', href: '/patients', icon: 'group' },
-          { name: 'Statistiques', href: '/statistics', icon: 'analytics' },
-          { name: 'Notifications', href: '/notifications', icon: 'notifications' },
-          { name: 'Campagnes', href: '/accueil', icon: 'campaign' },
+          { name: 'Ma file d\'attente', href: '/patients', icon: 'group' },
+          { name: 'Mes Notifications', href: '/notifications', icon: 'notifications' },
+          { name: 'Campagnes locales', href: '/accueil', icon: 'campaign' },
           { name: 'Assistant Njariñu', href: '/agent/chatbot', icon: 'robot_2' },
         ];
       case 'patient':

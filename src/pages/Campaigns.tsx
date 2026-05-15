@@ -19,11 +19,26 @@ const Campaigns: React.FC = () => {
 
   const isAdmin = user?.role === 'admin' || user?.role === 'supervisor';
 
-  const { data: campaigns, isLoading } = useQuery(
+  const { data: campaigns, isLoading, error } = useQuery(
     ['campaigns', filter],
     () => analyticsService.getCampaigns({ status: filter !== 'all' ? filter : undefined }),
-    { refetchInterval: 30000 }
+    { 
+      refetchInterval: 30000,
+      retry: false
+    }
   );
+
+  if (error) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center bg-white rounded-3xl p-12 text-center border border-[#bec9c9]/10 shadow-sm">
+        <div className="w-20 h-20 bg-[#ffdeaa] text-[#795500] rounded-full flex items-center justify-center mb-6">
+          <span className="material-symbols-outlined text-4xl">visibility_off</span>
+        </div>
+        <h2 className="text-2xl font-bold text-[#091e25] mb-2" style={{ fontFamily: 'Literata, serif' }}>Campagnes Restreintes</h2>
+        <p className="text-[#6f7979] max-w-md">Vous n'avez pas la permission de consulter les campagnes globales ou aucune campagne n'est affectée à votre zone.</p>
+      </div>
+    );
+  }
 
   const deleteMutation = useMutation(
     (id: number) => analyticsService.deleteCampaign(id),
