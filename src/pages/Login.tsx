@@ -125,23 +125,23 @@ const Login: React.FC = () => {
 
       <main className="relative min-h-screen grid grid-cols-1 lg:grid-cols-2">
         {/* Left Section: Form */}
-        <div className="flex flex-col justify-center items-center p-6 lg:p-12 z-10">
-          <div className="soft-panel w-full max-w-[540px] p-10 md:p-16">
+        <div className="flex flex-col justify-center items-center p-4 lg:p-8 z-10">
+          <div className="soft-panel w-full max-w-[500px] p-8 md:p-10">
             {/* Brand Anchor */}
-            <div className="flex items-center gap-4 mb-14">
-              <div className="w-12 h-12 bg-[#8f464c]/10 rounded-full flex items-center justify-center">
-                <span className="material-symbols-outlined text-[#8f464c] text-3xl">clinical_notes</span>
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-10 h-10 bg-[#8f464c]/10 rounded-full flex items-center justify-center">
+                <span className="material-symbols-outlined text-[#8f464c] text-2xl">clinical_notes</span>
               </div>
-              <span className="font-headline text-headline-md text-[#8f464c] tracking-tight">CerviCare+</span>
+              <span className="font-headline text-xl font-bold text-[#8f464c] tracking-tight">CerviCare+</span>
             </div>
 
-            <div className="mb-12">
-              <h1 className="font-headline text-headline-xl text-[#1b1c1a] mb-6">Bienvenue sur CerviCare+</h1>
-              <p className="font-body text-lg text-[#534343] leading-relaxed opacity-80">Connectez-vous pour accéder à votre espace santé sécurisé.</p>
+            <div className="mb-6">
+              <h1 className="font-headline text-3xl md:text-4xl text-[#1b1c1a] mb-2 leading-tight">Bienvenue sur CerviCare+</h1>
+              <p className="font-body text-base text-[#534343] leading-relaxed opacity-80">Connectez-vous pour accéder à votre espace santé sécurisé.</p>
             </div>
 
-            <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
-              <div className="space-y-3">
+            <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+              <div className="space-y-2">
                 <label className="text-label-md text-[#8f464c]/70 ml-1 uppercase">Utilisateur ou Email</label>
                 <div className="relative group">
                   <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-[#867273] group-focus-within:text-[#8f464c] transition-colors">person</span>
@@ -155,7 +155,7 @@ const Login: React.FC = () => {
                 {errors.username && <p className="text-[11px] text-[#ba1a1a] ml-5 font-bold uppercase tracking-wider">Ce champ est requis</p>}
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <div className="flex justify-between items-center px-1">
                   <label className="text-label-md text-[#8f464c]/70 uppercase">Mot de passe</label>
                   <a className="text-xs font-bold text-[#066a5f] hover:text-[#8f464c] transition-colors underline underline-offset-4" href="/login">Mot de passe oublié ?</a>
@@ -185,30 +185,30 @@ const Login: React.FC = () => {
               </button>
             </form>
 
-            <div className="relative my-12 text-center">
+            <div className="relative my-6 text-center">
               <span className="absolute inset-0 flex items-center"><span className="w-full border-t border-[#d8c1c1]/40"></span></span>
-              <span className="relative bg-[#fcf9f6] px-6 text-[11px] text-[#867273] uppercase tracking-[0.2em] font-bold">Ou continuer avec</span>
+              <span className="relative bg-[#fcf9f6] px-6 text-[10px] text-[#867273] uppercase tracking-[0.2em] font-bold">Ou continuer avec</span>
             </div>
 
-            <div className="grid grid-cols-2 gap-5">
-              <button className="flex items-center justify-center gap-3 py-4 rounded-full border border-[#d8c1c1] hover:border-[#8f464c] hover:bg-[#8f464c]/5 transition-all group">
+            <div className="grid grid-cols-2 gap-4">
+              <button className="flex items-center justify-center gap-3 py-3 rounded-full border border-[#d8c1c1] hover:border-[#8f464c] hover:bg-[#8f464c]/5 transition-all group">
                 <span className="material-symbols-outlined text-[#8f464c] group-hover:scale-110 transition-transform">fingerprint</span>
                 <span className="font-body text-xs font-bold text-[#1b1c1a]">Biométrie</span>
               </button>
-              <button className="flex items-center justify-center gap-3 py-4 rounded-full border border-[#d8c1c1] hover:border-[#066a5f] hover:bg-[#066a5f]/5 transition-all group">
+              <button className="flex items-center justify-center gap-3 py-3 rounded-full border border-[#d8c1c1] hover:border-[#066a5f] hover:bg-[#066a5f]/5 transition-all group">
                 <span className="material-symbols-outlined text-[#066a5f] group-hover:scale-110 transition-transform">shield_person</span>
                 <span className="font-body text-xs font-bold text-[#1b1c1a]">Passkey</span>
               </button>
             </div>
 
-            <div className="mt-14 lg:hidden flex justify-center gap-10 opacity-60">
+            <div className="mt-8 lg:hidden flex justify-center gap-8 opacity-60">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-xl text-[#066a5f]">security</span>
-                <span className="text-[11px] text-[#1b1c1a] uppercase tracking-wider font-bold">100% Sécurisé</span>
+                <span className="text-[10px] text-[#1b1c1a] uppercase tracking-wider font-bold">100% Sécurisé</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-xl text-[#8f464c]">health_and_safety</span>
-                <span className="text-[11px] text-[#1b1c1a] uppercase tracking-wider font-bold">Santé France</span>
+                <span className="text-[10px] text-[#1b1c1a] uppercase tracking-wider font-bold">Santé France</span>
               </div>
             </div>
           </div>
@@ -224,34 +224,34 @@ const Login: React.FC = () => {
             />
           </div>
           <div className="absolute inset-0 bg-gradient-to-tr from-[#fcf9f6] via-[#fcf9f6]/30 to-transparent"></div>
-          <div className="relative z-10 flex flex-col justify-end p-24 w-full">
+          <div className="relative z-10 flex flex-col justify-end p-12 lg:p-16 w-full">
             <div className="max-w-lg">
-              <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white border border-[#d8c1c1] text-[#066a5f] text-xs font-bold mb-10 shadow-sm">
+              <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white border border-[#d8c1c1] text-[#066a5f] text-xs font-bold mb-6 shadow-sm">
                 <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                 Technologie médicale de pointe
               </div>
-              <h2 className="font-headline text-headline-xl text-[#1b1c1a] mb-10 leading-[1.05]">Prendre soin de vous, avec <span className="text-[#8f464c] italic">bienveillance</span>.</h2>
-              <p className="font-body text-xl text-[#534343] mb-14 max-w-md leading-relaxed opacity-90">
+              <h2 className="font-headline text-3xl lg:text-4xl text-[#1b1c1a] mb-6 leading-[1.1]">Prendre soin de vous, avec <span className="text-[#8f464c] italic">bienveillance</span>.</h2>
+              <p className="font-body text-base lg:text-lg text-[#534343] mb-8 max-w-md leading-relaxed opacity-90">
                 Notre plateforme allie expertise clinique et intelligence artificielle pour un accompagnement personnalisé de votre santé féminine.
               </p>
               
-              <div className="flex gap-14 border-t border-[#d8c1c1]/40 pt-12">
-                <div className="flex items-center gap-5">
-                  <div className="w-14 h-14 rounded-full bg-white border border-[#d8c1c1] flex items-center justify-center shadow-md">
-                    <span className="material-symbols-outlined text-[#066a5f] text-3xl">gpp_maybe</span>
+              <div className="flex gap-10 border-t border-[#d8c1c1]/40 pt-8">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-white border border-[#d8c1c1] flex items-center justify-center shadow-sm">
+                    <span className="material-symbols-outlined text-[#066a5f] text-2xl">gpp_maybe</span>
                   </div>
                   <div>
-                    <p className="text-[11px] text-[#867273] uppercase tracking-[0.15em] font-bold">Certifié par</p>
-                    <p className="text-base text-[#1b1c1a] font-bold">Ministère de la Santé</p>
+                    <p className="text-[10px] text-[#867273] uppercase tracking-[0.15em] font-bold">Certifié par</p>
+                    <p className="text-sm text-[#1b1c1a] font-bold">Ministère de la Santé</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-5">
-                  <div className="w-14 h-14 rounded-full bg-white border border-[#d8c1c1] flex items-center justify-center shadow-md">
-                    <span className="material-symbols-outlined text-[#8f464c] text-3xl">encrypted</span>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-white border border-[#d8c1c1] flex items-center justify-center shadow-sm">
+                    <span className="material-symbols-outlined text-[#8f464c] text-2xl">encrypted</span>
                   </div>
                   <div>
-                    <p className="text-[11px] text-[#867273] uppercase tracking-[0.15em] font-bold">Confidentialité</p>
-                    <p className="text-base text-[#1b1c1a] font-bold">Chiffrement AES-256</p>
+                    <p className="text-[10px] text-[#867273] uppercase tracking-[0.15em] font-bold">Confidentialité</p>
+                    <p className="text-sm text-[#1b1c1a] font-bold">Chiffrement AES-256</p>
                   </div>
                 </div>
               </div>
