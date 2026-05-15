@@ -50,7 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       navigate("/dashboard");
     } catch (error) {
       console.error("LOGIN FAILED", error);
-      throw error;
+      throw error; // On laisse le composant catcher l'erreur
     } finally {
       setLoading(false);
     }

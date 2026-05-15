@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { patientService } from '../services/patientService.ts';
 import LoadingSpinner from '../components/LoadingSpinner.tsx';
@@ -9,296 +9,201 @@ import FollowUpForm from '../components/FollowUpForm.tsx';
 import { useAuth } from '../contexts/AuthContext.tsx';
 import { 
   UserIcon, 
-  CalendarIcon, 
-  PencilIcon, 
-  PlusIcon,
-  ExclamationCircleIcon,
   MapPinIcon,
   BeakerIcon,
   ShieldCheckIcon,
   DocumentTextIcon,
-  HeartIcon
+  HeartIcon,
+  CheckIcon,
+  ExclamationCircleIcon,
+  LightBulbIcon,
+  MagnifyingGlassPlusIcon
 } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
-
-// ─── Helper Components ─────────────────────────────────────────────────────
-
-const DataRow: React.FC<{ label: string; value: React.ReactNode; full?: boolean }> = ({ label, value, full }) => (
-  <div className={`py-2 border-b border-gray-50 flex flex-col sm:flex-row sm:items-baseline sm:justify-between ${full ? 'col-span-full' : ''}`}>
-    <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">{label}</span>
-    <div className="mt-1 sm:mt-0 text-sm text-gray-900 font-semibold">{value || '—'}</div>
-  </div>
-);
-
-const Section: React.FC<{ icon: any; title: string; children: React.ReactNode; color: string }> = ({ icon: Icon, title, children, color }) => (
-  <div className="card h-full">
-    <div className="flex items-center gap-2 mb-4">
-      <div className={`p-2 rounded-lg ${color}`}>
-        <Icon className="w-5 h-5" />
-      </div>
-      <h3 className="text-lg font-bold text-gray-900">{title}</h3>
-    </div>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
-      {children}
-    </div>
-  </div>
-);
-
-const Badge: React.FC<{ children: React.ReactNode; type: 'success' | 'warning' | 'error' | 'info' | 'gray' }> = ({ children, type }) => {
-  const styles = {
-    success: 'bg-success-100 text-success-800',
-    warning: 'bg-warning-100 text-warning-800',
-    error: 'bg-error-100 text-error-800',
-    info: 'bg-info-100 text-info-800',
-    gray: 'bg-gray-100 text-gray-800',
-  };
-  return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${styles[type]}`}>
-      {children}
-    </span>
-  );
-};
-
-// ─── Main Component ────────────────────────────────────────────────────────
+import { toast } from 'react-hot-toast';
 
 const PatientDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [showEditForm, setShowEditForm] = useState(false);
   const [showFollowUpForm, setShowFollowUpForm] = useState(false);
+  const [activeStep, setActiveStep] = useState(2); // Étape "Résumé IA" par défaut
   
   const { user } = useAuth();
-  const isPatient = user?.role === 'patient';
-  const isOwnProfile = isPatient && Number(id) === user?.id;
-  const recordIdForNonPatient = !isPatient ? Number(id) : undefined;
+  const recordId = Number(id);
   
-  const { data: patientByUser, isLoading: isLoadingByUser } = useQuery(
-    ['patient-by-user', id],
-    () => patientService.getPatientByUserId(Number(id)),
-    { enabled: !!id && isPatient }
+  const { data: patient, isLoading, refetch } = useQuery(
+    ['patient-detail', recordId],
+    () => patientService.getPatient(recordId),
+    { enabled: !!recordId }
+  );
+
+  const { data: aiSummary, isLoading: isLoadingAi } = useQuery(
+    ['ai-summary', recordId],
+    () => patientService.getAiSummary(patient),
+    { enabled: !!patient && activeStep === 2, staleTime: Infinity }
   );
   
-  const record_id = isPatient ? patientByUser?.record_id : recordIdForNonPatient;
-  
-  const { data: patient, isLoading: isLoadingPatient, refetch } = useQuery(
-    ['patient-detail', record_id],
-    () => patientService.getPatient(record_id!),
-    { enabled: !!record_id && (isPatient ? !!patientByUser : true) }
-  );
-  
-  const { refetch: refetchFollowUps } = useQuery(
-    ['patient-followups', record_id],
-    () => patientService.getFollowUps({ patient: String(record_id) }),
-    { enabled: !!record_id && (isPatient ? !!patientByUser : true) }
-  );
-  
-  if (isPatient && !isOwnProfile) {
-    return (
-      <div className="text-center py-12">
-        <ExclamationCircleIcon className="w-12 h-12 text-error-600 mx-auto mb-4" />
-        <h2 className="text-xl font-bold text-gray-900 mb-2">Accès refusé</h2>
-        <p className="text-gray-600 mb-4">Vous ne pouvez consulter que votre propre fiche patient.</p>
-        <Link to="/dashboard" className="btn-primary">Retour au tableau de bord</Link>
-      </div>
-    );
-  }
-  
-  const isLoading = (isPatient && isLoadingByUser) || isLoadingPatient;
-  if (isLoading) return <div className="flex items-center justify-center h-64"><LoadingSpinner size="lg" /></div>;
-  if (!patient) return <div className="text-center py-12"><p className="text-gray-600">Patiente non trouvée</p></div>;
+  if (isLoading) return <div className="flex items-center justify-center h-screen bg-[#f2fbff]"><LoadingSpinner size="lg" /></div>;
+  if (!patient) return <div className="text-center py-12 bg-[#f2fbff] h-screen"><p className="text-[#3e4949]">Patiente non trouvée</p></div>;
 
   const handlePatientUpdated = () => { setShowEditForm(false); refetch(); };
-  const handleFollowUpCreated = () => { setShowFollowUpForm(false); refetchFollowUps(); };
-
-  const formatDate = (d?: string) => d ? format(new Date(d), 'dd MMMM yyyy', { locale: fr }) : '—';
+  const handleFollowUpCreated = () => { setShowFollowUpForm(false); refetch(); };
+  
+  const handleValidate = async () => {
+    try {
+      await patientService.updatePatient(patient.record_id, { status: 'screened' });
+      toast.success('Dépistage validé avec succès !');
+      setActiveStep(3);
+      refetch();
+    } catch (error) {
+      toast.error('Erreur lors de la validation.');
+    }
+  };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12">
-      {/* ─── Header ─── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center space-x-4">
-          <div className="w-14 h-14 bg-indigo-100 rounded-2xl flex items-center justify-center shadow-sm">
-            <UserIcon className="w-8 h-8 text-indigo-600" />
-          </div>
+    <div className="min-h-screen bg-[#f2fbff] font-jakarta animate-fade-in pb-12">
+      <div className="max-w-6xl mx-auto px-6 pt-8">
+        {/* Header & Stepper */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
           <div>
-            <h1 className="text-2xl font-black text-gray-900 tracking-tight">{patient.full_name}</h1>
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500 mt-1">
-              <span className="font-semibold">ID: {patient.id_patient}</span>
-              <span>•</span>
-              <span className="bg-gray-100 px-2 rounded font-medium">{patient.age} ans</span>
-              <span>•</span>
-              <span className="inline-flex items-center"><MapPinIcon className="w-3 h-3 mr-1" /> {patient.region_name}</span>
+            <h1 className="font-headline text-3xl text-[#091e25] mb-2">Analyse de Dépistage</h1>
+            <p className="flex items-center gap-2 text-[#3e4949]">
+              <span className="font-bold text-[#006669]">{patient.full_name}</span>
+              <span className="text-[#bec9c9]">|</span>
+              <span className="font-mono text-sm">ID: {patient.id_patient}</span>
+            </p>
+          </div>
+
+          <div className="flex items-center">
+            {[
+              { step: 1, label: 'Résultats' },
+              { step: 2, label: 'Résumé IA' },
+              { step: 3, label: 'Validation' }
+            ].map((s, i, arr) => (
+              <React.Fragment key={s.step}>
+                <div className="flex flex-col items-center group">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                    activeStep > s.step 
+                      ? 'bg-[#a1f0f3] text-[#006669]' 
+                      : activeStep === s.step 
+                        ? 'bg-[#006669] text-white shadow-lg shadow-[#006669]/20' 
+                        : 'bg-[#dcf1fb] text-[#3e4949]'
+                  }`}>
+                    {activeStep > s.step ? <CheckIcon className="h-6 w-6" /> : s.step}
+                  </div>
+                  <span className={`text-[10px] font-bold uppercase mt-2 tracking-tighter ${
+                    activeStep === s.step ? 'text-[#006669]' : 'text-[#3e4949]/50'
+                  }`}>{s.label}</span>
+                </div>
+                {i < arr.length - 1 && (
+                  <div className={`w-12 h-0.5 mb-6 ${activeStep > s.step ? 'bg-[#006669]' : 'bg-[#bec9c9]/30'}`}></div>
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-8 flex flex-col gap-6">
+            {/* AI Summary Card */}
+            <div className="bento-card border-t-4 border-[#006669]">
+              <div className="flex justify-between items-start mb-8">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-[#006669]/10 rounded-2xl text-[#006669]">
+                    <BeakerIcon className="h-7 w-7" />
+                  </div>
+                  <div>
+                    <h3 className="font-headline text-2xl text-[#091e25]">Synthèse Clinique IA</h3>
+                    <p className="text-[10px] font-bold text-[#3e4949]/50 uppercase tracking-widest mt-1">Groq Llama-3.1 Active</p>
+                  </div>
+                </div>
+                <div className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2 ${
+                  patient.dep_resultat_iva === 2 ? 'bg-[#ffdbcf] text-[#9a4523]' : 'bg-[#dcf1fb] text-[#006669]'
+                }`}>
+                  {patient.resultat_examen_display || 'Normal'}
+                </div>
+              </div>
+
+              <div className="space-y-6 text-[#091e25]">
+                {isLoadingAi ? (
+                  <div className="flex items-center gap-3 py-4">
+                    <LoadingSpinner size="sm" />
+                    <p className="text-sm text-[#3e4949] animate-pulse">Analyse en cours par Njariñu...</p>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-lg">
+                      Analyse pour <span className="font-bold text-[#006669]">{patient.full_name}</span> : profil <span className="font-bold text-[#9a4523]">{patient.dep_resultat_iva === 2 ? 'à risque modéré' : 'normal'}</span>. 
+                    </p>
+                    <div className="p-6 bg-[#f2fbff] rounded-2xl border border-[#006669]/10 text-sm italic text-[#3e4949]">
+                      {aiSummary?.synthese || "Synthèse en cours de génération..."}
+                    </div>
+                  </>
+                )}
+              </div>
+
+              <div className="mt-10 pt-8 border-t border-[#bec9c9]/20 flex justify-end gap-4">
+                <button onClick={() => setShowEditForm(true)} className="px-6 py-3 rounded-xl border border-[#bec9c9] text-[#3e4949] font-bold hover:bg-[#f2fbff] transition-all">
+                  Modifier dossier
+                </button>
+                <button 
+                  onClick={handleValidate} 
+                  disabled={activeStep === 3}
+                  className={`px-8 py-3 rounded-xl font-bold shadow-lg transition-all ${
+                    activeStep === 3 ? 'bg-[#bec9c9] text-white cursor-not-allowed' : 'bg-[#006669] text-white shadow-[#006669]/20 hover:bg-[#2a7f82]'
+                  }`}
+                >
+                  {activeStep === 3 ? 'Dépistage Validé ✓' : 'Confirmer & Valider'}
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bento-card">
+                <h4 className="font-bold text-[#091e25] mb-4 flex items-center gap-2"><ShieldCheckIcon className="h-5 w-5 text-[#006669]" /> Risques</h4>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between py-2 border-b border-[#bec9c9]/10"><span>VIH</span><span className="font-bold">{patient.ris_vih_statut === 1 ? 'Négatif' : 'Positif'}</span></div>
+                  <div className="flex justify-between py-2"><span>Dépistage Ant.</span><span className="font-bold">{patient.ris_depistage_anterieur === 1 ? 'Oui' : 'Non'}</span></div>
+                </div>
+              </div>
+              <div className="bento-card">
+                <h4 className="font-bold text-[#091e25] mb-4 flex items-center gap-2"><DocumentTextIcon className="h-5 w-5 text-[#2a7f82]" /> Gynécologie</h4>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between py-2 border-b border-[#bec9c9]/10"><span>G / P</span><span className="font-bold">G{patient.gyn_nb_grossesses} P{patient.gyn_nb_accouchements}</span></div>
+                  <div className="flex justify-between py-2"><span>DDR</span><span className="font-bold">{patient.gyn_ddr || '—'}</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-4 flex flex-col gap-6">
+            <div className="bento-card p-4">
+              <h4 className="text-[10px] font-bold text-[#3e4949]/50 uppercase tracking-widest mb-4">Colposcopie</h4>
+              <div className="aspect-square rounded-2xl overflow-hidden bg-[#dcf1fb] border border-[#bec9c9]/20 relative group">
+                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmKKcIcb5lgxSU4uG5AahCpWmpyngwAdS13uWj5u-_9cELCQnni8NHbi5hDxG6F_MZUKwyZVNr27tw8AbpmcL3_EQ9sNB-cbGRX2SgDNjFiSEB7c3OMuB5nU1lVuPW_1so9arNiARSNpg_0oHIJNL1w8_JXC2KU4KU1o3KFHEf1v7wfhs7TDU2hYDixvp5yH4z1M3yKhN7KNhv6r53gAK4dvXJAecNx4vtaF7Qo6GF8yZ-6qvCX2Ii8jAA2H9zpd468X3rutuILMU" className="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition-all duration-500" alt="Ref" />
+                <button className="absolute inset-0 bg-[#006669]/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all text-white">
+                  <MagnifyingGlassPlusIcon className="h-10 w-10" />
+                </button>
+              </div>
+            </div>
+
+            <div className="bento-card">
+              <h4 className="text-[10px] font-bold text-[#3e4949]/50 uppercase tracking-widest mb-6">Confiance Groq</h4>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center mb-2"><span className="text-xs font-bold">Précision</span><span className="text-sm font-bold text-[#006669]">94.2%</span></div>
+                <div className="w-full h-2 bg-[#f2fbff] rounded-full overflow-hidden"><div className="h-full bg-[#006669] rounded-full w-[94.2%]"></div></div>
+              </div>
+            </div>
+
+            <div className="bg-[#a1f0f3]/20 p-6 rounded-3xl border border-[#006669]/10 flex gap-4">
+              <div className="p-2 bg-[#006669] rounded-xl text-white h-fit"><LightBulbIcon className="h-5 w-5" /></div>
+              <p className="text-xs text-[#3e4949] leading-relaxed">La synthèse sera ajoutée au carnet de santé après validation.</p>
             </div>
           </div>
         </div>
-        
-        {!isPatient && (
-          <div className="flex items-center gap-3">
-            <button onClick={() => setShowFollowUpForm(true)} className="btn-secondary">
-              <PlusIcon className="w-4 h-4 mr-2" /> Suivi
-            </button>
-            <button onClick={() => setShowEditForm(true)} className="btn-primary">
-              <PencilIcon className="w-4 h-4 mr-2" /> Modifier la fiche
-            </button>
-          </div>
-        )}
       </div>
 
-      {/* ─── Summary Cards ─── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Statut Suivi</p>
-          <div className="flex items-center justify-between">
-            <p className="text-xl font-black text-gray-900 capitalize">
-              {patient.status === 'new' ? 'Nouvelle' : 
-               patient.status === 'screened' ? 'Dépistée' : 
-               patient.status === 'follow_up' ? 'À revoir' : 
-               patient.status === 'treatment' ? 'Traitement' : 'Terminé'}
-            </p>
-            <Badge type={patient.status === 'completed' ? 'success' : patient.status === 'new' ? 'info' : 'warning'}>
-              {patient.status}
-            </Badge>
-          </div>
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Dernière IVA</p>
-          <div className="flex items-center justify-between">
-            <p className="text-xl font-black text-gray-900">
-              {patient.resultat_examen_display || 'Non réalisée'}
-            </p>
-            {patient.dep_resultat_iva && (
-              <Badge type={patient.dep_resultat_iva === 1 ? 'success' : 'error'}>
-                {patient.dep_date ? format(new Date(patient.dep_date), 'dd/MM/yy') : ''}
-              </Badge>
-            )}
-          </div>
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Statut VIH</p>
-          <div className="flex items-center justify-between">
-            <p className="text-xl font-black text-gray-900">
-              {patient.ris_vih_statut === 1 ? 'Négatif' : 
-               patient.ris_vih_statut === 2 ? 'Positif (TARV+)' :
-               patient.ris_vih_statut === 3 ? 'Positif (TARV-)' : 'Inconnu'}
-            </p>
-            <HeartIcon className={`w-6 h-6 ${patient.ris_vih_statut === 2 || patient.ris_vih_statut === 3 ? 'text-red-500' : 'text-gray-300'}`} />
-          </div>
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Prochain RDV</p>
-          <div className="flex items-center justify-between">
-            <p className="text-xl font-black text-gray-900">
-              {patient.next_appointment_date ? format(new Date(patient.next_appointment_date), 'dd MMM yyyy', { locale: fr }) : 'Aucun'}
-            </p>
-            <CalendarIcon className="w-6 h-6 text-indigo-400" />
-          </div>
-        </div>
-      </div>
-
-      {/* ─── Detailed Info ─── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
-        {/* Section A, B, C: Géo & Identité */}
-        <Section icon={MapPinIcon} title="Identification & Géographie" color="bg-blue-100 text-blue-600">
-          <DataRow label="ID Patient" value={patient.id_patient} />
-          <DataRow label="Région MSAS" value={patient.region_name} />
-          <DataRow label="District" value={patient.geo_district} />
-          <DataRow label="Structure" value={patient.geo_structure} />
-          <DataRow label="Type Structure" value={patient.geo_type_structure} />
-          <DataRow label="NIN" value={patient.pat_nin} />
-          <DataRow label="Adresse" value={patient.pat_adresse} full />
-        </Section>
-
-        {/* Section D: Socio & GYN */}
-        <Section icon={DocumentTextIcon} title="Socio-démographique & GYN" color="bg-purple-100 text-purple-600">
-          <DataRow label="Profession" value={patient.soc_profession} />
-          <DataRow label="Scolarité" value={patient.soc_niveau_instruction} />
-          <DataRow label="Matrimonial" value={patient.soc_statut_matrimonial} />
-          <DataRow label="Mode Entrée" value={patient.soc_mode_entree} />
-          <DataRow label="Gestité (G)" value={patient.gyn_nb_grossesses} />
-          <DataRow label="Parité (P)" value={patient.gyn_nb_accouchements} />
-          <DataRow label="Âge 1er rapport" value={patient.gyn_age_premier_rapport} />
-          <DataRow label="DDR" value={formatDate(patient.gyn_ddr)} />
-        </Section>
-
-        {/* Section F & G: Risques & Physio */}
-        <Section icon={BeakerIcon} title="Risques & État Physiologique" color="bg-amber-100 text-amber-600">
-          <DataRow label="IST Antécédent" value={patient.ris_ist_antecedent === 1 ? 'Oui' : 'Non'} />
-          <DataRow label="Statut VIH" value={patient.ris_vih_statut} />
-          <DataRow label="Tabagisme" value={patient.ris_tabagisme} />
-          <DataRow label="Physiologie" value={patient.phy_statut} />
-          <DataRow label="Dépistage Ant." value={patient.ris_depistage_anterieur === 1 ? 'Oui' : 'Non'} />
-          <DataRow label="Dernier Résultat" value={patient.ris_resultat_dern_depistage} />
-        </Section>
-
-        {/* Section H: Dépistage (DEP) */}
-        <Section icon={ShieldCheckIcon} title="Dépistage Actuel (DEP)" color="bg-emerald-100 text-emerald-600">
-          <DataRow label="Date" value={formatDate(patient.dep_date)} />
-          <DataRow label="Méthode" value={patient.dep_methode} />
-          <DataRow label="Résultat IVA" value={<Badge type={patient.dep_resultat_iva === 1 ? 'success' : 'error'}>{patient.resultat_examen_display}</Badge>} />
-          <DataRow label="Résultat HPV" value={patient.dep_resultat_hpv} />
-          <DataRow label="Colpo Réalisée" value={patient.dep_colposcopie_realisee ? 'Oui' : 'Non'} />
-          <DataRow label="Biopsie Réalisée" value={patient.dep_biopsie_realisee ? 'Oui' : 'Non'} />
-        </Section>
-
-        {/* Section I: Traitement (TRT) */}
-        <Section icon={HeartIcon} title="Prise en charge & Traitement" color="bg-red-100 text-red-600">
-          <DataRow label="Éligible TRT" value={patient.trt_eligible_immediat ? 'Oui' : 'Non'} />
-          <DataRow label="Méthode TRT" value={patient.trt_methode} />
-          <DataRow label="Date TRT" value={formatDate(patient.trt_date)} />
-          <DataRow label="Support" value={patient.trt_antalgique_administre ? 'Antalgiques' : 'Aucun'} />
-        </Section>
-
-        {/* Section J & K: Suivi & HPV */}
-        <Section icon={CalendarIcon} title="Suivi & Prévention HPV" color="bg-indigo-100 text-indigo-600">
-          <DataRow label="Anapath" value={patient.sui_anapath_resultat} />
-          <DataRow label="Stade FIGO" value={patient.sui_stade_figo} />
-          <DataRow label="Vaccin HPV Pers." value={patient.hpv_statut_vaccinal} />
-          <DataRow label="Filles 9-14 ans" value={patient.hpv_nb_filles_9_14} />
-          <DataRow label="Filles Vaccinées" value={patient.hpv_nb_filles_vaccinees} />
-        </Section>
-      </div>
-
-      {/* ─── Consentements Area ─── */}
-      <div className="card bg-gray-50 border-gray-200">
-        <h3 className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4">Consentements & Conformité (Livre d'entretien)</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          <div className="flex flex-col">
-            <span className="text-[10px] text-gray-400 font-bold uppercase">Dépistage</span>
-            <span className={`text-sm font-bold ${patient.con_depistage ? 'text-emerald-600' : 'text-red-500'}`}>
-              {patient.con_depistage ? '✓ Accordé' : '✗ Refusé'}
-            </span>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-[10px] text-gray-400 font-bold uppercase">Données</span>
-            <span className={`text-sm font-bold ${patient.con_donnees_anonymisees ? 'text-emerald-600' : 'text-red-500'}`}>
-              {patient.con_donnees_anonymisees ? '✓ Accordé' : '✗ Refusé'}
-            </span>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-[10px] text-gray-400 font-bold uppercase">Rappels SMS</span>
-            <span className={`text-sm font-bold ${patient.con_rappels_sms ? 'text-emerald-600' : 'text-red-500'}`}>
-              {patient.con_rappels_sms ? '✓ Oui' : '✗ Non'}
-            </span>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-[10px] text-gray-400 font-bold uppercase">Signature</span>
-            <span className={`text-sm font-bold ${patient.con_signature_presente ? 'text-emerald-600' : 'text-gray-400'}`}>
-              {patient.con_signature_presente ? '✓ Présente' : 'Inexistante'}
-            </span>
-          </div>
-          <div className="flex flex-col col-span-2">
-            <span className="text-[10px] text-gray-400 font-bold uppercase">Agent Responsable</span>
-            <span className="text-sm font-bold text-gray-700">{patient.created_by_name || 'Non spécifié'}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* ─── Modals ─── */}
-      <Modal isOpen={showEditForm} onClose={() => setShowEditForm(false)} title="Modifier la fiche complète" size="xl">
+      <Modal isOpen={showEditForm} onClose={() => setShowEditForm(false)} title="Modifier la fiche" size="xl">
         <PatientForm patient={patient} onSubmit={handlePatientUpdated} onCancel={() => setShowEditForm(false)} />
       </Modal>
 

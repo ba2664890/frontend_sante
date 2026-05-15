@@ -5,7 +5,6 @@ import { useAuth } from '../contexts/AuthContext.tsx';
 import {
   HomeIcon,
   UsersIcon,
-  ChartBarIcon,
   BellIcon,
   ArrowRightOnRectangleIcon as LogoutIcon,
   Bars3Icon as MenuIcon,
@@ -13,6 +12,11 @@ import {
   ShieldCheckIcon,
   DocumentTextIcon as DocumentReportIcon,
   CalendarIcon,
+  BeakerIcon,
+  ClipboardIcon,
+  ChatBubbleBottomCenterTextIcon,
+  QuestionMarkCircleIcon,
+  PlusIcon
 } from '@heroicons/react/24/outline';
 
 const Sidebar: React.FC = () => {
@@ -27,35 +31,37 @@ const Sidebar: React.FC = () => {
     switch (user?.role) {
       case 'admin':
         return [
-          { name: 'Tableau de bord', href: '/dashboard', icon: HomeIcon },
-          { name: 'Patientes', href: '/patients', icon: UsersIcon },
-          { name: 'Statistiques', href: '/statistics', icon: ChartBarIcon },
+          { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
+          { name: 'Patient Queue', href: '/patients', icon: UsersIcon },
+          { name: 'Lab Results', href: '/lab-results', icon: BeakerIcon },
           { name: 'Notifications', href: '/notifications', icon: BellIcon },
           { name: 'Administration', href: '/admin', icon: ShieldCheckIcon },
-          { name: 'Rapports', href: '/reports', icon: DocumentReportIcon },
-          { name: 'Campagne', href: '/accueil', icon: DocumentReportIcon }
+          { name: 'Reports', href: '/reports', icon: DocumentReportIcon },
+          { name: 'Chatbot Njariñu', href: '/chatbot', icon: ChatBubbleBottomCenterTextIcon }
         ];
       case 'supervisor':
         return [
-          { name: 'Tableau de bord', href: '/dashboard', icon: HomeIcon },
-          { name: 'Patientes', href: '/patients', icon: UsersIcon },
-          { name: 'Statistiques', href: '/statistics', icon: ChartBarIcon },
+          { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
+          { name: 'Patient Queue', href: '/patients', icon: UsersIcon },
+          { name: 'Lab Results', href: '/lab-results', icon: BeakerIcon },
           { name: 'Notifications', href: '/notifications', icon: BellIcon },
-          { name: 'Rapports', href: '/reports', icon: DocumentReportIcon },
+          { name: 'Reports', href: '/reports', icon: DocumentReportIcon },
         ];
       case 'health_agent':
         return [
-          { name: 'Tableau de bord', href: '/dashboard', icon: HomeIcon },
-          { name: 'Mes Patientes', href: '/patients', icon: UsersIcon },
+          { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
+          { name: 'Patient Queue', href: '/patients', icon: UsersIcon },
+          { name: 'Lab Results', href: '/lab-results', icon: BeakerIcon },
           { name: 'Notifications', href: '/notifications', icon: BellIcon },
+          { name: 'Chatbot Njariñu', href: '/chatbot', icon: ChatBubbleBottomCenterTextIcon }
         ];
       case 'patient':
         return [
-          { name: 'Acceuil', href: `/acceuil_patient`, icon: HomeIcon },
+          { name: 'Accueil', href: `/acceuil_patient`, icon: HomeIcon },
           { name: 'Mon Suivi', href: `/patients/${user?.id}`, icon: HomeIcon },
           { name: 'Rendez-vous', href: `/appointments/${user?.id}`, icon: CalendarIcon },
           { name: 'Messages', href: '/notifications', icon: BellIcon },
-          { name: 'Chatbot', href: '/chatbot', icon: BellIcon },
+          { name: 'Chatbot Njariñu', href: '/chatbot', icon: ChatBubbleBottomCenterTextIcon },
         ];
       default:
         return [];
@@ -64,47 +70,36 @@ const Sidebar: React.FC = () => {
 
   const navigation = rawNav.map((item, idx) => ({ ...item, idx }));
 
-  /* ----------  STYLES  ---------- */
-  const navItemBase =
-    'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium ' +
-    'transition-all duration-300 ease-out';
-  const activeClass =
-    'bg-gradient-primary text-black shadow-[0_0_12px_var(--c-primary)]';
-  const inactiveClass =
-    'text-gray-400 hover:text-white hover:bg-white/10';
-
-  /* ----------  NAV ITEM ANIMÉ  ---------- */
+  /* ----------  NAV ITEM  ---------- */
   const NavItem: React.FC<{ item: any }> = ({ item }) => {
     const active = isActive(item.href);
     return (
       <Link
         to={item.href}
-        className={`${navItemBase} ${active ? activeClass : inactiveClass} ${isOpen ? 'translate-x-0' : '-translate-x-4'
-          } animate-slide-in`}
-        style={{ animationDelay: `${item.idx * 60}ms` }}
+        className={`flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 group ${
+          active 
+            ? 'bg-[#9a4523] text-white shadow-lg shadow-[#9a4523]/20' 
+            : 'text-[#3e4949] hover:text-[#006669] hover:bg-[#dcf1fb]'
+        }`}
       >
-        <item.icon className="w-5 h-5" />
+        <item.icon className={`w-5 h-5 ${active ? 'text-white' : 'text-[#3e4949] group-hover:text-[#006669]'}`} />
         <span className="flex-1">{item.name}</span>
-        {active && (
-          <span className="h-1 w-1 rounded-full bg-white animate-ping" />
-        )}
       </Link>
     );
   };
 
-  /* ----------  RETURN  ---------- */
   return (
     <>
       {/* Burger mobile */}
       <div className="lg:hidden fixed top-4 left-4 z-50">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="w-10 h-10 grid place-items-center rounded-xl glass shadow-neon"
+          className="w-10 h-10 grid place-items-center rounded-xl bg-white shadow-lg border border-[#bec9c9]/30"
         >
           {isOpen ? (
-            <XIcon className="w-5 h-5 text-white animate-spin-short" />
+            <XIcon className="w-5 h-5 text-[#006669]" />
           ) : (
-            <MenuIcon className="w-5 h-5 text-gray-200" />
+            <MenuIcon className="w-5 h-5 text-[#006669]" />
           )}
         </button>
       </div>
@@ -113,64 +108,68 @@ const Sidebar: React.FC = () => {
       <div
         className={`
           fixed inset-y-0 left-0 z-40 w-64
-          bg-gray-900 shadow-neon
+          bg-[#e4f7ff] border-r border-[#bec9c9]/20
           transform transition-transform duration-500 ease-[cubic-bezier(.4,0,.2,1)]
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-          lg:translate-x-0 lg:static lg:inset-0
+          lg:translate-x-0 lg:static lg:inset-0 flex flex-col
         `}
       >
-
         {/* Logo */}
-        <div className="flex items-center justify-center h-20 px-4 border-b border-white/10">
-          <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-lg bg-gradient-primary shadow-[0_0_12px_var(--c-primary)] grid place-items-center">
-              <span className="text-black font-extrabold text-xs">C+</span>
+        <div className="flex items-center px-8 h-20 border-b border-[#bec9c9]/10 mb-6">
+          <span className="font-headline text-2xl text-[#006669]">CerviCare+</span>
+        </div>
+
+        {/* Profile Card Mini */}
+        <div className="px-4 mb-8">
+          <div className="flex items-center gap-3 p-3 bg-[#dcf1fb] rounded-2xl border border-[#bec9c9]/20">
+            <div className="w-10 h-10 rounded-xl bg-[#006669] flex items-center justify-center text-white font-bold text-sm">
+              {user?.first_name?.[0] || 'A'}
             </div>
-            <span className="text-white font-bold text-xl tracking-tight">CerviCare+</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-[#091e25] text-sm font-bold truncate">
+                {user?.first_name} {user?.last_name}
+              </p>
+              <p className="text-[#3e4949] text-[10px] uppercase font-bold tracking-wider">
+                {user?.region || 'Pikine'} · Dakar
+              </p>
+            </div>
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 py-6 space-y-2">
+        <nav className="flex-1 px-4 space-y-1 overflow-y-auto custom-scrollbar">
           {navigation.map((item) => (
             <NavItem key={item.name} item={item} />
           ))}
+          
+          {(user?.role === 'health_agent' || user?.role === 'admin') && (
+            <button className="w-full mt-6 bg-[#006669] text-white py-3 rounded-xl font-bold text-sm shadow-lg shadow-[#006669]/20 flex items-center justify-center gap-2 hover:bg-[#2a7f82] transition-all active:scale-95">
+              <PlusIcon className="h-5 w-5" />
+              New Screening
+            </button>
+          )}
         </nav>
 
-        {/* Profil */}
-        <div className="border-t border-white/10 p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-gradient-secondary shadow-[0_0_12px_var(--c-secondary)] grid place-items-center">
-              <span className="text-black font-bold text-sm">
-                {user?.first_name?.[0] || 'U'}
-              </span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-white text-sm font-medium truncate">
-                {user?.first_name} {user?.last_name}
-              </p>
-              <p className="text-gray-400 text-xs capitalize">
-                {user?.role === 'admin' && 'Administrateur'}
-                {user?.role === 'supervisor' && 'Superviseur'}
-                {user?.role === 'health_agent' && 'Agent de santé'}
-                {user?.role === 'patient' && 'Patient'}
-              </p>
-            </div>
-            <button
-              onClick={logout}
-              className="p-2 rounded-lg hover:bg-white/10 transition-colors"
-              title="Déconnexion"
-            >
-              <LogoutIcon className="w-5 h-5 text-gray-400 hover:text-white" />
-            </button>
-          </div>
+        {/* Bottom Actions */}
+        <div className="p-4 border-t border-[#bec9c9]/10 space-y-1">
+          <Link to="/help" className="flex items-center gap-4 px-4 py-3 text-[#3e4949] hover:text-[#006669] text-sm font-bold transition-all">
+            <QuestionMarkCircleIcon className="w-5 h-5" />
+            <span>Help Center</span>
+          </Link>
+          <button
+            onClick={logout}
+            className="w-full flex items-center gap-4 px-4 py-3 text-[#3e4949] hover:text-[#ba1a1a] text-sm font-bold transition-all"
+          >
+            <LogoutIcon className="w-5 h-5" />
+            <span>Logout</span>
+          </button>
         </div>
       </div>
 
       {/* Overlay mobile */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 lg:hidden animate-fade-in"
+          className="fixed inset-0 bg-[#091e25]/60 backdrop-blur-sm z-30 lg:hidden animate-fade-in"
           onClick={() => setIsOpen(false)}
         />
       )}

@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
-import { PlusIcon, MagnifyingGlassIcon as SearchIcon, ArrowDownTrayIcon as DownloadIcon } from '@heroicons/react/24/outline';
+import { 
+  PlusIcon, 
+  MagnifyingGlassIcon as SearchIcon, 
+  ArrowDownTrayIcon as DownloadIcon,
+  FunnelIcon,
+  AdjustmentsHorizontalIcon,
+  UserCircleIcon,
+  ChevronRightIcon
+} from '@heroicons/react/24/outline';
 import { patientService } from '../services/patientService.ts';
 import { Patient, PatientFilters } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner.tsx';
-import DataTable from '../components/DataTable.tsx';
 import PatientFormWizard from '../components/PatientForm.tsx';
 import Modal from '../components/Modal.tsx';
 import { toast } from 'react-hot-toast';
@@ -58,177 +65,50 @@ const Patients: React.FC = () => {
     }
   };
 
-  const columns = [
-    { key: 'id_patient', header: 'ID Patient', sortable: true },
-    {
-      key: 'full_name',
-      header: 'Nom complet',
-      sortable: true,
-      render: (patient: Patient) => (
-        <Link
-          to={`/patients/${patient.record_id}`}
-          className="text-primary-600 hover:text-primary-700 font-medium"
-        >
-          {patient.full_name}
-        </Link>
-      ),
-    },
-    { key: 'age', header: 'Âge', sortable: true, render: (p: Patient) => `${p.age} ans` },
-    { key: 'region_name', header: 'Région', sortable: true },
-    {
-      key: 'dep_resultat_iva',
-      header: 'IVA',
-      render: (patient: Patient) => (
-        <span
-          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-            patient.dep_resultat_iva === 1
-              ? 'bg-success-100 text-success-800'
-              : patient.dep_resultat_iva === 2 || patient.dep_resultat_iva === 4
-              ? 'bg-error-100 text-error-800'
-              : 'bg-gray-100 text-gray-800'
-          }`}
-        >
-          {patient.resultat_examen_display || '—'}
-        </span>
-      ),
-    },
-    {
-      key: 'ris_vih_statut',
-      header: 'VIH',
-      render: (patient: Patient) => (
-        <span
-          className={`text-xs font-medium ${
-            patient.ris_vih_statut === 2 || patient.ris_vih_statut === 3
-              ? 'text-error-600'
-              : 'text-gray-500'
-          }`}
-        >
-          {patient.ris_vih_statut === 1 && 'Négatif'}
-          {patient.ris_vih_statut === 2 && 'Positif (TARV+)'}
-          {patient.ris_vih_statut === 3 && 'Positif (TARV-)'}
-          {patient.ris_vih_statut === 9 && 'Inconnu'}
-          {!patient.ris_vih_statut && '—'}
-        </span>
-      ),
-    },
-    {
-      key: 'status',
-      header: 'Statut',
-      render: (patient: Patient) => (
-        <span
-          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-            patient.status === 'completed'
-              ? 'bg-success-100 text-success-800'
-              : patient.status === 'follow_up' || patient.status === 'treatment'
-              ? 'bg-warning-100 text-warning-800'
-              : 'bg-primary-100 text-primary-800'
-          }`}
-        >
-          {patient.status === 'new' && 'Nouvelle'}
-          {patient.status === 'screened' && 'Dépistée'}
-          {patient.status === 'follow_up' && 'À revoir'}
-          {patient.status === 'treatment' && 'Traitement'}
-          {patient.status === 'completed' && 'Terminé'}
-        </span>
-      ),
-    },
-    {
-      key: 'created_at',
-      header: 'Enregistré le',
-      sortable: true,
-      render: (patient: Patient) =>
-        new Date(patient.created_at).toLocaleDateString('fr-FR'),
-    },
-  ];
-
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-[#f2fbff] font-jakarta animate-fade-in">
+      {/* Header Section */}
+      <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Gestion des Patientes</h1>
-          <p className="text-gray-600">Gérez les informations des patientes du programme CerviCare+</p>
+          <h1 className="font-headline text-3xl text-[#091e25]">File d'attente des patientes</h1>
+          <p className="text-[#3e4949] mt-1">Gestion centralisée des dépistages et suivis régionaux</p>
         </div>
-        <div className="flex items-center space-x-3">
-          <button onClick={handleExport} className="btn-secondary">
-            <DownloadIcon className="w-4 h-4 mr-2" />
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={handleExport} 
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[#bec9c9]/30 text-[#3e4949] font-bold hover:bg-[#dcf1fb] transition-all"
+          >
+            <DownloadIcon className="w-5 h-5" />
             Exporter
           </button>
-          <button onClick={() => setShowForm(true)} className="btn-primary">
-            <PlusIcon className="w-4 h-4 mr-2" />
-            Nouvelle patiente
+          <button 
+            onClick={() => setShowForm(true)} 
+            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#006669] text-white font-bold shadow-lg shadow-[#006669]/20 hover:bg-[#2a7f82] transition-all active:scale-95"
+          >
+            <PlusIcon className="w-5 h-5" />
+            Nouvelle Patiente
           </button>
         </div>
-      </div>
+      </header>
 
-      {/* Filters */}
-      <div className="card">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="relative">
-            <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Rechercher (ID, Nom...)"
-              className="input-field pl-10"
-              value={searchTerm}
-              onChange={(e) => handleSearch(e.target.value)}
-            />
-          </div>
-          
+      {/* Search & Global Filters Bar */}
+      <div className="mb-8 flex flex-col lg:flex-row gap-4 items-center">
+        <div className="relative flex-1 w-full group">
+          <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#3e4949] group-focus-within:text-[#006669]" />
+          <input
+            type="text"
+            placeholder="Rechercher par nom, ID ou région..."
+            className="w-full pl-12 pr-4 py-3 bg-white border border-[#bec9c9]/20 rounded-2xl focus:ring-4 focus:ring-[#006669]/5 shadow-sm font-medium text-[#091e25]"
+            value={searchTerm}
+            onChange={(e) => handleSearch(e.target.value)}
+          />
+        </div>
+        
+        <div className="flex items-center gap-3 w-full lg:w-auto">
           <select
-            className="input-field"
-            value={filters.geo_region || ''}
-            onChange={(e) =>
-              handleFilterChange({
-                ...filters,
-                geo_region: e.target.value ? parseInt(e.target.value) : undefined,
-              })
-            }
-          >
-            <option value="">Toutes les régions</option>
-            <option value="1">Dakar</option>
-            <option value="2">Diourbel</option>
-            <option value="3">Fatick</option>
-            <option value="4">Kaffrine</option>
-            <option value="5">Kaolack</option>
-            <option value="6">Kédougou</option>
-            <option value="7">Kolda</option>
-            <option value="8">Louga</option>
-            <option value="9">Matam</option>
-            <option value="10">Saint-Louis</option>
-            <option value="11">Sédhiou</option>
-            <option value="12">Tambacounda</option>
-            <option value="13">Thiès</option>
-            <option value="14">Ziguinchor</option>
-          </select>
-
-          <select
-            className="input-field"
-            value={filters.dep_resultat_iva || ''}
-            onChange={(e) =>
-              handleFilterChange({
-                ...filters,
-                dep_resultat_iva: e.target.value ? parseInt(e.target.value) : undefined,
-              })
-            }
-          >
-            <option value="">Résultats IVA (Tous)</option>
-            <option value="1">Négatif</option>
-            <option value="2">Positif</option>
-            <option value="3">Polype</option>
-            <option value="4">Suspicion Cancer</option>
-            <option value="5">Non concluant</option>
-          </select>
-
-          <select
-            className="input-field"
+            className="flex-1 lg:w-48 px-4 py-3 bg-white border border-[#bec9c9]/20 rounded-2xl text-sm font-bold text-[#3e4949]"
             value={filters.status || ''}
-            onChange={(e) =>
-              handleFilterChange({
-                ...filters,
-                status: e.target.value || undefined,
-              })
-            }
+            onChange={(e) => handleFilterChange({ ...filters, status: e.target.value || undefined })}
           >
             <option value="">Tous les statuts</option>
             <option value="new">Nouvelle</option>
@@ -237,28 +117,97 @@ const Patients: React.FC = () => {
             <option value="treatment">En traitement</option>
             <option value="completed">Terminé</option>
           </select>
+
+          <button className="p-3 bg-white border border-[#bec9c9]/20 rounded-2xl hover:bg-[#dcf1fb] transition-all text-[#3e4949]">
+            <AdjustmentsHorizontalIcon className="w-6 h-6" />
+          </button>
         </div>
       </div>
 
-      {/* Table */}
-      <div className="card">
-        {isLoading ? (
-          <div className="flex items-center justify-center h-64">
-            <LoadingSpinner size="lg" />
-          </div>
-        ) : (
-          <DataTable
-            columns={columns}
-            data={patients?.results || []}
-            pagination={{
-              current: currentPage,
-              total: patients?.count || 0,
-              pageSize: 20,
-              onChange: setCurrentPage,
-            }}
-          />
-        )}
-      </div>
+      {/* Patients Grid */}
+      {isLoading ? (
+        <div className="flex items-center justify-center h-64">
+          <LoadingSpinner size="lg" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {patients?.results?.map((patient: Patient) => (
+            <div 
+              key={patient.record_id}
+              className="bento-card group hover:border-[#006669]/30"
+            >
+              <div className="flex justify-between items-start mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-[#f2fbff] border border-[#bec9c9]/20 flex items-center justify-center text-[#006669]">
+                    <UserCircleIcon className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-[#091e25] group-hover:text-[#006669] transition-colors">{patient.full_name}</h3>
+                    <p className="text-[10px] font-bold text-[#3e4949] uppercase tracking-widest mt-0.5">ID: {patient.id_patient}</p>
+                  </div>
+                </div>
+                <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                  patient.status === 'completed' 
+                    ? 'bg-[#006669]/10 text-[#006669]' 
+                    : 'bg-[#9a4523]/10 text-[#9a4523]'
+                }`}>
+                  {patient.status}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="p-3 bg-[#f2fbff]/50 rounded-xl border border-[#bec9c9]/10">
+                  <p className="text-[10px] uppercase font-bold text-[#3e4949] mb-1">Région</p>
+                  <p className="text-sm font-bold text-[#091e25]">{patient.region_name}</p>
+                </div>
+                <div className="p-3 bg-[#f2fbff]/50 rounded-xl border border-[#bec9c9]/10">
+                  <p className="text-[10px] uppercase font-bold text-[#3e4949] mb-1">IVA Result</p>
+                  <p className={`text-sm font-bold ${patient.dep_resultat_iva === 2 ? 'text-[#ba1a1a]' : 'text-[#006669]'}`}>
+                    {patient.resultat_examen_display || 'Non fait'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-4 border-t border-[#bec9c9]/10">
+                <div className="flex flex-col">
+                  <span className="text-[10px] uppercase font-bold text-[#3e4949]/50">Dernier passage</span>
+                  <span className="text-xs font-bold text-[#091e25]">
+                    {new Date(patient.created_at).toLocaleDateString('fr-FR')}
+                  </span>
+                </div>
+                <Link 
+                  to={`/patients/${patient.record_id}`}
+                  className="flex items-center gap-1 px-4 py-2 bg-[#dcf1fb] text-[#006669] rounded-xl text-xs font-bold hover:bg-[#006669] hover:text-white transition-all group/btn"
+                >
+                  Voir dossier
+                  <ChevronRightIcon className="w-4 h-4 transform group-hover/btn:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {!isLoading && patients && patients.count > 0 && (
+        <div className="mt-12 flex justify-center items-center gap-4">
+          <button 
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(v => v - 1)}
+            className="p-2 rounded-xl border border-[#bec9c9]/30 disabled:opacity-30 hover:bg-white transition-all"
+          >
+            Précédent
+          </button>
+          <span className="font-bold text-[#091e25]">Page {currentPage} / {Math.ceil(patients.count / 20)}</span>
+          <button 
+            disabled={currentPage >= Math.ceil(patients.count / 20)}
+            onClick={() => setCurrentPage(v => v + 1)}
+            className="p-2 rounded-xl border border-[#bec9c9]/30 disabled:opacity-30 hover:bg-white transition-all"
+          >
+            Suivant
+          </button>
+        </div>
+      )}
 
       {/* Modal for new patient */}
       <Modal
