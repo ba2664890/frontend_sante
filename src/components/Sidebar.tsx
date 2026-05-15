@@ -1,90 +1,65 @@
-// src/components/Sidebar.tsx
+// src/components/Sidebar.tsx — Design "Clinical Precision" (refonte_agent)
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.tsx';
-import {
-  HomeIcon,
-  UsersIcon,
-  BellIcon,
-  ArrowRightOnRectangleIcon as LogoutIcon,
-  Bars3Icon as MenuIcon,
-  XMarkIcon as XIcon,
-  ShieldCheckIcon,
-  DocumentTextIcon as DocumentReportIcon,
-  CalendarIcon,
-  BeakerIcon,
-  ChatBubbleBottomCenterTextIcon,
-  QuestionMarkCircleIcon,
-  PlusIcon
-} from '@heroicons/react/24/outline';
 
 const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, logout } = useAuth();
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/');
 
-  /* ----------  NAVIGATION PAR RÔLE  ---------- */
-  const rawNav = (() => {
+  /* ---- NAVIGATION PAR RÔLE ---- */
+  const getNavItems = () => {
     switch (user?.role) {
       case 'admin':
         return [
-          { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-          { name: 'Patient Queue', href: '/patients', icon: UsersIcon },
-          { name: 'Lab Results', href: '/lab-results', icon: BeakerIcon },
-          { name: 'Notifications', href: '/notifications', icon: BellIcon },
-          { name: 'Administration', href: '/admin', icon: ShieldCheckIcon },
-          { name: 'Reports', href: '/reports', icon: DocumentReportIcon },
-          { name: 'Chatbot Njariñu', href: '/chatbot', icon: ChatBubbleBottomCenterTextIcon }
+          { name: 'Dashboard', href: '/dashboard', icon: 'dashboard' },
+          { name: 'File de patientes', href: '/patients', icon: 'group' },
+          { name: 'Statistiques', href: '/statistics', icon: 'analytics' },
+          { name: 'Notifications', href: '/notifications', icon: 'notifications' },
+          { name: 'Campagnes', href: '/accueil', icon: 'campaign' },
+          { name: 'Rapports', href: '/reports', icon: 'summarize' },
+          { name: 'Assistant Njariñu', href: '/agent/chatbot', icon: 'robot_2' },
+          { name: 'Administration', href: '/admin', icon: 'admin_panel_settings' },
         ];
       case 'supervisor':
         return [
-          { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-          { name: 'Patient Queue', href: '/patients', icon: UsersIcon },
-          { name: 'Lab Results', href: '/lab-results', icon: BeakerIcon },
-          { name: 'Notifications', href: '/notifications', icon: BellIcon },
-          { name: 'Reports', href: '/reports', icon: DocumentReportIcon },
+          { name: 'Dashboard', href: '/dashboard', icon: 'dashboard' },
+          { name: 'File de patientes', href: '/patients', icon: 'group' },
+          { name: 'Statistiques', href: '/statistics', icon: 'analytics' },
+          { name: 'Notifications', href: '/notifications', icon: 'notifications' },
+          { name: 'Rapports', href: '/reports', icon: 'summarize' },
         ];
       case 'health_agent':
         return [
-          { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-          { name: 'Patient Queue', href: '/patients', icon: UsersIcon },
-          { name: 'Lab Results', href: '/lab-results', icon: BeakerIcon },
-          { name: 'Notifications', href: '/notifications', icon: BellIcon },
-          { name: 'Chatbot Njariñu', href: '/chatbot', icon: ChatBubbleBottomCenterTextIcon }
+          { name: 'Dashboard', href: '/dashboard', icon: 'dashboard' },
+          { name: 'File de patientes', href: '/patients', icon: 'group' },
+          { name: 'Statistiques', href: '/statistics', icon: 'analytics' },
+          { name: 'Notifications', href: '/notifications', icon: 'notifications' },
+          { name: 'Campagnes', href: '/accueil', icon: 'campaign' },
+          { name: 'Assistant Njariñu', href: '/agent/chatbot', icon: 'robot_2' },
         ];
       case 'patient':
         return [
-          { name: 'Accueil', href: `/acceuil_patient`, icon: HomeIcon },
-          { name: 'Mon Suivi', href: `/patients/${user?.id}`, icon: HomeIcon },
-          { name: 'Rendez-vous', href: `/appointments/${user?.id}`, icon: CalendarIcon },
-          { name: 'Messages', href: '/notifications', icon: BellIcon },
-          { name: 'Chatbot Njariñu', href: '/chatbot', icon: ChatBubbleBottomCenterTextIcon },
+          { name: 'Accueil', href: '/acceuil_patient', icon: 'home' },
+          { name: 'Mon dossier', href: '/patient/records', icon: 'folder_open' },
+          { name: 'Rendez-vous', href: '/patient/appointments', icon: 'calendar_today' },
+          { name: 'Notifications', href: '/notifications', icon: 'notifications' },
+          { name: 'Assistant Njariñu', href: '/chatbot', icon: 'robot_2' },
         ];
       default:
         return [];
     }
-  })();
+  };
 
-  const navigation = rawNav.map((item, idx) => ({ ...item, idx }));
+  const navItems = getNavItems();
+  const isAgent = user?.role === 'health_agent' || user?.role === 'admin' || user?.role === 'supervisor';
 
-  /* ----------  NAV ITEM  ---------- */
-  const NavItem: React.FC<{ item: any }> = ({ item }) => {
-    const active = isActive(item.href);
-    return (
-      <Link
-        to={item.href}
-        className={`flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 group ${
-          active 
-            ? 'bg-[#9a4523] text-white shadow-lg shadow-[#9a4523]/20' 
-            : 'text-[#3e4949] hover:text-[#006669] hover:bg-[#dcf1fb]'
-        }`}
-      >
-        <item.icon className={`w-5 h-5 ${active ? 'text-white' : 'text-[#3e4949] group-hover:text-[#006669]'}`} />
-        <span className="flex-1">{item.name}</span>
-      </Link>
-    );
+  const handleNewScreening = () => {
+    navigate('/patients');
   };
 
   return (
@@ -94,12 +69,9 @@ const Sidebar: React.FC = () => {
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="w-10 h-10 grid place-items-center rounded-xl bg-white shadow-lg border border-[#bec9c9]/30"
+          aria-label="Menu"
         >
-          {isOpen ? (
-            <XIcon className="w-5 h-5 text-[#006669]" />
-          ) : (
-            <MenuIcon className="w-5 h-5 text-[#006669]" />
-          )}
+          <span className="material-symbols-outlined text-[#006669]">{isOpen ? 'close' : 'menu'}</span>
         </button>
       </div>
 
@@ -108,27 +80,33 @@ const Sidebar: React.FC = () => {
         className={`
           fixed inset-y-0 left-0 z-40 w-64
           bg-[#e4f7ff] border-r border-[#bec9c9]/20
+          shadow-[2px_0_8px_rgba(42,127,130,0.08)]
           transform transition-transform duration-500 ease-[cubic-bezier(.4,0,.2,1)]
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0 lg:static lg:inset-0 flex flex-col
         `}
       >
         {/* Logo */}
-        <div className="flex items-center px-8 h-20 border-b border-[#bec9c9]/10 mb-6">
-          <span className="font-headline text-2xl text-[#006669]">CerviCare+</span>
+        <div className="flex items-center px-6 h-16 border-b border-[#bec9c9]/20 flex-shrink-0">
+          <span
+            className="text-[#006669] text-xl font-semibold"
+            style={{ fontFamily: 'Literata, serif' }}
+          >
+            CerviCare+
+          </span>
         </div>
 
-        {/* Profile Card Mini */}
-        <div className="px-4 mb-8">
-          <div className="flex items-center gap-3 p-3 bg-[#dcf1fb] rounded-2xl border border-[#bec9c9]/20">
-            <div className="w-10 h-10 rounded-xl bg-[#006669] flex items-center justify-center text-white font-bold text-sm">
+        {/* Profile Card */}
+        <div className="px-4 py-4 flex-shrink-0">
+          <div className="flex items-center gap-3 p-3 bg-[#dcf1fb] rounded-xl border border-[#bec9c9]/20">
+            <div className="w-10 h-10 rounded-xl bg-[#006669] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
               {user?.first_name?.[0] || 'A'}
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[#091e25] text-sm font-bold truncate">
+            <div className="min-w-0 flex-1">
+              <p className="text-[#091e25] text-sm font-semibold truncate">
                 {user?.first_name} {user?.last_name}
               </p>
-              <p className="text-[#3e4949] text-[10px] uppercase font-bold tracking-wider">
+              <p className="text-[#3e4949] text-[10px] uppercase font-bold tracking-wider truncate">
                 {user?.region || 'Pikine'} · Dakar
               </p>
             </div>
@@ -136,31 +114,58 @@ const Sidebar: React.FC = () => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 space-y-1 overflow-y-auto custom-scrollbar">
-          {navigation.map((item) => (
-            <NavItem key={item.name} item={item} />
-          ))}
-          
-          {(user?.role === 'health_agent' || user?.role === 'admin') && (
-            <button className="w-full mt-6 bg-[#006669] text-white py-3 rounded-xl font-bold text-sm shadow-lg shadow-[#006669]/20 flex items-center justify-center gap-2 hover:bg-[#2a7f82] transition-all active:scale-95">
-              <PlusIcon className="h-5 w-5" />
-              New Screening
+        <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
+          {navItems.map((item) => {
+            const active = isActive(item.href);
+            return (
+              <Link
+                key={item.name}
+                to={item.href}
+                onClick={() => setIsOpen(false)}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 active:scale-[0.98] ${
+                  active
+                    ? 'bg-[#9a4523] text-white shadow-md shadow-[#9a4523]/20'
+                    : 'text-[#3e4949] hover:text-[#006669] hover:bg-[#dcf1fb]'
+                }`}
+              >
+                <span
+                  className="material-symbols-outlined text-[20px]"
+                  style={active ? { fontVariationSettings: "'FILL' 1" } : {}}
+                >
+                  {item.icon}
+                </span>
+                <span className="flex-1">{item.name}</span>
+              </Link>
+            );
+          })}
+
+          {/* Bouton Nouveau Dépistage (agents seulement) */}
+          {isAgent && (
+            <button
+              onClick={handleNewScreening}
+              className="w-full mt-4 bg-[#006669] text-white py-3 rounded-xl font-semibold text-sm shadow-lg shadow-[#006669]/20 flex items-center justify-center gap-2 hover:bg-[#2a7f82] transition-all active:scale-95"
+            >
+              <span className="material-symbols-outlined text-[20px]">add</span>
+              Nouveau dépistage
             </button>
           )}
         </nav>
 
-        {/* Bottom Actions */}
-        <div className="p-4 border-t border-[#bec9c9]/10 space-y-1">
-          <Link to="/help" className="flex items-center gap-4 px-4 py-3 text-[#3e4949] hover:text-[#006669] text-sm font-bold transition-all">
-            <QuestionMarkCircleIcon className="w-5 h-5" />
-            <span>Help Center</span>
+        {/* Footer */}
+        <div className="p-4 border-t border-[#bec9c9]/20 space-y-1 flex-shrink-0">
+          <Link
+            to="/settings"
+            className="flex items-center gap-3 px-3 py-2.5 text-[#3e4949] hover:text-[#006669] text-sm font-semibold transition-all rounded-xl hover:bg-[#dcf1fb]"
+          >
+            <span className="material-symbols-outlined text-[20px]">settings</span>
+            <span>Paramètres</span>
           </Link>
           <button
             onClick={logout}
-            className="w-full flex items-center gap-4 px-4 py-3 text-[#3e4949] hover:text-[#ba1a1a] text-sm font-bold transition-all"
+            className="w-full flex items-center gap-3 px-3 py-2.5 text-[#3e4949] hover:text-[#ba1a1a] text-sm font-semibold transition-all rounded-xl hover:bg-[#ffdad6]/40"
           >
-            <LogoutIcon className="w-5 h-5" />
-            <span>Logout</span>
+            <span className="material-symbols-outlined text-[20px]">logout</span>
+            <span>Déconnexion</span>
           </button>
         </div>
       </div>

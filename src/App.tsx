@@ -17,6 +17,7 @@ import Notifications from './pages/Notifications.tsx';
 import ReportsPage from './pages/ReportsPage.tsx';
 import Appointments from './pages/Appointments.tsx';
 import ChatbotPage from './pages/ChatbotPage.tsx';
+import AgentChatbotPage from './pages/AgentChatbotPage.tsx';
 import Campaigns from './pages/Campaigns.tsx';
 import HomePage from './pages/HomePage.tsx';
 import PatientDashboard from './pages/dashboards/PatientDashboard.tsx';
@@ -38,14 +39,14 @@ const App: React.FC = () => (
           {/* Main Dashboard Dispatcher */}
           <Route path="/dashboard" element={<Dashboard />} />
 
-          {/* Patient Specific Routes */}
+          {/* Patient Specific Routes — ESPACE PATIENT UNIQUEMENT */}
           <Route path="/acceuil_patient" element={<PatientDashboard />} />
           <Route path="/patient/records" element={<MedicalRecords />} />
           <Route path="/patient/appointments" element={<PatientAppointments />} />
           <Route path="/chatbot" element={<ChatbotPage />} />
           <Route path="/settings" element={<Settings />} />
 
-          {/* Admin & Health Agent Routes (With Sidebar) */}
+          {/* Admin & Health Agent Routes (With Sidebar) — ESPACE AGENT */}
           <Route element={<Layout />}>
             <Route path="/reports" element={<ReportsPage />} />
             <Route path="/patients" element={<Patients />} />
@@ -55,6 +56,7 @@ const App: React.FC = () => (
             <Route path="/patients/:id" element={<PatientDetail />} />
             <Route path="/statistics" element={<Statistics />} />
             <Route path="/notifications" element={<Notifications />} />
+            <Route path="/agent/chatbot" element={<AgentChatbotPage />} />
           </Route>
         </Route>
 

@@ -1,22 +1,11 @@
+// src/pages/Notifications.tsx — Refonte "Clinical Precision" (Espace Agent)
 import React, { useState } from 'react';
 import { useQuery } from 'react-query';
 import { Notification } from '../types/notification.ts';
-import { 
-  BellIcon, 
-  CheckIcon, 
-  ExclamationTriangleIcon,
-  InformationCircleIcon,
-  TrashIcon
-} from '@heroicons/react/24/outline';
 import { notificationService } from '../services/notificationService.ts';
-
 import LoadingSpinner from '../components/LoadingSpinner.tsx';
-import DataTable from '../components/DataTable.tsx';
-//import { formatDistanceToNow } from 'date-fns';
-//import { fr } from 'date-fns/locale';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext.tsx';
-
 
 const Notifications: React.FC = () => {
   const [filter, setFilter] = useState<'all' | 'pending' | 'sent' | 'failed'>('all');
@@ -24,295 +13,225 @@ const Notifications: React.FC = () => {
 
   const { data: notifications, isLoading, refetch, error } = useQuery(
     ['notifications', filter],
-    () => notificationService.getNotifications({ 
-      status: filter !== 'all' ? filter : undefined 
+    () => notificationService.getNotifications({
+      status: filter !== 'all' ? filter : undefined
     }),
     {
       enabled: !!user,
       refetchInterval: 30000,
       retry: 2,
-      onError: (error: any) => {
-        console.error('Error loading notifications:', error);
-      }
     }
   );
-
-  console.log('Notifications data:', notifications);
-  console.log('Notifications error:', error);
 
   const handleSendNotification = async (id: number) => {
     try {
       await notificationService.sendNotification(id);
-      toast.success('Notification envoyée avec succès !');
+      toast.success('Notification envoyée !');
       refetch();
-    } catch (error) {
-      console.error('Error sending notification:', error);
-      toast.error('Erreur lors de l\'envoi de la notification');
+    } catch {
+      toast.error("Erreur lors de l'envoi de la notification");
     }
   };
 
   const handleDeleteNotification = async (id: number) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette notification ?')) {
+    if (window.confirm('Supprimer cette notification ?')) {
       try {
         await notificationService.deleteNotification(id);
-        toast.success('Notification supprimée avec succès !');
+        toast.success('Notification supprimée !');
         refetch();
-      } catch (error) {
-        console.error('Error deleting notification:', error);
-        toast.error('Erreur lors de la suppression de la notification');
+      } catch {
+        toast.error('Erreur lors de la suppression');
       }
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusBadge = (status: string) => {
     switch (status) {
       case 'sent':
-        return 'bg-success-100 text-success-800';
-      case 'failed':
-        return 'bg-error-100 text-error-800';
+        return <span className="px-2.5 py-0.5 bg-[#dcf1fb] text-[#006669] rounded-full text-[10px] font-bold uppercase">Envoyée</span>;
       case 'delivered':
-        return 'bg-primary-100 text-primary-800';
+        return <span className="px-2.5 py-0.5 bg-[#dcf1fb] text-[#2a7f82] rounded-full text-[10px] font-bold uppercase">Livrée</span>;
+      case 'failed':
+        return <span className="px-2.5 py-0.5 bg-[#ffdad6] text-[#ba1a1a] rounded-full text-[10px] font-bold uppercase">Échouée</span>;
       default:
-        return 'bg-gray-100 text-gray-800';
+        return <span className="px-2.5 py-0.5 bg-[#ffdeaa] text-[#795500] rounded-full text-[10px] font-bold uppercase">En attente</span>;
     }
   };
 
-  const getPriorityColor = (priority: string) => {
+  const getPriorityDot = (priority: string) => {
     switch (priority) {
-      case 'urgent':
-        return 'bg-error-100 text-error-800';
-      case 'high':
-        return 'bg-warning-100 text-warning-800';
-      case 'medium':
-        return 'bg-primary-100 text-primary-800';
-      case 'low':
-        return 'bg-gray-100 text-gray-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+      case 'urgent': return 'bg-[#ba1a1a]';
+      case 'high': return 'bg-[#9a4523]';
+      case 'medium': return 'bg-[#795500]';
+      default: return 'bg-[#bec9c9]';
     }
   };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'sms':
-        return <InformationCircleIcon className="w-4 h-4" />;
-      case 'email':
-        return <BellIcon className="w-4 h-4" />;
-      default:
-        return <ExclamationTriangleIcon className="w-4 h-4" />;
+      case 'sms': return 'sms';
+      case 'email': return 'email';
+      default: return 'notifications';
     }
   };
 
-  const columns = [
-    {
-      key: 'id',
-      header: 'ID',
-      render: (notification: Notification) => (
-        <div className="flex items-center">
-          {getTypeIcon(notification.notification_type)}
-          <span className="ml-2">#{notification.id}</span>
-        </div>
-      ),
-    },
-    {
-      key: 'title',
-      header: 'Titre',
-      render: (notification: Notification) => (
-        <div>
-          <p className="font-medium text-gray-900">{notification.title}</p>
-          <p className="text-sm text-gray-600 truncate max-w-xs">
-            {notification.message}
-          </p>
-        </div>
-      ),
-    },
-    {
-      key: 'recipient',
-      header: 'Destinataire',
-      render: (notification: Notification) => (
-        <span className="text-sm text-gray-900">
-          {notification.recipient_name || 'Inconnu'}
-        </span>
-      ),
-    },
-    {
-      key: 'notification_type',
-      header: 'Type',
-      render: (notification: Notification) => (
-        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-          {notification.notification_type.toUpperCase()}
-        </span>
-      ),
-    },
-    {
-      key: 'priority',
-      header: 'Priorité',
-      render: (notification: Notification) => (
-        <span
-          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(
-            notification.priority
-          )}`}
-        >
-          {notification.priority}
-        </span>
-      ),
-    },
-    {
-      key: 'status',
-      header: 'Statut',
-      render: (notification: Notification) => (
-        <span
-          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-            notification.status
-          )}`}
-        >
-          {notification.status === 'pending' && 'En attente'}
-          {notification.status === 'sent' && 'Envoyée'}
-          {notification.status === 'failed' && 'Échouée'}
-          {notification.status === 'delivered' && 'Livrée'}
-        </span>
-      ),
-    },
-    {
-      key: 'scheduled_time',
-      header: 'Date prévue',
-      render: (notification: Notification) => (
-        <span className="text-sm text-gray-900">
-          {new Date(notification.scheduled_time).toLocaleDateString('fr-FR')}
-        </span>
-      ),
-    },
-    {
-      key: 'actions',
-      header: 'Actions',
-      render: (notification: Notification) => (
-        <div className="flex items-center space-x-2">
-          {notification.status === 'pending' && (
-            <button
-              onClick={() => handleSendNotification(notification.id)}
-              className="text-primary-600 hover:text-primary-700 p-1"
-              title="Envoyer maintenant"
-            >
-              <CheckIcon className="w-4 h-4" />
-            </button>
-          )}
-          <button
-            onClick={() => handleDeleteNotification(notification.id)}
-            className="text-error-600 hover:text-error-700 p-1"
-            title="Supprimer"
-          >
-            <TrashIcon className="w-4 h-4" />
-          </button>
-        </div>
-      ),
-    },
-  ];
+  const notifList = notifications?.results || [];
+  const pendingCount = notifList.filter((n) => n.status === 'pending').length;
+  const sentCount = notifList.filter((n) => n.status === 'sent').length;
+  const failedCount = notifList.filter((n) => n.status === 'failed').length;
 
-  // Calculer les statistiques en gérant les cas où notifications est undefined
-  const pendingCount = notifications?.results?.filter((n) => n.status === 'pending').length || 0;
-  const sentCount = notifications?.results?.filter((n) => n.status === 'sent').length || 0;
-  const failedCount = notifications?.results?.filter((n) => n.status === 'failed').length || 0;
+  const filterTabs = [
+    { label: 'Toutes', value: 'all', count: notifications?.count || 0 },
+    { label: 'En attente', value: 'pending', count: pendingCount },
+    { label: 'Envoyées', value: 'sent', count: sentCount },
+    { label: 'Échouées', value: 'failed', count: failedCount },
+  ] as const;
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-[#f2fbff] font-jakarta animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Notifications et Rappels</h1>
-          <p className="text-gray-600">Gérez les notifications et rappels automatiques</p>
+          <h1 className="text-3xl font-semibold text-[#2a7f82]" style={{ fontFamily: 'Literata, serif' }}>
+            Notifications & Rappels
+          </h1>
+          <p className="text-[#3e4949] mt-1 text-sm">Gestion des notifications et rappels automatiques aux patientes</p>
         </div>
-        <div className="flex items-center space-x-3">
-          <select
-            className="input-field"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value as any)}
+      </header>
+
+      {/* KPI Bento Row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        {[
+          { label: 'Total', value: notifications?.count || 0, icon: 'notifications', color: '#006669', bg: '#dcf1fb' },
+          { label: 'En attente', value: pendingCount, icon: 'schedule', color: '#795500', bg: '#ffdeaa' },
+          { label: 'Envoyées', value: sentCount, icon: 'check_circle', color: '#006669', bg: '#dcf1fb' },
+          { label: 'Échouées', value: failedCount, icon: 'error', color: '#ba1a1a', bg: '#ffdad6' },
+        ].map((kpi) => (
+          <div key={kpi.label} className="bg-white rounded-2xl p-5 shadow-[0_2px_4px_rgba(42,127,130,0.08)] border border-[#bec9c9]/10 flex items-center gap-4">
+            <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: kpi.bg }}>
+              <span className="material-symbols-outlined text-[22px]" style={{ color: kpi.color }}>{kpi.icon}</span>
+            </div>
+            <div>
+              <p className="text-[10px] text-[#3e4949] font-bold uppercase tracking-wider">{kpi.label}</p>
+              <p className="font-mono text-2xl font-semibold text-[#091e25]">{kpi.value}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Filter Chips */}
+      <div className="flex items-center gap-2 mb-6 flex-wrap">
+        {filterTabs.map((tab) => (
+          <button
+            key={tab.value}
+            onClick={() => setFilter(tab.value)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+              filter === tab.value
+                ? 'bg-[#006669] text-white shadow-md'
+                : 'bg-white text-[#3e4949] border border-[#bec9c9]/30 hover:bg-[#dcf1fb] hover:text-[#006669]'
+            }`}
           >
-            <option value="all">Toutes les notifications</option>
-            <option value="pending">En attente</option>
-            <option value="sent">Envoyées</option>
-            <option value="failed">Échouées</option>
-          </select>
-        </div>
+            {tab.label}
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
+              filter === tab.value ? 'bg-white/20 text-white' : 'bg-[#f2fbff] text-[#3e4949]'
+            }`}>
+              {tab.count}
+            </span>
+          </button>
+        ))}
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="card">
-          <div className="flex items-center">
-            <div className="p-2 bg-gray-100 rounded-lg">
-              <BellIcon className="w-6 h-6 text-gray-600" />
-            </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium text-gray-600">Total</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {notifications?.count || 0}
-              </p>
-            </div>
-          </div>
+      {/* Table Card */}
+      <div className="bg-white rounded-2xl shadow-[0_2px_4px_rgba(42,127,130,0.08)] border border-[#bec9c9]/10 overflow-hidden">
+        {/* Table Header */}
+        <div className="grid grid-cols-12 px-6 py-3 border-b border-[#bec9c9]/10 bg-[#f2fbff]">
+          <span className="col-span-1 text-[10px] font-bold text-[#3e4949] uppercase tracking-wider">Type</span>
+          <span className="col-span-4 text-[10px] font-bold text-[#3e4949] uppercase tracking-wider">Titre / Message</span>
+          <span className="col-span-2 text-[10px] font-bold text-[#3e4949] uppercase tracking-wider">Destinataire</span>
+          <span className="col-span-1 text-[10px] font-bold text-[#3e4949] uppercase tracking-wider">Priorité</span>
+          <span className="col-span-2 text-[10px] font-bold text-[#3e4949] uppercase tracking-wider">Statut</span>
+          <span className="col-span-1 text-[10px] font-bold text-[#3e4949] uppercase tracking-wider">Date</span>
+          <span className="col-span-1 text-[10px] font-bold text-[#3e4949] uppercase tracking-wider text-right">Actions</span>
         </div>
-        <div className="card">
-          <div className="flex items-center">
-            <div className="p-2 bg-primary-100 rounded-lg">
-              <BellIcon className="w-6 h-6 text-primary-600" />
-            </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium text-gray-600">En attente</p>
-              <p className="text-2xl font-bold text-gray-900">{pendingCount}</p>
-            </div>
-          </div>
-        </div>
-        <div className="card">
-          <div className="flex items-center">
-            <div className="p-2 bg-success-100 rounded-lg">
-              <CheckIcon className="w-6 h-6 text-success-600" />
-            </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium text-gray-600">Envoyées</p>
-              <p className="text-2xl font-bold text-gray-900">{sentCount}</p>
-            </div>
-          </div>
-        </div>
-        <div className="card">
-          <div className="flex items-center">
-            <div className="p-2 bg-error-100 rounded-lg">
-              <ExclamationTriangleIcon className="w-6 h-6 text-error-600" />
-            </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium text-gray-600">Échouées</p>
-              <p className="text-2xl font-bold text-gray-900">{failedCount}</p>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Table */}
-      <div className="card">
         {isLoading ? (
-          <div className="flex items-center justify-center h-64">
+          <div className="flex items-center justify-center h-40">
             <LoadingSpinner size="lg" />
           </div>
         ) : error ? (
-          <div className="flex flex-col items-center justify-center h-64 text-center">
-            <ExclamationTriangleIcon className="w-12 h-12 text-error-500 mb-4" />
-            <p className="text-gray-600 mb-2">Erreur lors du chargement des notifications</p>
-            <button 
-              onClick={() => refetch()} 
-              className="btn-primary"
+          <div className="flex flex-col items-center justify-center py-16 gap-4">
+            <span className="material-symbols-outlined text-5xl text-[#ba1a1a]">error_outline</span>
+            <p className="text-[#3e4949] text-sm">Erreur lors du chargement des notifications</p>
+            <button
+              onClick={() => refetch()}
+              className="px-4 py-2 bg-[#006669] text-white rounded-xl text-sm font-semibold hover:bg-[#2a7f82] transition-all"
             >
               Réessayer
             </button>
           </div>
+        ) : notifList.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 gap-3">
+            <span className="material-symbols-outlined text-5xl text-[#bec9c9]">notifications_off</span>
+            <p className="text-[#3e4949] text-sm italic">Aucune notification</p>
+          </div>
         ) : (
-          <DataTable
-            columns={columns}
-            data={notifications?.results || []}
-            pagination={{
-              current: 1,
-              total: notifications?.count || 0,
-              pageSize: 20,
-              onChange: () => {},
-            }}
-          />
+          <div className="divide-y divide-[#bec9c9]/10">
+            {notifList.map((notif: Notification) => (
+              <div key={notif.id} className="grid grid-cols-12 px-6 py-4 items-center hover:bg-[#f2fbff] transition-colors group">
+                {/* Type */}
+                <div className="col-span-1">
+                  <div className="w-8 h-8 rounded-lg bg-[#f2fbff] flex items-center justify-center border border-[#bec9c9]/20">
+                    <span className="material-symbols-outlined text-[16px] text-[#006669]">
+                      {getTypeIcon(notif.notification_type)}
+                    </span>
+                  </div>
+                </div>
+                {/* Titre / Message */}
+                <div className="col-span-4 min-w-0 pr-4">
+                  <p className="text-sm font-semibold text-[#091e25] truncate">{notif.title}</p>
+                  <p className="text-xs text-[#3e4949] truncate mt-0.5">{notif.message}</p>
+                </div>
+                {/* Destinataire */}
+                <div className="col-span-2">
+                  <span className="text-sm text-[#091e25] font-mono">{notif.recipient_name || 'Inconnu'}</span>
+                </div>
+                {/* Priorité */}
+                <div className="col-span-1">
+                  <div className="flex items-center gap-1.5">
+                    <div className={`w-2 h-2 rounded-full ${getPriorityDot(notif.priority)}`}></div>
+                    <span className="text-xs text-[#3e4949] capitalize">{notif.priority}</span>
+                  </div>
+                </div>
+                {/* Statut */}
+                <div className="col-span-2">{getStatusBadge(notif.status)}</div>
+                {/* Date */}
+                <div className="col-span-1">
+                  <span className="font-mono text-xs text-[#6f7979]">
+                    {new Date(notif.scheduled_time).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
+                  </span>
+                </div>
+                {/* Actions */}
+                <div className="col-span-1 flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {notif.status === 'pending' && (
+                    <button
+                      onClick={() => handleSendNotification(notif.id)}
+                      className="w-8 h-8 rounded-lg bg-[#dcf1fb] text-[#006669] flex items-center justify-center hover:bg-[#006669] hover:text-white transition-all"
+                      title="Envoyer maintenant"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">send</span>
+                    </button>
+                  )}
+                  <button
+                    onClick={() => handleDeleteNotification(notif.id)}
+                    className="w-8 h-8 rounded-lg bg-[#ffdad6] text-[#ba1a1a] flex items-center justify-center hover:bg-[#ba1a1a] hover:text-white transition-all"
+                    title="Supprimer"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">delete</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>
