@@ -11,7 +11,7 @@ import Sidebar from '../components/Sidebar.tsx';
 import Header from '../components/Header.tsx';
 
 const Settings: React.FC = () => {
-  const { user, login, updateUser } = useAuth();
+  const { user, updateUser } = useAuth();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState<string>(location.state?.defaultTab || 'profile');
   const [isLoading, setIsLoading] = useState(false);
