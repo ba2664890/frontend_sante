@@ -1,11 +1,9 @@
 // src/pages/ChatbotPage.tsx — Version Patient (ESPACE PATIENT UNIQUEMENT)
 import React, { useState, useRef, useEffect } from 'react';
-import { useQuery } from 'react-query';
 import { patientService } from '../services/patientService.ts';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { toast } from 'react-hot-toast';
-import { useAuth } from '../contexts/AuthContext.tsx';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -14,7 +12,6 @@ type Message = {
 };
 
 const ChatbotPage: React.FC = () => {
-  const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
