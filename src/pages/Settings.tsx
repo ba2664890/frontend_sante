@@ -11,7 +11,7 @@ import Sidebar from '../components/Sidebar.tsx';
 import Header from '../components/Header.tsx';
 
 const Settings: React.FC = () => {
-  const { user, login } = useAuth();
+  const { user, login, updateUser } = useAuth();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState<string>(location.state?.defaultTab || 'profile');
   const [isLoading, setIsLoading] = useState(false);
@@ -51,7 +51,7 @@ const Settings: React.FC = () => {
     setIsLoading(true);
     try {
       const updatedUser = await authService.updateProfile(formData);
-      login(updatedUser);
+      updateUser(updatedUser);
       toast.success('Profil mis à jour !');
     } catch (error: any) {
       toast.error('Erreur : ' + (error.response?.data?.detail || 'Serveur indisponible'));

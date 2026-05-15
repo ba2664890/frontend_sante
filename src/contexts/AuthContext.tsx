@@ -7,6 +7,7 @@ interface AuthContextType {
   user: User | null;
   login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  updateUser: (newUser: User) => void;
   isAuthenticated: boolean;
   loading: boolean;
 }
@@ -76,9 +77,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Mise à jour locale de l'utilisateur
+  const updateUser = (newUser: User) => {
+    setUser(newUser);
+    localStorage.setItem('user', JSON.stringify(newUser));
+  };
+
   return (
     <AuthContext.Provider
-      value={{ user, login, logout, isAuthenticated: !!user, loading }}
+      value={{ user, login, logout, updateUser, isAuthenticated: !!user, loading }}
     >
       {children}
     </AuthContext.Provider>
