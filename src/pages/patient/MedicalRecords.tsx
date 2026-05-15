@@ -24,13 +24,7 @@ const MedicalRecords: React.FC = () => {
   );
 
   if (isPatientLoading || isFollowUpsLoading) {
-    return (
-      <PatientLayout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <LoadingSpinner size="lg" />
-        </div>
-      </PatientLayout>
-    );
+    return <LoadingSpinner fullPage size="xl" message="Récupération de vos dossiers médicaux..." />;
   }
 
   // --- Fonctions de formatage et de mapping ---
