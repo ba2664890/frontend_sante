@@ -15,13 +15,13 @@ const Statistics: React.FC = () => {
 
   const isAgent = user?.role === 'health_agent';
 
-  const { data: stats, isLoading: statsLoading, error: statsError } = useQuery(
+  const { data: stats, isLoading: statsLoading } = useQuery(
     ['patient-stats'],
     () => patientService.getPatientStats(),
     { enabled: !isAgent } // Désactiver pour les agents
   );
 
-  const { data: dashboardData, isLoading: dashboardLoading, error: dashError } = useQuery(
+  const { data: dashboardData, isLoading: dashboardLoading } = useQuery(
     'dashboard-data',
     () => analyticsService.getDashboardData()
   );
