@@ -11,11 +11,9 @@ import Modal from '../../components/Modal.tsx';
 import { format, differenceInMonths } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { toast } from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
 
 const Appointments: React.FC = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [showRequestModal, setShowRequestModal] = useState(false);
 
   const { data: dashboardData, isLoading: isDashboardLoading } = useQuery(

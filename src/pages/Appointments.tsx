@@ -10,7 +10,7 @@ import LoadingSpinner from '../components/LoadingSpinner.tsx';
 import Modal from '../components/Modal.tsx';
 import { toast } from 'react-hot-toast';
 import PatientLayout from '../components/PatientLayout.tsx';
-import { BentoCard, IconBox } from '../components/ui/PatientUI.tsx';
+import { IconBox } from '../components/ui/PatientUI.tsx';
 
 const Appointments: React.FC = () => {
   const { user } = useAuth();
