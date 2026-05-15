@@ -1,25 +1,21 @@
+// src/components/Layout.tsx — Design Clinical Precision
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar.tsx';
 import Header from './Header.tsx';
-import bgImage from '../assets/background.jpg';
 
-interface LayoutProps {
-  children?: React.ReactNode;
-}
-
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout: React.FC = () => {
   return (
-    <div
-      className="min-h-screen bg-cover  bg-no-repeat flex"
-      style={{ backgroundImage: `url(${bgImage})` }}
-    >
+    <div className="h-screen bg-[#f2fbff] flex overflow-hidden">
+      {/* Sidebar fixe */}
       <Sidebar />
-      <div className="flex-1 flex flex-col bg-white/70 backdrop-blur-sm">
+
+      {/* Zone principale : header + contenu */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Header />
-        <main className="flex-1 p-6">
-          <div className="max-w-7xl mx-auto">
-            {children || <Outlet />}
+        <main className="flex-1 overflow-y-auto bg-[#f2fbff]">
+          <div className="p-6 h-full">
+            <Outlet />
           </div>
         </main>
       </div>

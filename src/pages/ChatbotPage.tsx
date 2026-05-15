@@ -146,8 +146,8 @@ const ChatbotPage: React.FC = () => {
             <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[80%] flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
                 <div className={`px-5 py-3 rounded-2xl text-sm shadow-sm ${msg.role === 'user'
-                    ? 'bg-compassion-rose text-white rounded-tr-none'
-                    : 'bg-white text-on-surface border border-sahara-rose rounded-tl-none'
+                  ? 'bg-compassion-rose text-white rounded-tr-none'
+                  : 'bg-white text-on-surface border border-sahara-rose rounded-tl-none'
                   }`}>
                   {msg.content}
                 </div>

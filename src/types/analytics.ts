@@ -4,6 +4,8 @@ export interface DashboardStats {
   active_patients: number;
   total_screened: number;
   abnormal_results: number;
+  normal_results: number;
+  pending_results: number;
   pending_followups: number;
   monthly_screenings: number;
   follow_up_rate: number;
