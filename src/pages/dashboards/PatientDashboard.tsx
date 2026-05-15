@@ -182,6 +182,64 @@ const PatientDashboard: React.FC = () => {
           </GlassPanel>
         </div>
 
+        {/* New App Demo Section */}
+        <div className="lg:col-span-12 mt-4 animate-fade-in delay-200">
+          <section className="bg-atlantic-sage text-white rounded-[40px] p-8 md:p-12 overflow-hidden relative group shadow-2xl">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl"></div>
+            <div className="flex flex-col lg:flex-row items-center gap-12">
+              <div className="lg:w-1/2 space-y-6">
+                <span className="px-4 py-1.5 bg-white/10 text-white border border-white/20 rounded-full text-[10px] font-black uppercase tracking-widest">Tutoriel vidéo</span>
+                <h2 className="font-headline text-4xl md:text-5xl tracking-tighter leading-none">
+                  Découvrir CerviCare+ en 2 minutes
+                </h2>
+                <p className="font-body text-lg text-white/70 leading-relaxed italic">
+                  Apprenez à utiliser toutes les fonctionnalités de votre application : suivi, messagerie et dossiers médicaux.
+                </p>
+                <div className="flex items-center gap-6 pt-4">
+                  <div className="flex -space-x-3">
+                    {[1,2,3].map(i => (
+                      <div key={i} className="w-10 h-10 rounded-full border-2 border-atlantic-sage overflow-hidden">
+                        <img src={`https://i.pravatar.cc/100?img=${i+10}`} alt="User" />
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-sm font-bold text-white/60">+ 1,200 patientes utilisent l'appli</p>
+                </div>
+              </div>
+              <div className="lg:w-1/2 w-full">
+                <div 
+                  className="relative aspect-video rounded-[32px] overflow-hidden shadow-3xl cursor-pointer group/video"
+                  onClick={() => setSelectedVideo({ title: "Démo de l'application", url: "/demo-app.mp4" })}
+                >
+                  {/* Vidéo en boucle (Background Preview) */}
+                  <video 
+                    autoPlay 
+                    loop 
+                    muted 
+                    playsInline 
+                    className="w-full h-full object-cover group-hover/video:scale-105 transition-transform duration-1000 opacity-60"
+                    poster="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=800"
+                  >
+                    <source src="/demo-app.mp4" type="video/mp4" />
+                    votre navigateur ne supporte pas la vidéo.
+                  </video>
+
+                  <div className="absolute inset-0 bg-gradient-to-tr from-atlantic-sage via-transparent to-transparent opacity-40"></div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-24 h-24 bg-white/20 backdrop-blur-md text-white rounded-full flex items-center justify-center shadow-2xl group-hover/video:scale-110 transition-transform duration-500 border border-white/30">
+                      <span className="material-symbols-outlined text-5xl">play_arrow</span>
+                    </div>
+                  </div>
+                  <div className="absolute bottom-6 left-6 flex items-center gap-2">
+                    <span className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-white">Aperçu dynamique</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
         {/* Action Cards */}
         <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-8">
           <BentoCard className="h-full flex flex-col justify-between hover-lift animate-fade-in delay-200">
@@ -352,13 +410,24 @@ const PatientDashboard: React.FC = () => {
               </button>
             </div>
             <div className="aspect-video bg-black">
-              <iframe
-                src={selectedVideo.url}
-                title={selectedVideo.title}
-                className="w-full h-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
+              {selectedVideo.url.startsWith('http') ? (
+                <iframe
+                  src={selectedVideo.url}
+                  title={selectedVideo.title}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
+                <video 
+                  src={selectedVideo.url} 
+                  className="w-full h-full" 
+                  controls 
+                  autoPlay
+                >
+                  votre navigateur ne supporte pas la vidéo.
+                </video>
+              )}
             </div>
             <div className="p-8 bg-cream-silk/50">
                <p className="font-body text-xl text-on-surface leading-relaxed italic">
