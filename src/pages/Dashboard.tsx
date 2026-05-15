@@ -1,43 +1,30 @@
+// src/pages/Dashboard.tsx — Simple Dispatcher (Layout géré par App.tsx)
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext.tsx';
 import AdminDashboard from './dashboards/AdminDashboard.tsx';
 import HealthAgentDashboard from './dashboards/HealthAgentDashboard.tsx';
 import PatientDashboard from './dashboards/PatientDashboard.tsx';
-import Layout from '../components/Layout.tsx';
 
 const Dashboard: React.FC = () => {
   const { user, loading } = useAuth();
-  console.log('Dashboard - user:', user?.role, 'loading:', loading);
 
   if (loading) {
-    return <div className="p-4 text-center">Chargement...</div>;
+    return <div className="p-10 text-center animate-pulse text-[#006669] font-bold">Chargement de votre espace...</div>;
   }
 
   if (!user) {
-    return <div className="p-4 text-center">Non authentifié</div>;
+    return <div className="p-10 text-center text-red-500">Non authentifié</div>;
   }
 
   switch (user.role) {
     case 'admin':
-      return (
-        <Layout>
-          <AdminDashboard />
-        </Layout>
-      );
+      return <AdminDashboard />;
     case 'health_agent':
-      return (
-        <Layout>
-          <HealthAgentDashboard />
-        </Layout>
-      );
+      return <HealthAgentDashboard />;
     case 'patient':
       return <PatientDashboard />;
     default:
-      return (
-        <Layout>
-          <div className="p-4 text-center">Rôle inconnu</div>
-        </Layout>
-      );
+      return <div className="p-10 text-center italic">Rôle inconnu : {user.role}</div>;
   }
 };
 

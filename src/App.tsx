@@ -36,10 +36,6 @@ const App: React.FC = () => (
 
         {/* protected routes */}
         <Route element={<ProtectedRoute />}>
-          {/* Main Dashboard Dispatcher */}
-          <Route path="/dashboard" element={<Dashboard />} />
-
-          {/* Patient Specific Routes — ESPACE PATIENT UNIQUEMENT */}
           <Route path="/acceuil_patient" element={<PatientDashboard />} />
           <Route path="/patient/records" element={<MedicalRecords />} />
           <Route path="/patient/appointments" element={<PatientAppointments />} />
@@ -48,6 +44,7 @@ const App: React.FC = () => (
 
           {/* Admin & Health Agent Routes (With Sidebar) — ESPACE AGENT */}
           <Route element={<Layout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/reports" element={<ReportsPage />} />
             <Route path="/patients" element={<Patients />} />
             <Route path="/accueil" element={<Campaigns />} />

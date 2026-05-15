@@ -17,30 +17,34 @@ const HealthAgentDashboard: React.FC = () => {
   const { data: dashboardData, isLoading } = useQuery<DashboardStats>(
     'health-agent-dashboard',
     () => analyticsService.getDashboardData(),
-    { refetchInterval: 60_000 }
+    { 
+      refetchInterval: 60_000,
+      retry: false, // Ne pas boucler sur les 403
+    }
   );
 
   const { data: recentPatientsData } = useQuery(
     ['recent-patients-dashboard'],
     () => patientService.getPatients({}, 1),
-    { refetchInterval: 60_000 }
+    { 
+      refetchInterval: 60_000,
+      retry: false
+    }
   );
 
   const { data: pendingNotifs = [] } = useQuery(
     ['notifs-pending-dashboard'],
     () => notificationService.getPendingNotifications(),
-    { refetchInterval: 60_000 }
+    { 
+      refetchInterval: 60_000,
+      retry: false
+    }
   );
 
-  const recentPatients: Patient[] = recentPatientsData?.results?.slice(0, 5) || [];
+  const recentPatients: Patient[] = Array.isArray(recentPatientsData?.results) ? recentPatientsData.results.slice(0, 5) : [];
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-[calc(100vh-64px)] bg-[#f2fbff]">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
+  // On ne bloque plus tout l'affichage pendant le chargement
+  // if (isLoading) { ... }
 
   const kpis = [
     {
