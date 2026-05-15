@@ -6,6 +6,7 @@ import { analyticsService } from '../services/analyticsService.ts';
 import LoadingSpinner from '../components/LoadingSpinner.tsx';
 import Chart from '../components/Chart.tsx';
 import SenegalMap from '../components/SenegalMap.tsx';
+import { useAuth } from '../contexts/AuthContext.tsx';
 
 const Statistics: React.FC = () => {
   const { user } = useAuth();

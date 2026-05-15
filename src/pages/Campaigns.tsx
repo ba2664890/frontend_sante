@@ -28,6 +28,17 @@ const Campaigns: React.FC = () => {
     }
   );
 
+  const deleteMutation = useMutation(
+    (id: number) => analyticsService.deleteCampaign(id),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('campaigns');
+        toast.success('Campagne supprimée');
+      },
+      onError: () => toast.error('Erreur lors de la suppression'),
+    }
+  );
+
   if (error) {
     return (
       <div className="h-full flex flex-col items-center justify-center bg-white rounded-3xl p-12 text-center border border-[#bec9c9]/10 shadow-sm">
@@ -39,17 +50,6 @@ const Campaigns: React.FC = () => {
       </div>
     );
   }
-
-  const deleteMutation = useMutation(
-    (id: number) => analyticsService.deleteCampaign(id),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('campaigns');
-        toast.success('Campagne supprimée');
-      },
-      onError: () => toast.error('Erreur lors de la suppression'),
-    }
-  );
 
   const campaignsList = Array.isArray(campaigns) ? campaigns : campaigns?.results || [];
 
