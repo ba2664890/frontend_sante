@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .soft-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 12px 40px rgba(146, 72, 78, 0.08);
+        }
+        .glow-blob {
+            filter: blur(100px);
+            z-index: -1;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-fixed-dim": "#d3c3c3",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-container": "#f0edea",
+                      "error": "#ba1a1a",
+                      "on-error": "#ffffff",
+                      "on-secondary-container": "#157165",
+                      "inverse-on-surface": "#f3f0ed",
+                      "surface-bright": "#fcf9f6",
+                      "on-surface": "#1b1c1a",
+                      "secondary-fixed-dim": "#85d5c7",
+                      "primary-container": "#ac5d63",
+                      "on-tertiary-fixed-variant": "#4f4444",
+                      "secondary-container": "#a1f2e2",
+                      "background": "#fcf9f6",
+                      "surface-tint": "#92484e",
+                      "secondary": "#066a5f",
+                      "surface": "#fcf9f6",
+                      "surface-container-low": "#f6f3f0",
+                      "primary-fixed": "#ffdadb",
+                      "surface-container-high": "#eae8e5",
+                      "secondary-fixed": "#a1f2e2",
+                      "on-secondary-fixed-variant": "#005047",
+                      "on-primary-container": "#fffbff",
+                      "surface-container-highest": "#e5e2df",
+                      "on-surface-variant": "#534343",
+                      "on-primary": "#ffffff",
+                      "on-tertiary-fixed": "#22191a",
+                      "tertiary": "#655959",
+                      "tertiary-fixed": "#efdfdf",
+                      "primary": "#8f464c",
+                      "on-tertiary": "#ffffff",
+                      "tertiary-container": "#7e7272",
+                      "on-primary-fixed": "#3c060f",
+                      "primary-fixed-dim": "#ffb2b6",
+                      "error-container": "#ffdad6",
+                      "on-secondary-fixed": "#00201c",
+                      "on-secondary": "#ffffff",
+                      "surface-dim": "#dcdad7",
+                      "outline": "#867273",
+                      "surface-variant": "#e5e2df",
+                      "on-background": "#1b1c1a",
+                      "on-tertiary-container": "#fffbff",
+                      "on-primary-fixed-variant": "#753138",
+                      "on-error-container": "#93000a",
+                      "inverse-surface": "#31302f",
+                      "inverse-primary": "#ffb2b6",
+                      "outline-variant": "#d8c1c1"
+              },
+              "borderRadius": {
+                      "DEFAULT": "1rem",
+                      "lg": "2rem",
+                      "xl": "3rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "grid-margin": "24px",
+                      "grid-gutter": "24px",
+                      "base": "8px",
+                      "section-gap-mobile": "48px",
+                      "section-gap-desktop": "80px"
+              },
+              "fontFamily": {
+                      "label-md": ["Nunito Sans"],
+                      "headline-md": ["Playfair Display"],
+                      "body-lg": ["Nunito Sans"],
+                      "headline-xl-mobile": ["Playfair Display"],
+                      "headline-xl": ["Playfair Display"],
+                      "headline-lg": ["Playfair Display"],
+                      "body-md": ["Nunito Sans"]
+              },
+              "fontSize": {
+                      "label-md": ["14px", {"lineHeight": "1.4", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                      "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                      "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "headline-xl-mobile": ["36px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                      "headline-xl": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen selection:bg-primary/20 selection:text-primary overflow-hidden">
+<!-- Background Decoration -->
+<div class="fixed inset-0 pointer-events-none overflow-hidden">
+<div class="glow-blob absolute -top-20 -left-20 w-[600px] h-[600px] bg-primary/10 rounded-full"></div>
+<div class="glow-blob absolute top-1/2 -right-20 w-[700px] h-[700px] bg-secondary/10 rounded-full"></div>
+<div class="glow-blob absolute -bottom-40 left-1/4 w-[500px] h-[500px] bg-tertiary/5 rounded-full"></div>
+</div>
+<!-- Layout Container -->
+<main class="relative min-h-screen grid grid-cols-1 lg:grid-cols-2">
+<!-- Left Section: Form -->
+<div class="flex flex-col justify-center items-center p-grid-margin lg:p-12 z-10">
+<div class="soft-panel w-full max-w-[520px] p-8 md:p-14 rounded-lg">
+<!-- Brand Anchor -->
+<div class="flex items-center gap-3 mb-12">
+<div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="clinical_notes">clinical_notes</span>
+</div>
+<span class="font-headline-md text-headline-md font-bold tracking-tight text-primary">CerviCare+</span>
+</div>
+<div class="mb-10">
+<h1 class="font-headline-xl-mobile md:font-headline-xl text-headline-xl-mobile md:text-headline-xl text-on-surface mb-4">Bienvenue sur CerviCare+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">Connectez-vous pour accéder à votre espace santé sécurisé.</p>
+</div>
+<!-- Login Form -->
+<form class="space-y-6" onsubmit="return false;">
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-primary/80 ml-1">Utilisateur ou Email</label>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors" data-icon="person">person</span>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-full py-4 pl-12 pr-4 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-body-md text-body-md placeholder:text-outline-variant" placeholder="nom@exemple.com" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-center px-1">
+<label class="font-label-md text-label-md text-primary/80">Mot de passe</label>
+<a class="font-label-md text-label-md text-secondary hover:text-primary transition-colors underline underline-offset-4" href="#">Mot de passe oublié ?</a>
+</div>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors" data-icon="lock">lock</span>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-full py-4 pl-12 pr-4 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-body-md text-body-md placeholder:text-outline-variant" placeholder="••••••••" type="password"/>
+</div>
+</div>
+<button class="w-full py-4 rounded-full bg-primary text-on-primary font-label-md text-label-md uppercase tracking-widest shadow-xl shadow-primary/20 hover:bg-primary/90 hover:scale-[1.01] active:scale-95 transition-all duration-300">
+                        Se connecter
+                    </button>
+</form>
+<!-- Divider -->
+<div class="relative my-10 text-center">
+<span class="absolute inset-0 flex items-center"><span class="w-full border-t border-outline-variant/40"></span></span>
+<span class="relative bg-[#fcf9f6] px-4 font-label-md text-[10px] text-outline uppercase tracking-widest">Ou continuer avec</span>
+</div>
+<!-- Biometrics & Third Party -->
+<div class="grid grid-cols-2 gap-4">
+<button class="flex items-center justify-center gap-2 py-4 rounded-full border border-outline-variant hover:border-primary hover:bg-primary/5 transition-all group">
+<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform" data-icon="fingerprint">fingerprint</span>
+<span class="font-label-md text-label-md text-on-surface">Biométrie</span>
+</button>
+<button class="flex items-center justify-center gap-2 py-4 rounded-full border border-outline-variant hover:border-secondary hover:bg-secondary/5 transition-all group">
+<span class="material-symbols-outlined text-secondary group-hover:scale-110 transition-transform" data-icon="shield_person">shield_person</span>
+<span class="font-label-md text-label-md text-on-surface">Passkey</span>
+</button>
+</div>
+<!-- Trust Badges Mobile -->
+<div class="mt-12 lg:hidden flex justify-center gap-8 opacity-60">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-xl text-secondary" data-icon="security">security</span>
+<span class="font-label-md text-[10px] text-on-surface uppercase tracking-tight">100% Sécurisé</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-xl text-primary" data-icon="health_and_safety">health_and_safety</span>
+<span class="font-label-md text-[10px] text-on-surface uppercase tracking-tight">Santé France</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Section: Visual -->
+<div class="hidden lg:flex relative overflow-hidden bg-surface-container-low">
+<div class="absolute inset-0">
+<img alt="Atmospheric Medical Wellness" class="w-full h-full object-cover opacity-30 mix-blend-multiply" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFMcE94wRKdyGqfiEUc7uFZ7plXiGdtmxTxloeZfkdgXo0FREHVUh8LaFbqD_Z4BPPPGPuVJpDde2kkU_Wf2KYfX3u06v64pZyVVDpnB-UHZ50U63jpWoaR3OGrgEbXP2tnG1FN95zdwLXKauScOI1ZuXgsvFYuyV7Cn6y36Cv--H1kjNa9UbRs5pGxbWOE6gDeQLzNSBrU6oK3j0yLfDmN-fjV0tsiFPlCXtgN7Kn88IoZe7m_SaOOEwmOlZY_LR5WEvGHlRzrIg"/>
+</div>
+<div class="absolute inset-0 bg-gradient-to-tr from-surface via-surface/40 to-transparent"></div>
+<div class="relative z-10 flex flex-col justify-end p-20 w-full">
+<div class="max-w-lg">
+<div class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white border border-outline-variant text-secondary font-label-md text-label-md mb-8 shadow-sm">
+<span class="material-symbols-outlined text-sm" data-icon="verified" style="font-variation-settings: 'FILL' 1;">verified</span>
+                        Technologie médicale de pointe
+                    </div>
+<h2 class="font-headline-xl text-headline-xl text-on-surface mb-8 leading-[1.1]">Prendre soin de vous, avec <span class="text-primary italic">bienveillance</span>.</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-12 max-w-md leading-relaxed">
+                        Notre plateforme allie expertise clinique et intelligence artificielle pour un accompagnement personnalisé de votre santé féminine.
+                    </p>
+<!-- Trust Badges Desktop -->
+<div class="flex gap-12 border-t border-outline-variant/30 pt-10">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-white border border-outline-variant flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-secondary text-2xl" data-icon="gpp_maybe">gpp_maybe</span>
+</div>
+<div>
+<p class="font-label-md text-[11px] text-outline uppercase tracking-wider">Certifié par</p>
+<p class="font-label-md text-label-md text-on-surface font-bold">Ministère de la Santé</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-white border border-outline-variant flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-primary text-2xl" data-icon="encrypted">encrypted</span>
+</div>
+<div>
+<p class="font-label-md text-[11px] text-outline uppercase tracking-wider">Confidentialité</p>
+<p class="font-label-md text-label-md text-on-surface font-bold">Chiffrement AES-256</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>
