@@ -194,7 +194,8 @@ const PatientDashboard: React.FC = () => {
               className="absolute inset-0 w-full h-full object-cover"
               poster="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=1600"
             >
-              <source src="/demo-app.mp4" type="video/mp4" />
+              <source src="/demo.webm" type="video/webm" />
+              votre navigateur ne supporte pas la vidéo.
             </video>
 
             {/* Subtle Gradient Overlay */}
