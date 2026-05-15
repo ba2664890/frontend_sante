@@ -154,7 +154,7 @@ const ReportsPage: React.FC = () => {
               e.preventDefault();
               const formData = new FormData(e.currentTarget);
               try {
-                const report = await analyticsService.createReport({
+                await analyticsService.createReport({
                   name: formData.get('name') as string,
                   report_type: formData.get('report_type') as any,
                   region: formData.get('region') as string || undefined
