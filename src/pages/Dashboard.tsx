@@ -1,5 +1,6 @@
 // src/pages/Dashboard.tsx — Simple Dispatcher (Layout géré par App.tsx)
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.tsx';
 import AdminDashboard from './dashboards/AdminDashboard.tsx';
 import HealthAgentDashboard from './dashboards/HealthAgentDashboard.tsx';
@@ -7,6 +8,13 @@ import PatientDashboard from './dashboards/PatientDashboard.tsx';
 
 const Dashboard: React.FC = () => {
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (user?.role === 'patient') {
+      navigate('/acceuil_patient');
+    }
+  }, [user, navigate]);
 
   if (loading) {
     return <div className="p-10 text-center animate-pulse text-[#006669] font-bold">Chargement de votre espace...</div>;

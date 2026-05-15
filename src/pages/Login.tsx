@@ -30,9 +30,15 @@ const Login: React.FC = () => {
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      await login(data.username, data.password);
+      const loggedUser = await login(data.username, data.password);
       toast.success('Connexion réussie !');
-      navigate('/dashboard');
+      
+      // Redirection basée sur le rôle
+      if (loggedUser?.role === 'patient') {
+        navigate('/acceuil_patient');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (error: any) {
       console.error('Login error:', error);
       let errorMessage = 'Identifiants invalides';
