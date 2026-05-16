@@ -835,12 +835,30 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <F label="Nombre total de grossesses (G)" required error={errors.gyn_nb_grossesses?.message}>
                     <input type="number" min={0} max={20}
-                      {...register('gyn_nb_grossesses', { required: 'Requis', min: 0, max: 20 })}
+                      {...register('gyn_nb_grossesses', { 
+                        required: 'Requis', 
+                        min: 0, 
+                        max: 20,
+                        deps: ['gyn_nb_accouchements']
+                      })}
                       className={cls(!!errors.gyn_nb_grossesses)} />
                   </F>
                   <F label="Nombre d'accouchements ≥ 22 SA (P)" required error={errors.gyn_nb_accouchements?.message}>
                     <input type="number" min={0} max={20}
-                      {...register('gyn_nb_accouchements', { required: 'Requis', min: 0, max: 20 })}
+                      {...register('gyn_nb_accouchements', { 
+                        required: 'Requis', 
+                        min: 0, 
+                        max: 20,
+                        validate: v => {
+                          const g = watch('gyn_nb_grossesses');
+                          if (g !== undefined && g !== null && g !== '') {
+                            if (Number(v) > Number(g)) {
+                              return "Le nombre d'accouchements ne peut pas dépasser le nombre de grossesses";
+                            }
+                          }
+                          return true;
+                        }
+                      })}
                       className={cls(!!errors.gyn_nb_accouchements)} />
                   </F>
                   <F label="Nombre d'avortements">
