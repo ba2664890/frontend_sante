@@ -391,13 +391,7 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
     const data = watch();
     setAiLoading(true);
     try {
-      const response = await fetch('/api/patients/patients/ai-summary/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error('Erreur lors de la génération');
-      const result = await response.json();
+      const result = await patientService.getAiSummary(data);
       setAiSummary(result.synthese);
       setValue('ai_synthese', result.synthese);
       toast.success('Synthèse IA générée avec succès');
