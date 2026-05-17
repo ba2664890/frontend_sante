@@ -9,6 +9,8 @@ import { fr } from 'date-fns/locale';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext.tsx';
 import LoadingSpinner from '../components/LoadingSpinner.tsx';
+import Modal from '../components/Modal.tsx';
+import { IconBox } from '../components/ui/PatientUI.tsx';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -81,6 +83,7 @@ const AgentChatbotPage: React.FC = () => {
   const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
   const [isWolof, setIsWolof] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   
   // SMS Reminder state
   const [smsText, setSmsText] = useState('Bonjour [Nom], c\'est CerviCare+. Vos résultats sont disponibles au centre de santé. Merci de nous contacter.');
@@ -95,6 +98,53 @@ const AgentChatbotPage: React.FC = () => {
       return res.results || [];
     }
   );
+
+  // Charger l'historique des discussions passées
+  const { data: conversationsData, refetch: refetchConversations } = useQuery(
+    ['agent-conversations-list'],
+    () => patientService.getConversations(1).catch(() => ({ results: [] })),
+    { enabled: true, refetchOnWindowFocus: false }
+  );
+  const conversations = conversationsData?.results || [];
+
+  // Sélectionner et charger une conversation existante
+  const selectConversation = async (id: number) => {
+    try {
+      const msgs = await patientService.getConversationMessages(id);
+      if (msgs && msgs.length > 0) {
+        setMessages(msgs.map((m: any) => ({
+          role: m.role,
+          content: m.content,
+          created_at: m.created_at
+        })));
+      } else {
+        setMessages([
+          {
+            role: 'assistant',
+            content: "Cette discussion est vide. Posez votre première question pour commencer !",
+          }
+        ]);
+      }
+      setConversationId(id);
+      setShowHistory(false);
+      toast.success("Discussion chargée avec succès !");
+    } catch (err) {
+      toast.error("Impossible de charger l'historique de cette discussion.");
+    }
+  };
+
+  // Recommencer une nouvelle session (nouvelle discussion)
+  const startNewSession = () => {
+    setMessages([
+      {
+        role: 'assistant',
+        content: `Bonjour ${user?.first_name || 'Docteur'}. Nouvelle discussion démarrée. Je suis Njariñu, votre assistant IA CerviCare+. Comment puis-je vous assister ?`,
+        created_at: new Date().toISOString(),
+      },
+    ]);
+    setConversationId(null);
+    toast.success("Nouvelle discussion commencée !");
+  };
 
   // Patientes urgentes (IVA positif)
   const urgentPatients = patients.filter((p: Patient) => p.dep_resultat_iva === 2).slice(0, 5);
@@ -125,6 +175,7 @@ const AgentChatbotPage: React.FC = () => {
       };
       setMessages((prev) => [...prev, botMsg]);
       setConversationId(res.conversation_id);
+      refetchConversations();
     } catch {
       toast.error("Erreur de connexion avec Njariñu.");
       setMessages((prev) => [
@@ -267,8 +318,27 @@ const AgentChatbotPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Toggle FR/Wolof */}
+            {/* Controls */}
             <div className="flex items-center gap-3">
+              <button
+                onClick={startNewSession}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#f2fbff] text-[#006669] border border-[#006669]/10 rounded-xl text-xs font-semibold hover:bg-[#006669] hover:text-white transition-all shadow-sm"
+                title="Démarrer une nouvelle discussion"
+              >
+                <span className="material-symbols-outlined text-sm">add</span>
+                Nouveau
+              </button>
+              <button
+                onClick={() => {
+                  refetchConversations();
+                  setShowHistory(true);
+                }}
+                className="p-2 hover:bg-[#dcf1fb] rounded-xl transition-colors text-[#006669]"
+                title="Historique des discussions"
+              >
+                <span className="material-symbols-outlined text-[20px]">history</span>
+              </button>
+
               {patients.length > 0 && (
                 <select
                   className="text-xs px-3 py-1.5 bg-[#f2fbff] border border-[#bec9c9]/30 rounded-xl text-[#091e25] focus:ring-2 focus:ring-[#006669]/20 outline-none"
@@ -298,9 +368,7 @@ const AgentChatbotPage: React.FC = () => {
           <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-[#f2fbff]/30">
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end flex-row-reverse' : 'justify-start'}`}>
-                <div className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-xs font-bold ${
-                  msg.role === 'user' ? 'bg-[#9a4523] text-white' : 'bg-[#dcf1fb] text-[#006669]'
-                }`}>
+                <div className="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-xs font-bold bg-[#9a4523] text-white">
                   {msg.role === 'user' ? (user?.first_name?.[0] || 'A') : 'Nj'}
                 </div>
                 <div className="max-w-[78%]">
@@ -368,6 +436,57 @@ const AgentChatbotPage: React.FC = () => {
             </div>
           </div>
         </section>
+      </div>
+
+      {/* Modal History */}
+      <Modal isOpen={showHistory} onClose={() => setShowHistory(false)} title="Mes Discussions Passées (Espace Agent)">
+        <div className="max-h-[50vh] overflow-y-auto space-y-3 p-4">
+          <button
+            onClick={() => {
+              startNewSession();
+              setShowHistory(false);
+            }}
+            className="w-full flex items-center justify-center gap-2 p-3 bg-[#dcf1fb]/50 hover:bg-[#dcf1fb] text-[#006669] rounded-2xl font-semibold text-sm transition-all border border-[#006669]/20"
+          >
+            <span className="material-symbols-outlined text-base">add_comment</span>
+            Démarrer une nouvelle discussion
+          </button>
+          
+          {conversations.length === 0 ? (
+            <div className="p-8 text-center">
+              <span className="material-symbols-outlined text-4xl text-[#bec9c9] opacity-40">forum</span>
+              <p className="text-sm text-[#3e4949] mt-2">Aucune conversation passée</p>
+            </div>
+          ) : (
+            conversations.map((c: any) => (
+              <div
+                key={c.id}
+                onClick={() => selectConversation(c.id)}
+                className={`p-4 rounded-2xl border transition-all cursor-pointer flex justify-between items-center ${
+                  conversationId === c.id
+                    ? 'border-[#006669] bg-[#dcf1fb]/20 shadow-sm'
+                    : 'border-[#bec9c9]/30 hover:bg-[#f2fbff]'
+                }`}
+              >
+                <div className="flex-1 min-w-0 pr-4">
+                  <p className="font-semibold text-sm text-[#091e25] truncate">
+                    {c.title || "Discussion sans titre"}
+                  </p>
+                  <p className="text-[10px] text-[#6f7979] mt-1 font-medium">
+                    {new Date(c.created_at).toLocaleDateString('fr-FR', {
+                      day: 'numeric',
+                      month: 'short',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </p>
+                </div>
+                <span className="material-symbols-outlined text-[#006669] text-lg">chevron_right</span>
+              </div>
+            ))
+          )}
+        </div>
+      </Modal>
       </div>
     </div>
   );

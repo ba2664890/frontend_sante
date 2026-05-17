@@ -95,6 +95,53 @@ const ChatbotPage: React.FC = () => {
     { enabled: !isPatient }
   );
 
+  // Charger l'historique des discussions passées
+  const { data: conversationsData, refetch: refetchConversations } = useQuery(
+    ['conversations-list'],
+    () => patientService.getConversations(1).catch(() => ({ results: [] })),
+    { enabled: true, refetchOnWindowFocus: false }
+  );
+  const conversations = conversationsData?.results || [];
+
+  // Sélectionner et charger une conversation existante
+  const selectConversation = async (id: number) => {
+    try {
+      const msgs = await patientService.getConversationMessages(id);
+      if (msgs && msgs.length > 0) {
+        setMessages(msgs.map((m: any) => ({
+          role: m.role,
+          content: m.content,
+          created_at: m.created_at
+        })));
+      } else {
+        setMessages([
+          {
+            role: 'assistant',
+            content: "Cette discussion est vide. Posez votre première question pour commencer !",
+          }
+        ]);
+      }
+      setConversationId(id);
+      setShowHistory(false);
+      toast.success("Discussion chargée avec succès !");
+    } catch (err) {
+      toast.error("Impossible de charger l'historique de cette discussion.");
+    }
+  };
+
+  // Recommencer une nouvelle session (nouvelle discussion)
+  const startNewSession = () => {
+    setMessages([
+      {
+        role: 'assistant',
+        content:
+          "Dalal ak jàmm ! Nouvelle discussion démarrée. Je suis Njariñu, votre assistant CerviCare+. Comment puis-je vous aider ?",
+      },
+    ]);
+    setConversationId(null);
+    toast.success("Nouvelle discussion commencée !");
+  };
+
   // Envoi message
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -117,6 +164,8 @@ const ChatbotPage: React.FC = () => {
       };
       setMessages((prev) => [...prev, botMsg]);
       setConversationId(res.conversation_id);
+      // Actualiser la liste des conversations pour inclure la nouvelle
+      refetchConversations();
     } catch (err: any) {
       toast.error("Erreur lors de l'envoi du message.");
       setMessages((prev) => [
@@ -186,9 +235,26 @@ const ChatbotPage: React.FC = () => {
               </div>
             </div>
           </div>
-          <button onClick={() => setShowHistory(true)} className="p-2 hover:bg-sahara-rose rounded-full transition-colors">
-            <span className="material-symbols-outlined text-compassion-rose">history</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={startNewSession}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#dcf1fb] text-[#006669] rounded-xl text-xs font-semibold hover:bg-compassion-rose hover:text-white transition-all shadow-sm"
+              title="Démarrer une nouvelle discussion"
+            >
+              <span className="material-symbols-outlined text-sm">add</span>
+              Nouveau
+            </button>
+            <button
+              onClick={() => {
+                refetchConversations();
+                setShowHistory(true);
+              }}
+              className="p-2 hover:bg-sahara-rose rounded-full transition-colors"
+              title="Historique des discussions"
+            >
+              <span className="material-symbols-outlined text-compassion-rose">history</span>
+            </button>
+          </div>
         </header>
 
         {/* Messages */}
@@ -248,10 +314,52 @@ const ChatbotPage: React.FC = () => {
       </div>
 
       {/* Modal History */}
-      <Modal isOpen={showHistory} onClose={() => setShowHistory(false)} title="Historique">
-        <div className="p-8 text-center">
-          <IconBox icon="history" className="mx-auto mb-4" />
-          <p className="text-on-surface-variant italic">L'historique de vos conversations sera disponible prochainement.</p>
+      <Modal isOpen={showHistory} onClose={() => setShowHistory(false)} title="Mes Discussions Passées">
+        <div className="max-h-[50vh] overflow-y-auto space-y-3 p-4">
+          <button
+            onClick={() => {
+              startNewSession();
+              setShowHistory(false);
+            }}
+            className="w-full flex items-center justify-center gap-2 p-3 bg-sahara-rose/30 hover:bg-sahara-rose/50 text-compassion-rose rounded-2xl font-semibold text-sm transition-all border border-sahara-rose"
+          >
+            <span className="material-symbols-outlined text-base">add_comment</span>
+            Démarrer une nouvelle discussion
+          </button>
+          
+          {conversations.length === 0 ? (
+            <div className="p-8 text-center">
+              <span className="material-symbols-outlined text-4xl text-sahara-rose opacity-40">forum</span>
+              <p className="text-sm text-on-surface-variant mt-2">Aucune conversation passée</p>
+            </div>
+          ) : (
+            conversations.map((c: any) => (
+              <div
+                key={c.id}
+                onClick={() => selectConversation(c.id)}
+                className={`p-4 rounded-2xl border transition-all cursor-pointer flex justify-between items-center ${
+                  conversationId === c.id
+                    ? 'border-compassion-rose bg-sahara-rose/10 shadow-sm'
+                    : 'border-sahara-rose/40 hover:bg-cream-silk/25'
+                }`}
+              >
+                <div className="flex-1 min-w-0 pr-4">
+                  <p className="font-semibold text-sm text-on-surface truncate">
+                    {c.title || "Discussion sans titre"}
+                  </p>
+                  <p className="text-[10px] text-on-surface-variant mt-1 font-medium">
+                    {new Date(c.created_at).toLocaleDateString('fr-FR', {
+                      day: 'numeric',
+                      month: 'short',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </p>
+                </div>
+                <span className="material-symbols-outlined text-compassion-rose text-lg">chevron_right</span>
+              </div>
+            ))
+          )}
         </div>
       </Modal>
     </div>
