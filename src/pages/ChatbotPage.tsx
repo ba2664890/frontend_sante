@@ -17,6 +17,57 @@ type Message = {
   created_at?: string;
 };
 
+// Inline bold parser
+const parseInlineBold = (text: string) => {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      const boldText = part.slice(2, -2);
+      return (
+        <strong key={i} className="font-extrabold text-[#9a4523] bg-[#fffaf5] px-1 py-0.5 rounded border border-[#ffdbcf]/50">
+          {boldText}
+        </strong>
+      );
+    }
+    return part;
+  });
+};
+
+// Beautiful formatting renderer
+const renderFormattedMessage = (content: string) => {
+  let text = content.replace(/<\/?s>/g, '').replace(/\[\/?INST\]/g, '').trim();
+  const paragraphs = text.split('\n\n');
+
+  return (
+    <div className="space-y-3">
+      {paragraphs.map((para, pIdx) => {
+        const lines = para.split('\n');
+        return (
+          <div key={pIdx} className="space-y-1.5">
+            {lines.map((line, lIdx) => {
+              const listMatch = line.match(/^[\s*\-\u2022]+\s*(.*)$/);
+              if (listMatch) {
+                const itemContent = listMatch[1];
+                return (
+                  <div key={lIdx} className="flex gap-2 items-start pl-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#9a4523] mt-2 flex-shrink-0" />
+                    <span className="text-[#3e4949] font-medium">{parseInlineBold(itemContent)}</span>
+                  </div>
+                );
+              }
+              return (
+                <p key={lIdx} className="text-[#3e4949] leading-relaxed">
+                  {parseInlineBold(line)}
+                </p>
+              );
+            })}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 const ChatbotPage: React.FC = () => {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([
@@ -149,7 +200,7 @@ const ChatbotPage: React.FC = () => {
                   ? 'bg-compassion-rose text-white rounded-tr-none'
                   : 'bg-white text-on-surface border border-sahara-rose rounded-tl-none'
                   }`}>
-                  {msg.content}
+                  {msg.role === 'assistant' ? renderFormattedMessage(msg.content) : msg.content}
                 </div>
                 {msg.created_at && (
                   <span className="text-[10px] text-on-surface-variant mt-1 px-1">
