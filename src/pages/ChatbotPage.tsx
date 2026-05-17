@@ -16,20 +16,80 @@ type Message = {
   created_at?: string;
 };
 
-// Inline bold parser
-const parseInlineBold = (text: string) => {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+const parseBold = (text: string, isAgent: boolean = false) => {
+  const boldRegex = /(\*\*[^*]+\*\*)/g;
+  const parts = text.split(boldRegex);
   return parts.map((part, i) => {
     if (part.startsWith('**') && part.endsWith('**')) {
       const boldText = part.slice(2, -2);
       return (
-        <strong key={i} className="font-extrabold text-[#9a4523] bg-[#fffaf5] px-1 py-0.5 rounded border border-[#ffdbcf]/50">
+        <strong
+          key={`bold-${i}`}
+          className={`font-extrabold px-1 py-0.5 rounded border border-opacity-35 ${
+            isAgent
+              ? 'text-[#006669] bg-[#dcf1fb]/40 border-[#bec9c9]/30'
+              : 'text-[#9a4523] bg-[#fffaf5] border-[#ffdbcf]/50'
+          }`}
+        >
           {boldText.replace(/\*/g, '')}
         </strong>
       );
     }
     return part.replace(/\*/g, '');
   });
+};
+
+const parseInlineContent = (text: string, isAgent: boolean = false) => {
+  const linkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = linkRegex.exec(text)) !== null) {
+    const plainText = text.substring(lastIndex, match.index);
+    if (plainText) {
+      parts.push(...parseBold(plainText, isAgent));
+    }
+
+    const linkText = match[1];
+    const linkUrl = match[2];
+
+    let icon = "link";
+    if (linkUrl.includes("youtube.com") || linkUrl.includes("youtu.be") || linkUrl.includes("vimeo.com")) {
+      icon = "play_circle";
+    } else if (linkUrl.includes(".mp3") || linkUrl.includes(".wav") || linkUrl.includes("audio")) {
+      icon = "volume_up";
+    } else if (linkUrl.includes(".png") || linkUrl.includes(".jpg") || linkUrl.includes(".jpeg") || linkUrl.includes("image")) {
+      icon = "image";
+    }
+
+    parts.push(
+      <a
+        key={`link-${match.index}`}
+        href={linkUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all shadow-sm my-0.5 mx-1"
+        style={
+          isAgent
+            ? { color: '#006669', backgroundColor: '#dcf1fb', borderColor: 'rgba(190, 201, 201, 0.3)' }
+            : { color: '#9a4523', backgroundColor: '#fffaf5', borderColor: 'rgba(255, 219, 207, 0.5)' }
+        }
+      >
+        <span className="material-symbols-outlined text-sm">{icon}</span>
+        <span className="underline">{linkText}</span>
+      </a>
+    );
+
+    lastIndex = linkRegex.lastIndex;
+  }
+
+  const remainingText = text.substring(lastIndex);
+  if (remainingText) {
+    parts.push(...parseBold(remainingText, isAgent));
+  }
+
+  return parts;
 };
 
 // Beautiful formatting renderer
@@ -50,13 +110,13 @@ const renderFormattedMessage = (content: string) => {
                 return (
                   <div key={lIdx} className="flex gap-2 items-start pl-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#9a4523] mt-2 flex-shrink-0" />
-                    <span className="text-[#3e4949] font-medium">{parseInlineBold(itemContent)}</span>
+                    <span className="text-[#3e4949] font-medium">{parseInlineContent(itemContent, false)}</span>
                   </div>
                 );
               }
               return (
                 <p key={lIdx} className="text-[#3e4949] leading-relaxed">
-                  {parseInlineBold(line)}
+                  {parseInlineContent(line, false)}
                 </p>
               );
             })}
