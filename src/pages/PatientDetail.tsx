@@ -8,6 +8,7 @@ import Modal from '../components/Modal.tsx';
 import PatientForm from '../components/PatientForm.tsx';
 import FollowUpForm from '../components/FollowUpForm.tsx';
 import { toast } from 'react-hot-toast';
+import { ClinicalAiSummary } from './Patients.tsx';
 
 const PatientDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -187,12 +188,16 @@ const PatientDetail: React.FC = () => {
                   <p className="text-base leading-relaxed">
                     Après analyse du profil clinique complet de <span className="font-bold text-[#006669]">{patient.full_name}</span> (âge: {patient.age} ans), l'assistant intelligent Njariñu propose la synthèse clinique suivante :
                   </p>
-                  <div className="p-8 bg-[#f2fbff] rounded-3xl border border-[#006669]/10 text-[#3e4949] text-sm leading-relaxed italic relative whitespace-pre-wrap">
-                    <span className="material-symbols-outlined absolute top-4 left-4 text-[#006669]/20 text-[40px]">format_quote</span>
-                    <div className="relative z-10 ml-6">
-                      {clinicalSummaryText || "La synthèse clinique automatique est disponible lors du premier enregistrement de la fiche ou peut être éditée manuellement."}
+                  {clinicalSummaryText ? (
+                    <ClinicalAiSummary text={clinicalSummaryText} />
+                  ) : (
+                    <div className="p-8 bg-[#f2fbff] rounded-3xl border border-[#006669]/10 text-[#3e4949] text-sm leading-relaxed italic relative whitespace-pre-wrap">
+                      <span className="material-symbols-outlined absolute top-4 left-4 text-[#006669]/20 text-[40px]">format_quote</span>
+                      <div className="relative z-10 ml-6">
+                        La synthèse clinique automatique est disponible lors du premier enregistrement de la fiche ou peut être éditée manuellement.
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </>
               )}
             </div>
