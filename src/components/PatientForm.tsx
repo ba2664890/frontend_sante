@@ -491,16 +491,9 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
       const dateFields = [
         'date_naiss', 'gyn_ddr', 'ris_date_dern_depistage', 'dep_date', 'trt_date',
         'sui_anapath_date_reception', 'sui_rdv_1mois', 'sui_rdv_3mois', 'sui_rdv_6mois',
-        'sui_rdv_12mois', 'sui_rdv_24mois', 'sui_rdv_36mois'
+        'sui_rdv_12mois', 'sui_rdv_24mois', 'sui_rdv_36mois', 'con_depistage_date'
       ];
       dateFields.forEach(f => { if (p[f] === '') p[f] = null; });
-
-      // Format datetime-local
-      if (p.con_depistage_date) {
-        const dt = p.con_depistage_date;
-        if (dt.length === 16) p.con_depistage_date = dt + ':00Z';
-        else if (dt.length === 19) p.con_depistage_date = dt + 'Z';
-      } else p.con_depistage_date = null;
 
       // Force Number Casting
       const numFields = [
