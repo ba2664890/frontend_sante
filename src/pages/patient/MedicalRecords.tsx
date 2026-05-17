@@ -79,6 +79,15 @@ const MedicalRecords: React.FC = () => {
     return val !== undefined ? map[val] : '--';
   };
 
+  const getCytologie = (val?: number) => {
+    if (!val) return 'Non réalisée';
+    const map: Record<number, string> = {
+      1: 'NILM (normal)', 2: 'ASC-US', 3: 'ASC-H', 4: 'LSIL', 5: 'HSIL',
+      6: 'AGC', 7: 'Carcinome épidermoïde', 8: 'Adénocarcinome', 9: 'Insatisfaisant'
+    };
+    return map[val] || 'Non réalisée';
+  };
+
   return (
     <PatientLayout>
       {/* Header Profil Rapide */}
@@ -183,7 +192,7 @@ const MedicalRecords: React.FC = () => {
 
             <BentoCard className="bg-white border-l-4 border-atlantic-sage">
               <span className="block text-[10px] text-on-surface-variant uppercase font-bold mb-1">Cytologie</span>
-              <p className="text-xl font-bold text-on-surface">{patient?.dep_resultat_cytologie || 'Non réalisée'}</p>
+              <p className="text-xl font-bold text-on-surface">{getCytologie(patient?.dep_resultat_cytologie)}</p>
               <p className="text-xs text-on-surface-variant mt-2">Biopsie: {patient?.dep_biopsie_realisee ? 'Effectuée' : 'Non effectuée'}</p>
             </BentoCard>
           </div>
@@ -206,7 +215,7 @@ const MedicalRecords: React.FC = () => {
             </BentoCard>
             <BentoCard className="bg-white border border-sahara-rose">
               <span className="block text-[10px] text-on-surface-variant uppercase font-bold mb-1">Dernières Règles</span>
-              <span className="text-xl font-bold text-on-surface">{safeFormatDate(patient?.gyn_ddr)}</span>
+              <span className="text-xl font-bold text-on-surface">{safeFormatDate(patient?.gyn_ddr || patient?.phy_ddr)}</span>
             </BentoCard>
             <BentoCard className="bg-white border border-sahara-rose">
               <span className="block text-[10px] text-on-surface-variant uppercase font-bold mb-1">Premier Rapport</span>
@@ -217,19 +226,19 @@ const MedicalRecords: React.FC = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-6">
             <div className="p-4 rounded-2xl bg-cream-silk/20 border border-sahara-rose text-center">
               <p className="text-[10px] text-on-surface-variant font-bold uppercase mb-1">Premières Règles</p>
-              <p className="font-headline text-lg">{patient?.gyn_age_menstrue || '--'} ans</p>
+              <p className="font-headline text-lg">{patient?.age_menstrue || '--'} ans</p>
             </div>
             <div className="p-4 rounded-2xl bg-cream-silk/20 border border-sahara-rose text-center">
               <p className="text-[10px] text-on-surface-variant font-bold uppercase mb-1">Enfants Vivants</p>
-              <p className="font-headline text-lg">{patient?.gyn_nb_enfants_vivants || 0}</p>
+              <p className="font-headline text-lg">{patient?.gyn_parite_simple !== undefined && patient?.gyn_parite_simple !== null ? patient.gyn_parite_simple : '--'}</p>
             </div>
             <div className="p-4 rounded-2xl bg-cream-silk/20 border border-sahara-rose text-center">
               <p className="text-[10px] text-on-surface-variant font-bold uppercase mb-1">ATCD Familiaux</p>
-              <p className="font-headline text-lg">{patient?.ris_atcd_familiaux_cancer ? 'Oui (Signalé)' : 'Aucun'}</p>
+              <p className="font-headline text-lg">{patient?.membr_famillecancer === 1 ? 'Oui (Signalé)' : 'Aucun'}</p>
             </div>
             <div className="p-4 rounded-2xl bg-cream-silk/20 border border-sahara-rose text-center">
               <p className="text-[10px] text-on-surface-variant font-bold uppercase mb-1">Contraception</p>
-              <p className="font-headline text-lg">{patient?.ris_contraception ? 'Active' : 'Inactive'}</p>
+              <p className="font-headline text-lg">{(patient?.ris_contraception && patient.ris_contraception !== '0') || patient?.traitema_contraceptif === 1 ? 'Active' : 'Inactive'}</p>
             </div>
           </div>
         </div>
@@ -249,14 +258,20 @@ const MedicalRecords: React.FC = () => {
               <IconBox icon="school" className="bg-white" />
               <div>
                 <p className="text-xs text-on-surface-variant font-bold">Instruction</p>
-                <p className="font-body font-bold">{patient?.soc_niveau_instruction ? { 1: 'Aucun', 2: 'Primaire', 3: 'Moyen', 4: 'Secondaire', 5: 'Supérieur' }[patient.soc_niveau_instruction] : '--'}</p>
+                <p className="font-body font-bold">
+                  {patient?.soc_niveau_instruction !== undefined && patient?.soc_niveau_instruction !== null 
+                    ? { 0: 'Aucun', 1: 'Primaire', 2: 'Secondaire', 3: 'Supérieur', 4: 'École coranique/Daara', 5: 'Alphabétisation' }[patient.soc_niveau_instruction as number] || '--' 
+                    : '--'}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-4">
               <IconBox icon="family_restroom" className="bg-white" />
               <div>
                 <p className="text-xs text-on-surface-variant font-bold">État Civil</p>
-                <p className="font-body font-bold">{patient?.soc_matrimoniale ? { 1: 'Célibataire', 2: 'Mariée', 3: 'Divorcée', 4: 'Veuve' }[patient.soc_matrimoniale] : '--'}</p>
+                <p className="font-body font-bold">
+                  {patient?.soc_statut_matrimonial ? { 1: 'Célibataire', 2: 'Mariée monogame', 3: 'Mariée polygame', 4: 'Veuve', 5: 'Divorcée/Séparée', 6: 'Union libre' }[patient.soc_statut_matrimonial as number] || '--' : '--'}
+                </p>
               </div>
             </div>
           </div>
