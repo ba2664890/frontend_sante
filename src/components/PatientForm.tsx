@@ -3,6 +3,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { patientService } from '../services/patientService.ts';
 import type { PatientFormData } from '../types';
+import { ClinicalAiSummary } from '../pages/Patients.tsx';
 
 // ─── Option helpers ────────────────────────────────────────────────────────
 const opt = (value: number | string, label: string) => ({ value, label });
@@ -331,7 +332,8 @@ const STEP_LABELS = [
 const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [aiSummary, setAiSummary] = useState('');
+  const [aiSummary, setAiSummary] = useState(patient?.ai_synthese || '');
+  const [summaryMode, setSummaryMode] = useState<'preview' | 'edit'>('preview');
   const [aiLoading, setAiLoading] = useState(false);
   const [multiValues, setMultiValues] = useState<Record<string, string>>({
     ris_ist_type: '', ris_contraception: '',
@@ -342,7 +344,12 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
   const { register, handleSubmit, watch, trigger, formState: { errors }, reset, setValue } =
     useForm<PatientFormData>({ mode: 'onChange', defaultValues: patient || {} });
 
-  useEffect(() => { if (patient) { reset(patient); } }, [patient, reset]);
+  useEffect(() => { 
+    if (patient) { 
+      reset(patient); 
+      setAiSummary(patient.ai_synthese || '');
+    } 
+  }, [patient, reset]);
 
   // Watchers for conditionals
   const w = {
@@ -1450,12 +1457,53 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
                     )}
                     
                     {aiSummary ? (
-                      <div className="prose prose-blue max-w-none">
-                        <textarea
-                          {...register('ai_synthese')}
-                          className="w-full h-[400px] border-none focus:ring-0 text-slate-800 font-medium text-lg leading-relaxed resize-none p-0"
-                          placeholder="La synthèse apparaîtra ici..."
-                        />
+                      <div>
+                        {/* Tab Headers */}
+                        <div className="flex border-b border-slate-100 mb-6 gap-6">
+                          <button
+                            type="button"
+                            onClick={() => setSummaryMode('preview')}
+                            className={`pb-3 font-bold text-sm transition-all border-b-2 flex items-center gap-1.5 ${
+                              summaryMode === 'preview'
+                                ? 'border-blue-600 text-blue-600'
+                                : 'border-transparent text-slate-400 hover:text-slate-700'
+                            }`}
+                          >
+                            <span className="material-symbols-outlined text-[18px]">visibility</span>
+                            Aperçu Clinique IA
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setSummaryMode('edit')}
+                            className={`pb-3 font-bold text-sm transition-all border-b-2 flex items-center gap-1.5 ${
+                              summaryMode === 'edit'
+                                ? 'border-blue-600 text-blue-600'
+                                : 'border-transparent text-slate-400 hover:text-slate-700'
+                            }`}
+                          >
+                            <span className="material-symbols-outlined text-[18px]">edit_note</span>
+                            Édition Manuelle
+                          </button>
+                        </div>
+
+                        {/* Tab Content */}
+                        {summaryMode === 'preview' ? (
+                          <div className="p-4 bg-slate-50/50 rounded-2xl border border-slate-100 max-h-[500px] overflow-y-auto">
+                            <ClinicalAiSummary text={watch('ai_synthese') || aiSummary} />
+                          </div>
+                        ) : (
+                          <div className="prose prose-blue max-w-none">
+                            <textarea
+                              {...register('ai_synthese')}
+                              onChange={(e) => {
+                                setValue('ai_synthese', e.target.value);
+                                setAiSummary(e.target.value);
+                              }}
+                              className="w-full h-[300px] border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-slate-800 font-medium text-lg leading-relaxed p-4"
+                              placeholder="La synthèse apparaîtra ici..."
+                            />
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <div className="h-full flex flex-col items-center justify-center text-slate-400 py-20">
