@@ -487,7 +487,6 @@ const AgentChatbotPage: React.FC = () => {
           )}
         </div>
       </Modal>
-      </div>
     </div>
   );
 };
