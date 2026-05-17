@@ -216,10 +216,7 @@ const Patients: React.FC = () => {
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
-                      setSelectedPatientList(patient);
-                      setActivePatientId(patient.record_id);
-                      setActiveTab('identity');
-                      setShowDrawer(true);
+                      navigate(`/patients/${patient.record_id}`);
                     }}
                     className="flex items-center gap-1.5 px-5 py-2.5 bg-[#dcf1fb] text-[#006669] rounded-2xl text-xs font-bold hover:bg-[#006669] hover:text-white transition-all group/btn"
                   >
