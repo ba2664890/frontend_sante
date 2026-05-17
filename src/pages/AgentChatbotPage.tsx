@@ -24,11 +24,11 @@ const parseInlineBold = (text: string) => {
       const boldText = part.slice(2, -2);
       return (
         <strong key={i} className="font-extrabold text-[#006669] bg-[#dcf1fb]/40 px-1 py-0.5 rounded border border-[#bec9c9]/10">
-          {boldText}
+          {boldText.replace(/\*/g, '')}
         </strong>
       );
     }
-    return part;
+    return part.replace(/\*/g, '');
   });
 };
 
