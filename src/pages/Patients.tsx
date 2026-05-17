@@ -18,7 +18,8 @@ const Patients: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   // Details drawer state
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [activePatientId, setActivePatientId] = useState<number | null>(null);
+  const [selectedPatientList, setSelectedPatientList] = useState<Patient | null>(null);
   const [showDrawer, setShowDrawer] = useState(false);
   const [activeTab, setActiveTab] = useState<'identity' | 'medical' | 'history'>('identity');
 
@@ -37,12 +38,21 @@ const Patients: React.FC = () => {
     { keepPreviousData: true }
   );
 
+  // Fetch full details of the active patient
+  const { data: selectedPatient } = useQuery(
+    ['patient-detail', activePatientId],
+    () => activePatientId ? patientService.getPatient(activePatientId) : Promise.resolve(null),
+    { enabled: !!activePatientId && showDrawer }
+  );
+
   // Fetch follow-ups for selected patient
   const { data: followUpsData } = useQuery(
-    ['followUps', selectedPatient?.record_id],
-    () => selectedPatient ? patientService.getFollowUps({ patient: selectedPatient.record_id }) : Promise.resolve(null),
-    { enabled: !!selectedPatient && showDrawer }
+    ['followUps', activePatientId],
+    () => activePatientId ? patientService.getFollowUps({ patient: activePatientId }) : Promise.resolve(null),
+    { enabled: !!activePatientId && showDrawer }
   );
+
+  const patientToDisplay = selectedPatient || selectedPatientList;
 
   const patients = data?.results || [];
   const totalPages = Math.ceil((data?.count || 0) / 20);
@@ -160,7 +170,8 @@ const Patients: React.FC = () => {
               <div 
                 key={patient.record_id}
                 onClick={() => {
-                  setSelectedPatient(patient);
+                  setSelectedPatientList(patient);
+                  setActivePatientId(patient.record_id);
                   setActiveTab('identity');
                   setShowDrawer(true);
                 }}
@@ -205,7 +216,8 @@ const Patients: React.FC = () => {
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
-                      setSelectedPatient(patient);
+                      setSelectedPatientList(patient);
+                      setActivePatientId(patient.record_id);
                       setActiveTab('identity');
                       setShowDrawer(true);
                     }}
@@ -247,7 +259,7 @@ const Patients: React.FC = () => {
       )}
 
       {/* Slide-in Detail View Sidebar */}
-      {showDrawer && selectedPatient && (
+      {showDrawer && patientToDisplay && (
         <div className="fixed inset-0 z-50 flex justify-end">
           {/* Backdrop with transition */}
           <div 
@@ -282,13 +294,16 @@ const Patients: React.FC = () => {
                   <span className="material-symbols-outlined text-[36px]">account_circle</span>
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-[#091e25]" style={{ fontFamily: 'Literata, serif' }}>
-                    {selectedPatient.full_name}
+                  <h2 className="text-2xl font-bold text-[#091e25] flex items-center" style={{ fontFamily: 'Literata, serif' }}>
+                    {patientToDisplay.full_name}
+                    {!selectedPatient && (
+                      <span className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-[#006669] border-t-transparent ml-2" title="Chargement des données complètes..."></span>
+                    )}
                   </h2>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs font-mono font-bold text-[#3e4949]">ID: {selectedPatient.id_patient}</span>
+                    <span className="text-xs font-mono font-bold text-[#3e4949]">ID: {patientToDisplay.id_patient}</span>
                     <span className="px-2 py-0.5 bg-[#ffdbcf] text-[#9a4523] rounded font-bold text-[10px] uppercase tracking-wider">
-                      {selectedPatient.status}
+                      {patientToDisplay.status}
                     </span>
                   </div>
                 </div>
@@ -328,20 +343,20 @@ const Patients: React.FC = () => {
                       <div>
                         <p className="text-[#3e4949] text-[11px] font-bold uppercase mb-0.5">Âge</p>
                         <p className="font-bold text-sm text-[#091e25]">
-                          {selectedPatient.age} ans {selectedPatient.date_naiss ? `(${new Date(selectedPatient.date_naiss).toLocaleDateString('fr-FR')})` : ''}
+                          {patientToDisplay.age} ans {patientToDisplay.date_naiss ? `(${new Date(patientToDisplay.date_naiss).toLocaleDateString('fr-FR')})` : ''}
                         </p>
                       </div>
                       <div>
                         <p className="text-[#3e4949] text-[11px] font-bold uppercase mb-0.5">Téléphone</p>
-                        <p className="font-bold text-sm text-[#091e25] font-mono">{selectedPatient.num_phone || '—'}</p>
+                        <p className="font-bold text-sm text-[#091e25] font-mono">{patientToDisplay.num_phone || '—'}</p>
                       </div>
                       <div className="col-span-2">
                         <p className="text-[#3e4949] text-[11px] font-bold uppercase mb-0.5">Localité (Adresse)</p>
-                        <p className="font-bold text-sm text-[#091e25]">{selectedPatient.pat_adresse || '—'}</p>
+                        <p className="font-bold text-sm text-[#091e25]">{patientToDisplay.pat_adresse || '—'}</p>
                       </div>
                       <div className="col-span-2">
                         <p className="text-[#3e4949] text-[11px] font-bold uppercase mb-0.5">NIN (Identifiant National)</p>
-                        <p className="font-bold text-sm text-[#091e25] font-mono">{selectedPatient.pat_nin || '—'}</p>
+                        <p className="font-bold text-sm text-[#091e25] font-mono">{patientToDisplay.pat_nin || '—'}</p>
                       </div>
                     </div>
                   </div>
@@ -352,19 +367,19 @@ const Patients: React.FC = () => {
                       <div>
                         <p className="text-[#3e4949] text-[11px] font-bold uppercase mb-0.5">Profession</p>
                         <p className="font-bold text-sm text-[#091e25]">
-                          {selectedPatient.soc_profession ? { 1: 'Ménagère', 2: 'Salariée', 3: 'Étudiante/Élève', 4: 'Commerçante', 5: 'Couturière/Coiffeuse/Restauratrice', 6: 'Paysanne/Éleveuse', 7: 'Sans emploi', 8: 'Autre' }[selectedPatient.soc_profession] || '—' : '—'}
+                          {patientToDisplay.soc_profession ? { 1: 'Ménagère', 2: 'Salariée', 3: 'Étudiante/Élève', 4: 'Commerçante', 5: 'Couturière/Coiffeuse/Restauratrice', 6: 'Paysanne/Éleveuse', 7: 'Sans emploi', 8: 'Autre' }[patientToDisplay.soc_profession] || '—' : '—'}
                         </p>
                       </div>
                       <div>
                         <p className="text-[#3e4949] text-[11px] font-bold uppercase mb-0.5">Niveau d'instruction</p>
                         <p className="font-bold text-sm text-[#091e25]">
-                          {selectedPatient.soc_niveau_instruction !== undefined ? { 0: 'Aucun', 1: 'Primaire', 2: 'Secondaire', 3: 'Supérieur', 4: 'École coranique/Daara', 5: 'Alphabétisation' }[selectedPatient.soc_niveau_instruction] || '—' : '—'}
+                          {patientToDisplay.soc_niveau_instruction !== undefined ? { 0: 'Aucun', 1: 'Primaire', 2: 'Secondaire', 3: 'Supérieur', 4: 'École coranique/Daara', 5: 'Alphabétisation' }[patientToDisplay.soc_niveau_instruction] || '—' : '—'}
                         </p>
                       </div>
                       <div className="col-span-2">
                         <p className="text-[#3e4949] text-[11px] font-bold uppercase mb-0.5">Statut Matrimonial</p>
                         <p className="font-bold text-sm text-[#091e25]">
-                          {selectedPatient.soc_statut_matrimonial ? { 1: 'Célibataire', 2: 'Mariée monogame', 3: 'Mariée polygame', 4: 'Veuve', 5: 'Divorcée/Séparée', 6: 'Union libre' }[selectedPatient.soc_statut_matrimonial] || '—' : '—'}
+                          {patientToDisplay.soc_statut_matrimonial ? { 1: 'Célibataire', 2: 'Mariée monogame', 3: 'Mariée polygame', 4: 'Veuve', 5: 'Divorcée/Séparée', 6: 'Union libre' }[patientToDisplay.soc_statut_matrimonial] || '—' : '—'}
                         </p>
                       </div>
                     </div>
@@ -382,22 +397,22 @@ const Patients: React.FC = () => {
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between border-b border-[#bec9c9]/10 pb-1.5">
                         <span className="text-[#3e4949]">Date d'examen</span>
-                        <span className="font-bold text-[#091e25]">{selectedPatient.dep_date ? new Date(selectedPatient.dep_date).toLocaleDateString('fr-FR') : '—'}</span>
+                        <span className="font-bold text-[#091e25]">{patientToDisplay.dep_date ? new Date(patientToDisplay.dep_date).toLocaleDateString('fr-FR') : '—'}</span>
                       </div>
                       <div className="flex justify-between border-b border-[#bec9c9]/10 pb-1.5">
                         <span className="text-[#3e4949]">Méthode</span>
-                        <span className="font-bold text-[#091e25]">{selectedPatient.dep_methode || 'IVA / IVL'}</span>
+                        <span className="font-bold text-[#091e25]">{patientToDisplay.dep_methode || 'IVA / IVL'}</span>
                       </div>
                       <div className="flex justify-between border-b border-[#bec9c9]/10 pb-1.5">
                         <span className="text-[#3e4949]">Résultat IVA</span>
-                        <span className={`font-bold ${selectedPatient.dep_resultat_iva === 2 ? 'text-[#9a4523]' : 'text-[#006669]'}`}>
-                          {selectedPatient.dep_resultat_iva ? { 1: 'Négatif', 2: 'Positif', 3: 'Polype', 4: 'Suspicion cancer', 5: 'Non concluant' }[selectedPatient.dep_resultat_iva] || '—' : '—'}
+                        <span className={`font-bold ${patientToDisplay.dep_resultat_iva === 2 ? 'text-[#9a4523]' : 'text-[#006669]'}`}>
+                          {patientToDisplay.dep_resultat_iva ? { 1: 'Négatif', 2: 'Positif', 3: 'Polype', 4: 'Suspicion cancer', 5: 'Non concluant' }[patientToDisplay.dep_resultat_iva] || '—' : '—'}
                         </span>
                       </div>
                       <div className="flex justify-between pb-1">
                         <span className="text-[#3e4949]">Résultat IVL</span>
                         <span className="font-bold text-[#091e25]">
-                          {selectedPatient.dep_resultat_ivl ? { 1: 'Négatif', 2: 'Positif', 3: 'Non concluant' }[selectedPatient.dep_resultat_ivl] || '—' : '—'}
+                          {patientToDisplay.dep_resultat_ivl ? { 1: 'Négatif', 2: 'Positif', 3: 'Non concluant' }[patientToDisplay.dep_resultat_ivl] || '—' : '—'}
                         </span>
                       </div>
                     </div>
@@ -409,33 +424,33 @@ const Patients: React.FC = () => {
                       <div>
                         <p className="text-[#3e4949] text-[11px] font-bold uppercase mb-0.5">Statut VIH</p>
                         <p className="font-bold text-[#091e25]">
-                          {selectedPatient.ris_vih_statut ? { 1: 'Négatif', 2: 'Positif sous TARV', 3: 'Positif sans TARV', 9: 'Inconnu/Refus' }[selectedPatient.ris_vih_statut] || '—' : '—'}
+                          {patientToDisplay.ris_vih_statut ? { 1: 'Négatif', 2: 'Positif sous TARV', 3: 'Positif sans TARV', 9: 'Inconnu/Refus' }[patientToDisplay.ris_vih_statut] || '—' : '—'}
                         </p>
                       </div>
                       <div>
                         <p className="text-[#3e4949] text-[11px] font-bold uppercase mb-0.5">Contraception</p>
                         <p className="font-bold text-[#091e25]">
-                          {(selectedPatient.ris_contraception && selectedPatient.ris_contraception !== '0') || selectedPatient.traitema_contraceptif === 1 ? 'Active' : 'Inactive'}
+                          {(patientToDisplay.ris_contraception && patientToDisplay.ris_contraception !== '0') || patientToDisplay.traitema_contraceptif === 1 ? 'Active' : 'Inactive'}
                         </p>
                       </div>
                       <div>
                         <p className="text-[#3e4949] text-[11px] font-bold uppercase mb-0.5">Premières règles</p>
-                        <p className="font-bold text-[#091e25]">{selectedPatient.age_menstrue || '—'} ans</p>
+                        <p className="font-bold text-[#091e25]">{patientToDisplay.age_menstrue || '—'} ans</p>
                       </div>
                       <div>
                         <p className="text-[#3e4949] text-[11px] font-bold uppercase mb-0.5">Enfants vivants</p>
-                        <p className="font-bold text-[#091e25]">{selectedPatient.gyn_parite_simple !== undefined ? selectedPatient.gyn_parite_simple : '—'}</p>
+                        <p className="font-bold text-[#091e25]">{patientToDisplay.gyn_parite_simple !== undefined ? patientToDisplay.gyn_parite_simple : '—'}</p>
                       </div>
                     </div>
                   </div>
 
-                  {selectedPatient.ai_synthese && (
+                  {patientToDisplay.ai_synthese && (
                     <div className="p-4 bg-[#fffaf5] rounded-2xl border border-[#ffdbcf]/50 mt-4">
                       <h4 className="font-bold text-[#9a4523] text-sm mb-2 flex items-center gap-1.5">
                         <span className="material-symbols-outlined text-[18px]">psychology</span>
                         Synthèse Clinique IA
                       </h4>
-                      <p className="text-[#3e4949] text-xs leading-relaxed italic">{selectedPatient.ai_synthese}</p>
+                      <p className="text-[#3e4949] text-xs leading-relaxed italic">{patientToDisplay.ai_synthese}</p>
                     </div>
                   )}
                 </section>
@@ -494,7 +509,7 @@ const Patients: React.FC = () => {
               <button 
                 onClick={() => {
                   setShowDrawer(false);
-                  navigate(`/patients/${selectedPatient.record_id}`);
+                  navigate(`/patients/${patientToDisplay.record_id}`);
                 }}
                 className="px-4 py-3 bg-[#dcf1fb] text-[#006669] rounded-xl hover:bg-[#006669] hover:text-white transition-all"
                 title="Voir dossier complet"
@@ -507,13 +522,13 @@ const Patients: React.FC = () => {
       )}
 
       {/* Modal Nouveau Patient */}
-      <Modal isOpen={showForm} onClose={() => setShowForm(false)} title={selectedPatient ? "Modifier le dossier patiente" : "Enregistrer une nouvelle patiente"} size="6xl">
+      <Modal isOpen={showForm} onClose={() => setShowForm(false)} title={patientToDisplay ? "Modifier le dossier patiente" : "Enregistrer une nouvelle patiente"} size="6xl">
         <PatientFormWizard 
-          patient={selectedPatient}
+          patient={patientToDisplay}
           onSubmit={() => { 
             setShowForm(false); 
             refetch(); 
-            toast.success(selectedPatient ? 'Dossier patiente mis à jour !' : 'Patiente enregistrée !'); 
+            toast.success(patientToDisplay ? 'Dossier patiente mis à jour !' : 'Patiente enregistrée !'); 
           }} 
           onCancel={() => setShowForm(false)} 
         />
