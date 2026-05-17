@@ -10,7 +10,6 @@ import { toast } from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext.tsx';
 import LoadingSpinner from '../components/LoadingSpinner.tsx';
 import Modal from '../components/Modal.tsx';
-import { IconBox } from '../components/ui/PatientUI.tsx';
 
 type Message = {
   role: 'user' | 'assistant';

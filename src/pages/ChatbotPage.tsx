@@ -9,7 +9,6 @@ import { fr } from 'date-fns/locale';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext.tsx';
 import PatientLayout from '../components/PatientLayout.tsx';
-import { IconBox } from '../components/ui/PatientUI.tsx';
 
 type Message = {
   role: 'user' | 'assistant';
