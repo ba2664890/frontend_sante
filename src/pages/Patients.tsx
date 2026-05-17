@@ -546,15 +546,15 @@ export const parseAiSummary = (text: string) => {
   const lines = cleanText.split('\n').map(l => l.trim()).filter(Boolean);
   
   return lines.map((line, idx) => {
-    const boldHeaderMatch = line.match(/^[\*\s\-–\u2022]*\*\*([^*]+)\*\*[\s:]*(.*)$/) || line.match(/^[\*\s\-–\u2022]*\*([^*]+)\*[\s:]*(.*)$/);
+    const boldHeaderMatch = line.match(/^[* \-–\u2022]*\*\*([^*]+)\*\*[\s:]*(.*)$/) || line.match(/^[* \-–\u2022]*\*([^*]+)\*[\s:]*(.*)$/);
     
     if (boldHeaderMatch) {
       const [, header, content] = boldHeaderMatch;
       return {
         id: idx,
         type: 'section',
-        header: header.replace(/[:\*]/g, '').trim(),
-        content: content.replace(/[\*]/g, '').trim()
+        header: header.replace(/[:*]/g, '').trim(),
+        content: content.replace(/[*]/g, '').trim()
       };
     }
     
@@ -563,14 +563,14 @@ export const parseAiSummary = (text: string) => {
       return {
         id: idx,
         type: 'list_item',
-        content: line.replace(/^[\s*\-\u2022]+/, '').replace(/[\*]/g, '').trim()
+        content: line.replace(/^[\s*\-\u2022]+/, '').replace(/[*]/g, '').trim()
       };
     }
     
     return {
       id: idx,
       type: 'paragraph',
-      content: line.replace(/[\*]/g, '').trim()
+      content: line.replace(/[*]/g, '').trim()
     };
   });
 };
