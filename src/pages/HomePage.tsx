@@ -35,7 +35,7 @@ const cancers = [
     gradient: 'from-[#D97BAE] to-[#B55A8A]',
     badge: 'Bientôt disponible',
     description: 'Mammographie numérique et suivi personnalisé pour la détection précoce du cancer du sein.',
-    stat: 'Lancement Q3 2025',
+    stat: 'Lancement Q3 ',
     link: '#',
   },
   {
@@ -48,7 +48,7 @@ const cancers = [
     gradient: 'from-[#5B8FD4] to-[#3A6AAE]',
     badge: 'Bientôt disponible',
     description: 'Dosage PSA et biopsie guidée par échographie pour le dépistage du cancer de la prostate.',
-    stat: 'Lancement Q4 2025',
+    stat: 'Lancement Q4 ',
     link: '#',
   },
 ];
@@ -60,7 +60,7 @@ const steps = [
 ];
 
 const stats = [
-  { value: '10 000+', label: 'Patients dépistés' },
+  { value: '1 200+', label: 'Patients dépistés' },
   { value: '3', label: 'Cancers ciblés' },
   { value: '14', label: 'Centres partenaires' },
   { value: '98%', label: 'Satisfaction patients' },
@@ -296,14 +296,14 @@ const HomePage: React.FC = () => {
       <footer style={{ background: '#0F1C3F', color: 'rgba(255,255,255,0.6)', padding: '60px 24px 40px', textAlign: 'center' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div className="headline" style={{ fontSize: 28, fontWeight: 800, color: '#fff', marginBottom: 8 }}>Despisteel</div>
-          <p style={{ fontSize: 14, marginBottom: 32 }}>Plateforme nationale de dépistage oncologique — Sénégal</p>
+          <p style={{ fontSize: 14, marginBottom: 32 }}>Plateforme nationale de dépistage oncologique Sénégal</p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 32, marginBottom: 32, flexWrap: 'wrap' }}>
             {['Politique de confidentialité', "Conditions d'utilisation", 'Ministère de la Santé', 'Support'].map(l => (
               <Link key={l} to="/" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: 600, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{l}</Link>
             ))}
           </div>
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 28, fontSize: 13 }}>
-            © 2025 Despisteel Sénégal — Cancer du Col de l'Utérus · Cancer du Sein · Cancer de la Prostate
+            ©  Despisteel Sénégal Cancer du Col de l'Utérus · Cancer du Sein · Cancer de la Prostate
           </div>
         </div>
       </footer>
