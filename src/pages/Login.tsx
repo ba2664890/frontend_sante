@@ -24,8 +24,8 @@ const Login: React.FC = () => {
     setIsLoading(true);
     try {
       const loggedUser = await login(data.username, data.password);
-      toast.success('Bienvenue sur CerviCare+');
-      
+      toast.success('Bienvenue sur Depisteel');
+
       if (loggedUser?.role === 'patient') {
         navigate('/acceuil_patient');
       } else {
@@ -132,11 +132,11 @@ const Login: React.FC = () => {
               <div className="w-10 h-10 bg-[#8f464c]/10 rounded-full flex items-center justify-center">
                 <span className="material-symbols-outlined text-[#8f464c] text-2xl">clinical_notes</span>
               </div>
-              <span className="font-headline text-xl font-bold text-[#8f464c] tracking-tight">CerviCare+</span>
+              <span className="font-headline text-xl font-bold text-[#8f464c] tracking-tight">Depisteel</span>
             </div>
 
             <div className="mb-6">
-              <h1 className="font-headline text-3xl md:text-4xl text-[#1b1c1a] mb-2 leading-tight">Bienvenue sur CerviCare+</h1>
+              <h1 className="font-headline text-3xl md:text-4xl text-[#1b1c1a] mb-2 leading-tight">Bienvenue sur Depisteel</h1>
               <p className="font-body text-base text-[#534343] leading-relaxed opacity-80">Connectez-vous pour accéder à votre espace santé sécurisé.</p>
             </div>
 
@@ -145,10 +145,10 @@ const Login: React.FC = () => {
                 <label className="text-label-md text-[#8f464c]/70 ml-1 uppercase">Utilisateur ou Email</label>
                 <div className="relative group">
                   <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-[#867273] group-focus-within:text-[#8f464c] transition-colors">person</span>
-                  <input 
+                  <input
                     {...register('username', { required: true })}
-                    className="input-field w-full text-base placeholder:text-[#d8c1c1]" 
-                    placeholder="nom@exemple.com" 
+                    className="input-field w-full text-base placeholder:text-[#d8c1c1]"
+                    placeholder="nom@exemple.com"
                     type="text"
                   />
                 </div>
@@ -162,17 +162,17 @@ const Login: React.FC = () => {
                 </div>
                 <div className="relative group">
                   <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-[#867273] group-focus-within:text-[#8f464c] transition-colors">lock</span>
-                  <input 
+                  <input
                     {...register('password', { required: true })}
-                    className="input-field w-full text-base placeholder:text-[#d8c1c1]" 
-                    placeholder="••••••••" 
+                    className="input-field w-full text-base placeholder:text-[#d8c1c1]"
+                    placeholder="••••••••"
                     type="password"
                   />
                 </div>
                 {errors.password && <p className="text-[11px] text-[#ba1a1a] ml-5 font-bold uppercase tracking-wider">Ce champ est requis</p>}
               </div>
 
-              <button 
+              <button
                 type="submit"
                 disabled={isLoading}
                 className="btn-primary w-full disabled:opacity-70 flex items-center justify-center gap-3"
@@ -217,9 +217,9 @@ const Login: React.FC = () => {
         {/* Right Section: Visual */}
         <div className="hidden lg:flex relative overflow-hidden bg-[#f6f3f0]">
           <div className="absolute inset-0">
-            <img 
-              alt="Atmospheric Medical Wellness" 
-              className="w-full h-full object-cover opacity-40 mix-blend-multiply" 
+            <img
+              alt="Atmospheric Medical Wellness"
+              className="w-full h-full object-cover opacity-40 mix-blend-multiply"
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFMcE94wRKdyGqfiEUc7uFZ7plXiGdtmxTxloeZfkdgXo0FREHVUh8LaFbqD_Z4BPPPGPuVJpDde2kkU_Wf2KYfX3u06v64pZyVVDpnB-UHZ50U63jpWoaR3OGrgEbXP2tnG1FN95zdwLXKauScOI1ZuXgsvFYuyV7Cn6y36Cv--H1kjNa9UbRs5pGxbWOE6gDeQLzNSBrU6oK3j0yLfDmN-fjV0tsiFPlCXtgN7Kn88IoZe7m_SaOOEwmOlZY_LR5WEvGHlRzrIg"
             />
           </div>
@@ -234,7 +234,7 @@ const Login: React.FC = () => {
               <p className="font-body text-base lg:text-lg text-[#534343] mb-8 max-w-md leading-relaxed opacity-90">
                 Notre plateforme allie expertise clinique et intelligence artificielle pour un accompagnement personnalisé de votre santé féminine.
               </p>
-              
+
               <div className="flex gap-10 border-t border-[#d8c1c1]/40 pt-8">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full bg-white border border-[#d8c1c1] flex items-center justify-center shadow-sm">
