@@ -85,15 +85,37 @@ const HomePage: React.FC = () => {
       {/* NAV */}
       <header style={{ position: 'fixed', top: 0, width: '100%', zIndex: 50, background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
         <nav style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px', height: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg,#1A2F6B,#3B5BDB)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span className="material-symbols-outlined" style={{ color: '#fff', fontSize: 20 }}>health_and_safety</span>
-            </div>
-            <span className="headline" style={{ fontSize: 22, fontWeight: 800, color: '#1A2340', letterSpacing: '-0.5px' }}>
+          <Link
+            to="/"
+            style={{
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12
+            }}
+          >
+            <img
+              src="/logo.jpeg"
+              alt="DEPISTEEL"
+              style={{
+                height: 50,
+                width: 'auto',
+                objectFit: 'contain'
+              }}
+            />
+
+            <span
+              className="headline"
+              style={{
+                fontSize: 22,
+                fontWeight: 800,
+                color: '#1A2340',
+                letterSpacing: '-0.5px'
+              }}
+            >
               DEPISTEEL
             </span>
           </Link>
-
           <div style={{ display: 'flex', gap: 32, alignItems: 'center' }}>
             <a href="#cancers" style={{ color: '#4A5568', fontWeight: 600, textDecoration: 'none', fontSize: 15 }}>Nos Programmes</a>
             <a href="#how" style={{ color: '#4A5568', fontWeight: 600, textDecoration: 'none', fontSize: 15 }}>Comment ça marche</a>
