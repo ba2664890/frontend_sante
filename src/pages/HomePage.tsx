@@ -90,7 +90,7 @@ const HomePage: React.FC = () => {
               <span className="material-symbols-outlined" style={{ color: '#fff', fontSize: 20 }}>health_and_safety</span>
             </div>
             <span className="headline" style={{ fontSize: 22, fontWeight: 800, color: '#1A2340', letterSpacing: '-0.5px' }}>
-              Despisteel
+              DEPISTEEL
             </span>
           </Link>
 
@@ -138,7 +138,7 @@ const HomePage: React.FC = () => {
 
             <motion.h1 variants={fadeInUp} className="headline"
               style={{ fontSize: 'clamp(44px,7vw,82px)', fontWeight: 800, color: '#fff', lineHeight: 1.1, marginBottom: 24, letterSpacing: '-2px' }}>
-              Despisteel
+              DEPISTEEL
               <span style={{ display: 'block', background: 'linear-gradient(135deg, #60A5FA, #E28B7A, #D97BAE)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontSize: '0.75em' }}>
                 Dépistez. Tôt. Vivez.
               </span>
@@ -187,7 +187,7 @@ const HomePage: React.FC = () => {
                 Trois cancers, une mission
               </h2>
               <p style={{ color: '#718096', fontSize: 18, maxWidth: 600, margin: '0 auto', lineHeight: 1.7 }}>
-                Despisteel vous accompagne dans la détection précoce des cancers les plus fréquents au Sénégal.
+                DEPISTEEL vous accompagne dans la détection précoce des cancers les plus fréquents au Sénégal.
               </p>
             </motion.div>
 
@@ -276,7 +276,7 @@ const HomePage: React.FC = () => {
                   Votre santé, notre priorité
                 </h2>
                 <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 18, maxWidth: 560, margin: '0 auto 48px', lineHeight: 1.7 }}>
-                  Ne laissez pas la maladie prendre de l'avance. Avec Despisteel, chaque dépistage est un acte de courage qui sauve des vies.
+                  Ne laissez pas la maladie prendre de l'avance. Avec DEPISTEEL, chaque dépistage est un acte de courage qui sauve des vies.
                 </p>
                 <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
                   <Link to="/login" style={{ background: '#fff', color: '#1A2F6B', padding: '16px 40px', borderRadius: 100, fontWeight: 800, textDecoration: 'none', fontSize: 16 }}>
@@ -295,7 +295,7 @@ const HomePage: React.FC = () => {
       {/* FOOTER */}
       <footer style={{ background: '#0F1C3F', color: 'rgba(255,255,255,0.6)', padding: '60px 24px 40px', textAlign: 'center' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div className="headline" style={{ fontSize: 28, fontWeight: 800, color: '#fff', marginBottom: 8 }}>Despisteel</div>
+          <div className="headline" style={{ fontSize: 28, fontWeight: 800, color: '#fff', marginBottom: 8 }}>DEPISTEEL</div>
           <p style={{ fontSize: 14, marginBottom: 32 }}>Plateforme nationale de dépistage oncologique Sénégal</p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 32, marginBottom: 32, flexWrap: 'wrap' }}>
             {['Politique de confidentialité', "Conditions d'utilisation", 'Ministère de la Santé', 'Support'].map(l => (
@@ -303,7 +303,7 @@ const HomePage: React.FC = () => {
             ))}
           </div>
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 28, fontSize: 13 }}>
-            ©  Despisteel Sénégal Cancer du Col de l'Utérus · Cancer du Sein · Cancer de la Prostate
+            ©  DEPISTEEL Sénégal Cancer du Col de l'Utérus · Cancer du Sein · Cancer de la Prostate
           </div>
         </div>
       </footer>
