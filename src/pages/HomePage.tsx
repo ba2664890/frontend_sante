@@ -103,18 +103,6 @@ const HomePage: React.FC = () => {
                 objectFit: 'contain'
               }}
             />
-
-            <span
-              className="headline"
-              style={{
-                fontSize: 22,
-                fontWeight: 800,
-                color: '#1A2340',
-                letterSpacing: '-0.5px'
-              }}
-            >
-              DEPISTEEL
-            </span>
           </Link>
           <div style={{ display: 'flex', gap: 32, alignItems: 'center' }}>
             <a href="#cancers" style={{ color: '#4A5568', fontWeight: 600, textDecoration: 'none', fontSize: 15 }}>Nos Programmes</a>
