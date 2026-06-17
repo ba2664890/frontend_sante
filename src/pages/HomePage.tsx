@@ -140,7 +140,7 @@ const HomePage: React.FC = () => {
               style={{ fontSize: 'clamp(44px,7vw,82px)', fontWeight: 800, color: '#fff', lineHeight: 1.1, marginBottom: 24, letterSpacing: '-2px' }}>
               DEPISTEEL
               <span style={{ display: 'block', background: 'linear-gradient(135deg, #60A5FA, #E28B7A, #D97BAE)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontSize: '0.75em' }}>
-                Dépistez. Tôt. Vivez.
+                FAGARULEEN CI TEEL
               </span>
             </motion.h1>
 
