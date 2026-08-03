@@ -3,7 +3,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { seinService } from '../services/seinService.ts';
 import type { SeinPatient } from '../types';
-import { CheckCard, ClinicalShell, F, NavigationActions, Notice, Sel, cls, opt } from './ClinicalFormUI.tsx';
+import { CheckCard, ClinicalShell, F, NavigationActions, Notice, Sel, StepHeader, cls, opt } from './ClinicalFormUI.tsx';
 
 const today = () => new Date().toISOString().slice(0, 10);
 
