@@ -24,6 +24,15 @@ class ProstateService {
     }
   }
 
+  async getPatientByUserId(user_id: number): Promise<ProstatePatient> {
+    try {
+      const response = await api.get(`/prostate/patients/by-user/${user_id}/`);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
   async createPatient(patientData: Partial<ProstatePatient>): Promise<ProstatePatient> {
     try {
       const response = await api.post('/prostate/patients/', patientData);

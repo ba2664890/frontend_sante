@@ -5,7 +5,7 @@ import { authService } from '../services/authService.ts';
 
 interface AuthContextType {
   user: User | null;
-  login: (username: string, password: string) => Promise<void>;
+  login: (username: string, password: string) => Promise<User>;
   logout: () => Promise<void>;
   updateUser: (newUser: User) => void;
   isAuthenticated: boolean;
@@ -36,7 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   // Connexion
-  const login = async (username: string, password: string) => {
+  const login = async (username: string, password: string): Promise<User> => {
     console.log('AuthContext - Initializing login process for:', username);
     setLoading(true);
     try {
@@ -50,7 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       setUser(res.user);
       console.log('LOGIN SUCCESS', res.user);
-      navigate("/dashboard");
+      return res.user;
     } catch (error) {
       console.error("LOGIN FAILED", error);
       throw error; // On laisse le composant catcher l'erreur

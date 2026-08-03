@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext.tsx';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { patientSpaceService } from '../services/patientSpaceService.ts';
 
 interface LoginFormData {
   username: string;
@@ -27,7 +28,12 @@ const Login: React.FC = () => {
       toast.success('Bienvenue sur DEPISTEEL');
 
       if (loggedUser?.role === 'patient') {
-        navigate('/acceuil_patient');
+        try {
+          const space = await patientSpaceService.resolve();
+          navigate(space.path || '/patient/no-record');
+        } catch {
+          navigate('/patient/no-record');
+        }
       } else {
         navigate('/dashboard');
       }

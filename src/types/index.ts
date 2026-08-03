@@ -438,6 +438,7 @@ export interface NotificationFilters {
 // Prostate Patient Interface
 // ============================================================
 export interface ProstatePatient {
+  user?: number;
   record_id: number;
   id_patient: number;
   prenom: string;
@@ -547,6 +548,7 @@ export interface ProstatePatient {
 // Sein Patient Interface
 // ============================================================
 export interface SeinPatient {
+  user?: number;
   record_id: number;
   id_patient: number;
   prenom: string;

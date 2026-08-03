@@ -24,6 +24,15 @@ class SeinService {
     }
   }
 
+  async getPatientByUserId(user_id: number): Promise<SeinPatient> {
+    try {
+      const response = await api.get(`/sein/patients/by-user/${user_id}/`);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
   async createPatient(patientData: Partial<SeinPatient>): Promise<SeinPatient> {
     try {
       const response = await api.post('/sein/patients/', patientData);

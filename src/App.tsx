@@ -20,9 +20,11 @@ import ChatbotPage from './pages/ChatbotPage.tsx';
 import AgentChatbotPage from './pages/AgentChatbotPage.tsx';
 import Campaigns from './pages/Campaigns.tsx';
 import HomePage from './pages/HomePage.tsx';
-import PatientDashboard from './pages/dashboards/PatientDashboard.tsx';
 import MedicalRecords from './pages/patient/MedicalRecords.tsx';
 import PatientAppointments from './pages/patient/Appointments.tsx';
+import PatientCancerSpace from './pages/patient/PatientCancerSpace.tsx';
+import PatientSpaceRedirect from './pages/patient/PatientSpaceRedirect.tsx';
+import PatientNoRecord from './pages/patient/PatientNoRecord.tsx';
 import ProstatePatients from './pages/ProstatePatients.tsx';
 import SeinPatients from './pages/SeinPatients.tsx';
 
@@ -39,7 +41,12 @@ const App: React.FC = () => (
 
         {/* protected routes */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/acceuil_patient" element={<PatientDashboard />} />
+          <Route path="/acceuil_patient" element={<PatientSpaceRedirect />} />
+          <Route path="/patient" element={<PatientSpaceRedirect />} />
+          <Route path="/patient/col" element={<PatientCancerSpace module="col" />} />
+          <Route path="/patient/prostate" element={<PatientCancerSpace module="prostate" />} />
+          <Route path="/patient/sein" element={<PatientCancerSpace module="sein" />} />
+          <Route path="/patient/no-record" element={<PatientNoRecord />} />
           <Route path="/patient/records" element={<MedicalRecords />} />
           <Route path="/patient/appointments" element={<PatientAppointments />} />
           <Route path="/chatbot" element={<ChatbotPage />} />
