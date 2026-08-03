@@ -1,158 +1,155 @@
-import React, { useState } from 'react';
-import { useQuery } from 'react-query';
+import React from 'react';
 import { seinService } from '../services/seinService.ts';
 import { SeinPatient } from '../types';
-import LoadingSpinner from '../components/LoadingSpinner.tsx';
 import SeinFormWizard from '../components/SeinForm.tsx';
-import Modal from '../components/Modal.tsx';
+import ClinicalPatientsPage from '../components/ClinicalPatientsPage.tsx';
 
-const SeinPatients: React.FC = () => {
-  const [showForm, setShowForm] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedPatient, setSelectedPatient] = useState<SeinPatient | null>(null);
-
-  const { data, isLoading, refetch } = useQuery(
-    ['sein-patients', currentPage, searchTerm],
-    () => seinService.getPatients({ search: searchTerm }, currentPage),
-    { keepPreviousData: true }
-  );
-
-  const patients = data?.results || [];
-  const totalPages = Math.ceil((data?.count || 0) / 20);
-
-  const getStatusBadge = (status: string) => {
-    switch (status?.toLowerCase()) {
-      case 'screened':
-        return <span className="px-3 py-1 bg-pink-100 text-pink-800 rounded-full text-[10px] font-bold">DÉPISTÉE</span>;
-      case 'follow_up':
-        return <span className="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-[10px] font-bold">À REVOIR</span>;
-      default:
-        return <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-[10px] font-bold">NOUVELLE</span>;
-    }
-  };
-
-  return (
-    <div className="h-full flex flex-col animate-fade-in space-y-6">
-      {/* Header Bento */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#bec9c9]/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-semibold text-[#831843]" style={{ fontFamily: 'Literata, serif' }}>
-            Dépistage Cancer du Sein
-          </h1>
-          <p className="text-gray-600 text-sm mt-1">Gestion des fiches de collecte et bilans mammo/écho</p>
-        </div>
-        <button
-          onClick={() => {
-            setSelectedPatient(null);
-            setShowForm(true);
-          }}
-          className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#be185d] text-white font-bold shadow-lg hover:bg-[#9d174d] transition-all"
-        >
-          <span className="material-symbols-outlined text-[20px]">add</span>
-          Nouvelle Patiente Sein
-        </button>
-      </div>
-
-      {/* Search */}
-      <div className="flex gap-4 items-center">
-        <div className="relative flex-1">
-          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span>
-          <input
-            type="text"
-            placeholder="Rechercher par nom, ID ou région..."
-            className="w-full pl-12 pr-4 py-3.5 bg-white border border-pink-100 rounded-2xl outline-none font-medium"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-      </div>
-
-      {/* Grid Bento */}
-      {isLoading ? (
-        <div className="flex-1 flex items-center justify-center">
-          <LoadingSpinner size="lg" />
-        </div>
-      ) : (
-        <div className="flex-1 overflow-y-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-8">
-            {patients.map((patient: SeinPatient) => (
-              <div 
-                key={patient.record_id}
-                onClick={() => {
-                  setSelectedPatient(patient);
-                  setShowForm(true);
-                }}
-                className="bg-white rounded-3xl p-6 shadow-sm border border-pink-100 hover:border-[#be185d]/30 transition-all cursor-pointer flex flex-col justify-between"
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-pink-50 border border-pink-100 flex items-center justify-center text-[#be185d]">
-                      <span className="material-symbols-outlined text-[28px]">female</span>
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-[#831843] text-lg">{patient.full_name}</h3>
-                      <p className="text-[10px] font-bold text-gray-400 font-mono">ID: {patient.id_patient}</p>
-                    </div>
-                  </div>
-                  {getStatusBadge(patient.status)}
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 my-4">
-                  <div className="p-3 bg-pink-50/50 rounded-xl">
-                    <p className="text-[9px] font-bold text-gray-500 uppercase">ÂGE</p>
-                    <p className="text-sm font-bold text-gray-900">{patient.age} ans</p>
-                  </div>
-                  <div className="p-3 bg-pink-50/50 rounded-xl">
-                    <p className="text-[9px] font-bold text-gray-500 uppercase">BIRADS D</p>
-                    <p className="text-sm font-bold text-[#be185d]">{patient.dep_mammo_birads_droit !== undefined ? `BIRADS ${patient.dep_mammo_birads_droit}` : '—'}</p>
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t flex justify-between items-center text-xs text-gray-500">
-                  <span>Inscrite le {new Date(patient.created_at).toLocaleDateString('fr-FR')}</span>
-                  <span className="material-symbols-outlined text-gray-400">chevron_right</span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-4 py-4">
-              <button
-                disabled={currentPage <= 1}
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                className="px-4 py-2 bg-white border border-pink-200 rounded-xl text-xs font-bold disabled:opacity-50"
-              >
-                Précédent
-              </button>
-              <span className="text-xs font-bold text-[#831843]">
-                Page {currentPage} sur {totalPages}
-              </span>
-              <button
-                disabled={currentPage >= totalPages}
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                className="px-4 py-2 bg-white border border-pink-200 rounded-xl text-xs font-bold disabled:opacity-50"
-              >
-                Suivant
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Modal Form */}
-      <Modal isOpen={showForm} onClose={() => setShowForm(false)} title={selectedPatient ? "Modifier dossier sein" : "Nouveau Dépistage Sein"} size="6xl">
-        <SeinFormWizard 
-          patient={selectedPatient}
-          onSubmit={() => { 
-            setShowForm(false); 
-            refetch(); 
-          }} 
-          onCancel={() => setShowForm(false)} 
-        />
-      </Modal>
-    </div>
-  );
+const yesNo = (value?: number | boolean | null) => {
+  if (value === true || value === 1) return 'Oui';
+  if (value === false || value === 0) return 'Non';
+  if (value === 9) return 'Ne sait pas';
+  return '-';
 };
+
+const fmtDate = (value?: string) => {
+  if (!value) return '-';
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? '-' : d.toLocaleDateString('fr-FR');
+};
+
+const mapValue = (value: number | undefined, map: Record<number, string>) =>
+  value !== undefined && value !== null ? map[value] || '-' : '-';
+
+const biradsLabel = (value?: number) =>
+  value !== undefined && value !== null ? `BIRADS ${value}` : '-';
+
+const resultGlobal: Record<number, string> = {
+  1: 'Normal',
+  2: 'Surveillance rapprochee',
+  3: 'Reference examens',
+  4: 'Reference urgente',
+  5: 'Cancer confirme',
+  6: 'Lesion benigne',
+};
+
+const menopause: Record<number, string> = {
+  1: 'Non menopausee',
+  2: 'Menopause naturelle',
+  3: 'Menopause chirurgicale',
+  9: 'Ne sait pas',
+};
+
+const vih: Record<number, string> = {
+  1: 'Negatif',
+  2: 'Positif sous TARV',
+  3: 'Positif sans TARV',
+  9: 'Inconnu/Refus',
+};
+
+const profession: Record<number, string> = {
+  1: 'Menagere',
+  2: 'Salariee',
+  3: 'Etudiante/Eleve',
+  4: 'Commercante',
+  5: 'Couturiere/Coiffeuse',
+  6: 'Paysanne/Eleveuse',
+  7: 'Sans emploi',
+  8: 'Autre',
+};
+
+const instruction: Record<number, string> = {
+  0: 'Aucun',
+  1: 'Primaire',
+  2: 'Secondaire',
+  3: 'Superieur',
+  4: 'Ecole coranique/Daara',
+  5: 'Alphabetisation',
+};
+
+const maxBirads = (...values: Array<number | undefined>) => {
+  const nums = values.filter((v): v is number => v !== undefined && v !== null);
+  return nums.length ? Math.max(...nums) : undefined;
+};
+
+const SeinPatients: React.FC = () => (
+  <ClinicalPatientsPage<SeinPatient>
+    moduleKey="sein"
+    title="Patientes Sein"
+    subtitle="Gestion clinique des examens mammaires, mammographies, echographies, biopsies et orientations"
+    newButtonLabel="Nouvelle Patiente Sein"
+    modalNewTitle="Nouveau Depistage Sein"
+    modalEditTitle="Modifier dossier sein"
+    icon="female"
+    form={SeinFormWizard}
+    service={seinService}
+    noun={{ singular: 'patiente', plural: 'patientes', newStatus: 'NOUVELLE', screenedStatus: 'DEPISTEE' }}
+    palette={{
+      primary: '#be185d',
+      primaryHover: '#9d174d',
+      primarySoft: '#fff5f7',
+      primaryBorder: 'rgba(190, 24, 93, 0.18)',
+      title: '#831843',
+      accent: '#6d28d9',
+      accentSoft: '#f3e8ff',
+      warning: '#9a4523',
+      warningSoft: '#ffdbcf',
+      cardShadow: '0 14px 28px rgba(190,24,93,0.18)',
+    }}
+    getCardMetrics={(patient) => {
+      const highestBirads = maxBirads(
+        patient.dep_mammo_birads_droit,
+        patient.dep_mammo_birads_gauche,
+        patient.dep_echo_birads_droit,
+        patient.dep_echo_birads_gauche
+      );
+      return [
+        { label: 'Age', value: patient.age ? `${patient.age} ans` : '-', tone: 'neutral' },
+        { label: 'Region', value: patient.region_name || '-', tone: 'primary' },
+        {
+          label: 'BIRADS max',
+          value: biradsLabel(highestBirads),
+          tone: highestBirads && highestBirads >= 4 ? 'warning' : 'accent',
+        },
+        {
+          label: 'Resultat',
+          value: patient.resultat_display || mapValue(patient.res_resultat_global, resultGlobal),
+          tone: [3, 4, 5].includes(Number(patient.res_resultat_global)) ? 'warning' : 'primary',
+        },
+      ];
+    }}
+    getIdentityItems={(patient) => [
+      { label: 'Profession', value: mapValue(patient.soc_profession, profession) },
+      { label: 'Instruction', value: mapValue(patient.soc_niveau_instruction, instruction) },
+    ]}
+    getMedicalSummary={(patient) => ({
+      title: 'Dernier bilan sein',
+      rows: [
+        { label: 'Date examen clinique', value: fmtDate(patient.exam_date) },
+        { label: 'Masse a l examen', value: yesNo(patient.exam_masse_palpee) },
+        { label: 'Ganglion axillaire', value: yesNo(patient.exam_ganglion_axillaire) },
+        { label: 'Mammographie', value: yesNo(patient.dep_mammo_realisee) },
+        { label: 'BIRADS mammo droit', value: biradsLabel(patient.dep_mammo_birads_droit) },
+        { label: 'BIRADS mammo gauche', value: biradsLabel(patient.dep_mammo_birads_gauche) },
+        { label: 'Echographie', value: yesNo(patient.dep_echo_realisee) },
+        { label: 'BIRADS echo droit', value: biradsLabel(patient.dep_echo_birads_droit) },
+        { label: 'BIRADS echo gauche', value: biradsLabel(patient.dep_echo_birads_gauche) },
+        { label: 'Biopsie', value: yesNo(patient.dep_biopsie_realisee) },
+        { label: 'Resultat global', value: patient.resultat_display || mapValue(patient.res_resultat_global, resultGlobal) },
+        { label: 'Prochain RDV', value: fmtDate(patient.next_appointment_date || patient.res_rdv_suivi) },
+      ],
+      resultTone: [3, 4, 5].includes(Number(patient.res_resultat_global)) ? 'warning' : 'primary',
+    })}
+    getRiskItems={(patient) => [
+      { label: 'ATCD personnel', value: yesNo(patient.ris_atcd_perso_sein) },
+      { label: 'ATCD familial sein', value: yesNo(patient.ris_atcd_fam_sein) },
+      { label: 'Lien familial', value: patient.ris_atcd_fam_sein_lien || '-' },
+      { label: 'ATCD ovaire', value: yesNo(patient.ris_atcd_fam_ovaire) },
+      { label: 'BRCA', value: yesNo(patient.ris_mutation_brca) },
+      { label: 'Menopause', value: mapValue(patient.ris_menopause, menopause) },
+      { label: 'Statut VIH', value: mapValue(patient.ris_vih_statut, vih) },
+      { label: 'Reference', value: yesNo(patient.res_reference) },
+    ]}
+  />
+);
+
 export default SeinPatients;
