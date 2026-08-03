@@ -102,6 +102,15 @@ class PatientService {
     }
   }
 
+  async generateDocumentBlob(recordId: number, docType: 'anapath' | 'fcv' | 'hpv' | 'colposcopie' | 'reference'): Promise<Blob> {
+    try {
+      const response = await api.get(`/patients/patients/${recordId}/generate_document/?type=${docType}`, { responseType: 'blob' });
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
   // ================= FOLLOW UPS =================
   async getFollowUps(filters?: { patient?: string | number }, page = 1): Promise<PaginatedResponse<PatientFollowUp>> {
     try {
@@ -245,6 +254,25 @@ class PatientService {
     try {
       const response = await api.post('/patients/patients/ai-summary/', patientData);
       return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  // ================= GÉNÉRATION DE DOCUMENTS MÉDICAUX =================
+
+  /**
+   * Génère l'une des 5 fiches officielles MSAS sous forme de Blob PDF.
+   * @param recordId  — record_id de la patiente
+   * @param docType   — 'anapath' | 'fcv' | 'hpv' | 'colposcopie' | 'reference'
+   */
+  async generateDocumentBlob(recordId: number, docType: string): Promise<Blob> {
+    try {
+      const response = await api.get(
+        `/patients/patients/${recordId}/generate-document/${docType}/`,
+        { responseType: 'blob' }
+      );
+      return response.data as Blob;
     } catch (error) {
       throw new Error(handleApiError(error));
     }

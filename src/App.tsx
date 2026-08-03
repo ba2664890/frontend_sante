@@ -23,6 +23,9 @@ import HomePage from './pages/HomePage.tsx';
 import PatientDashboard from './pages/dashboards/PatientDashboard.tsx';
 import MedicalRecords from './pages/patient/MedicalRecords.tsx';
 import PatientAppointments from './pages/patient/Appointments.tsx';
+import ProstatePatients from './pages/ProstatePatients.tsx';
+import SeinPatients from './pages/SeinPatients.tsx';
+
 console.log('Public route - /login')
 const App: React.FC = () => (
   <ThemeProvider>
@@ -48,6 +51,8 @@ const App: React.FC = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/reports" element={<ReportsPage />} />
             <Route path="/patients" element={<Patients />} />
+            <Route path="/prostate" element={<ProstatePatients />} />
+            <Route path="/sein" element={<SeinPatients />} />
             <Route path="/accueil" element={<Campaigns />} />
             <Route path="/appointments/:id" element={<Appointments />} />
             <Route path="/admin" element={<AdminRedirect />} />

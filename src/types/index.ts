@@ -433,3 +433,253 @@ export interface NotificationFilters {
   priority?: string;
   region?: string;
 }
+
+// ============================================================
+// Prostate Patient Interface
+// ============================================================
+export interface ProstatePatient {
+  record_id: number;
+  id_patient: number;
+  prenom: string;
+  nom: string;
+  full_name?: string;
+  date_naiss?: string;
+  age: number;
+  pat_age_estime?: boolean;
+  num_phone?: string;
+  pat_telephone_proche?: string;
+  pat_adresse?: string;
+  pat_nin?: string;
+
+  geo_region?: number;
+  geo_district?: string;
+  geo_structure?: string;
+  geo_type_structure?: number;
+  region_name?: string;
+
+  meta_agent_qualif?: number;
+  meta_agent_qualif_autre?: string;
+  meta_version_fiche?: string;
+
+  soc_profession?: number;
+  soc_profession_autre?: string;
+  soc_niveau_instruction?: number;
+  soc_statut_matrimonial?: number;
+  soc_mode_entree?: number;
+
+  ris_atcd_fam_prostate?: number;
+  ris_atcd_fam_prostate_lien?: string;
+  ris_atcd_perso_prostate?: number;
+  ris_atcd_perso_detail?: string;
+  ris_atcd_chir_urologique?: number;
+  ris_atcd_chir_detail?: string;
+  ris_vih_statut?: number;
+  ris_diabete?: number;
+  ris_hta?: number;
+  ris_tabagisme?: number;
+  ris_consommation_alcool?: number;
+  ris_psa_anterieur?: number;
+  ris_psa_anterieur_valeur?: number;
+  ris_psa_anterieur_date?: string;
+  ris_tr_anterieur?: number;
+  ris_tr_anterieur_resultat?: number;
+
+  sym_pollakiurie?: number;
+  sym_nycturie?: number;
+  sym_nycturie_nb?: number;
+  sym_urgence_mictionnelle?: number;
+  sym_jet_faible?: number;
+  sym_dysurie?: number;
+  sym_retention_urine?: number;
+  sym_hematurie?: number;
+  sym_hemospermie?: number;
+  sym_douleur_pelvienne?: number;
+  sym_douleur_osseuse?: number;
+  sym_score_ipss?: number;
+
+  dep_date?: string;
+  dep_tr_realise?: boolean;
+  dep_tr_resultat?: number;
+  dep_tr_volume_estime?: string;
+  dep_tr_note?: string;
+  dep_psa_realise?: boolean;
+  dep_psa_valeur?: number;
+  dep_psa_libre_valeur?: number;
+  dep_psa_rapport_libre_total?: number;
+  dep_psa_date?: string;
+  dep_psa_interpretation?: number;
+  dep_echo_realisee?: boolean;
+  dep_echo_resultat?: number;
+  dep_echo_volume?: number;
+  dep_biopsie_indiquee?: boolean;
+  dep_biopsie_realisee?: boolean;
+  dep_biopsie_resultat?: number;
+  dep_biopsie_gleason?: string;
+  dep_biopsie_nb_carottes?: number;
+  dep_biopsie_nb_positives?: number;
+
+  res_resultat_global?: number;
+  resultat_display?: string;
+  res_reference?: boolean;
+  res_reference_structure?: string;
+  res_reference_motif?: string;
+  res_stade_tnm?: string;
+  res_traitement_propose?: number;
+  res_traitement_note?: string;
+  res_rdv_suivi?: string;
+
+  con_depistage?: boolean;
+  con_depistage_date?: string;
+  con_traitement?: boolean;
+  con_donnees_anonymisees?: boolean;
+  con_rappels_sms?: boolean;
+  con_signature_presente?: boolean;
+
+  ai_synthese?: string;
+  ai_synthese_date?: string;
+  status: string;
+  next_appointment_date?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// ============================================================
+// Sein Patient Interface
+// ============================================================
+export interface SeinPatient {
+  record_id: number;
+  id_patient: number;
+  prenom: string;
+  nom: string;
+  full_name?: string;
+  date_naiss?: string;
+  age: number;
+  pat_age_estime?: boolean;
+  num_phone?: string;
+  pat_telephone_proche?: string;
+  pat_adresse?: string;
+  pat_nin?: string;
+
+  geo_region?: number;
+  geo_district?: string;
+  geo_structure?: string;
+  geo_type_structure?: number;
+  region_name?: string;
+
+  meta_agent_qualif?: number;
+  meta_agent_qualif_autre?: string;
+  meta_version_fiche?: string;
+
+  soc_profession?: number;
+  soc_profession_autre?: string;
+  soc_niveau_instruction?: number;
+  soc_statut_matrimonial?: number;
+  soc_mode_entree?: number;
+
+  ris_atcd_perso_sein?: number;
+  ris_atcd_perso_sein_annee?: number;
+  ris_atcd_lesion_benigne?: number;
+  ris_atcd_fam_sein?: number;
+  ris_atcd_fam_sein_lien?: string;
+  ris_atcd_fam_ovaire?: number;
+  ris_mutation_brca?: number;
+  ris_menopause?: number;
+  ris_age_menopause?: number;
+  ris_age_menarche?: number;
+  ris_age_premiere_grossesse?: number;
+  ris_nullipare?: boolean;
+  ris_nb_enfants?: number;
+  ris_allaitement?: number;
+  ris_allaitement_duree_mois?: number;
+  ris_contraception?: number;
+  ris_contraception_duree_ans?: number;
+  ris_thm?: number;
+  ris_thm_duree_ans?: number;
+  ris_obesite?: number;
+  ris_imc?: number;
+  ris_activite_physique?: number;
+  ris_consommation_alcool?: number;
+  ris_vih_statut?: number;
+  ris_irradiation_thoracique?: number;
+  ris_mammographie_anterieure?: number;
+  ris_mammographie_anterieure_annee?: number;
+  ris_mammographie_anterieure_birads?: number;
+  ris_auto_examen_pratique?: number;
+
+  sym_masse_palpable?: number;
+  sym_masse_sein?: string;
+  sym_ecoulement_mamelonnaire?: number;
+  sym_ecoulement_type?: string;
+  sym_douleur_sein?: number;
+  sym_retraction_mamelon?: number;
+  sym_modification_peau?: number;
+  sym_adenopathie_axillaire?: number;
+  sym_duree_symptomes_mois?: number;
+
+  exam_date?: string;
+  exam_inspection_droit?: number;
+  exam_inspection_gauche?: number;
+  exam_mamelon_droit?: string;
+  exam_mamelon_gauche?: string;
+  exam_masse_palpee?: boolean;
+  exam_masse_sein?: string;
+  exam_masse_quadrant?: string;
+  exam_masse_taille_cm?: number;
+  exam_masse_consistance?: number;
+  exam_masse_contours?: string;
+  exam_masse_mobile?: boolean;
+  exam_ganglion_axillaire?: boolean;
+  exam_ganglion_axillaire_sein?: string;
+  exam_ganglion_sus_claviculaire?: boolean;
+  exam_note?: string;
+
+  dep_mammo_realisee?: boolean;
+  dep_mammo_date?: string;
+  dep_mammo_birads_droit?: number;
+  dep_mammo_birads_gauche?: number;
+  dep_mammo_densite?: number;
+  dep_mammo_anomalie?: boolean;
+  dep_mammo_anomalie_detail?: string;
+  dep_echo_realisee?: boolean;
+  dep_echo_date?: string;
+  dep_echo_birads_droit?: number;
+  dep_echo_birads_gauche?: number;
+  dep_echo_masse?: boolean;
+  dep_echo_masse_taille_cm?: number;
+  dep_echo_note?: string;
+  dep_cytoponction_realisee?: boolean;
+  dep_biopsie_realisee?: boolean;
+  dep_biopsie_type?: number;
+  dep_anapath_resultat?: number;
+  dep_anapath_recepteurs?: string;
+  dep_anapath_ki67?: number;
+
+  res_resultat_global?: number;
+  resultat_display?: string;
+  res_reference?: boolean;
+  res_reference_structure?: string;
+  res_reference_motif?: string;
+  res_stade_tnm?: string;
+  res_stade_clinical?: string;
+  res_traitement_propose?: number;
+  res_traitement_note?: string;
+  res_rdv_suivi?: string;
+  res_rdv_1mois?: string;
+  res_rdv_3mois?: string;
+  res_rdv_6mois?: string;
+  res_rdv_1an?: string;
+
+  con_depistage?: boolean;
+  con_depistage_date?: string;
+  con_traitement?: boolean;
+  con_donnees_anonymisees?: boolean;
+  con_rappels_sms?: boolean;
+  con_signature_presente?: boolean;
+
+  ai_synthese?: string;
+  ai_synthese_date?: string;
+  status: string;
+  next_appointment_date?: string;
+  created_at: string;
+  updated_at: string;
+}

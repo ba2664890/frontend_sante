@@ -7,6 +7,7 @@ import LoadingSpinner from '../components/LoadingSpinner.tsx';
 import Modal from '../components/Modal.tsx';
 import PatientForm from '../components/PatientForm.tsx';
 import FollowUpForm from '../components/FollowUpForm.tsx';
+import MedicalDocumentsModal from '../components/MedicalDocumentsModal.tsx';
 import { toast } from 'react-hot-toast';
 import { ClinicalAiSummary } from './Patients.tsx';
 
@@ -15,6 +16,7 @@ const PatientDetail: React.FC = () => {
   const navigate = useNavigate();
   const [showEditForm, setShowEditForm] = useState(false);
   const [showFollowUpForm, setShowFollowUpForm] = useState(false);
+  const [showDocModal, setShowDocModal] = useState(false);
   const [activeStep, setActiveStep] = useState(2); // Étape "Résumé IA" par défaut
   
   const recordId = Number(id);
@@ -202,7 +204,14 @@ const PatientDetail: React.FC = () => {
               )}
             </div>
 
-            <div className="mt-10 pt-8 border-t border-[#bec9c9]/10 flex justify-end gap-4 relative z-10">
+            <div className="mt-10 pt-8 border-t border-[#bec9c9]/10 flex flex-wrap justify-end gap-4 relative z-10">
+              <button 
+                onClick={() => setShowDocModal(true)} 
+                className="px-6 py-3 rounded-xl bg-[#dcf1fb] text-[#006669] font-bold border border-[#006669]/20 hover:bg-[#006669] hover:text-white transition-all flex items-center gap-2"
+              >
+                <span className="material-symbols-outlined text-[20px]">description</span>
+                Fiches & Bulletins Médicaux (5)
+              </button>
               <button onClick={() => setShowEditForm(true)} className="px-6 py-3 rounded-xl border border-[#bec9c9] text-[#3e4949] font-bold hover:bg-[#f2fbff] transition-all">
                 Modifier dossier
               </button>
@@ -458,6 +467,12 @@ const PatientDetail: React.FC = () => {
       <Modal isOpen={showFollowUpForm} onClose={() => setShowFollowUpForm(false)} title="Programmer un rendez-vous de suivi">
         <FollowUpForm patientId={patient.record_id} onSubmit={handleFollowUpCreated} onCancel={() => setShowFollowUpForm(false)} />
       </Modal>
+
+      <MedicalDocumentsModal 
+        patient={patient} 
+        isOpen={showDocModal} 
+        onClose={() => setShowDocModal(false)} 
+      />
     </div>
   );
 };
