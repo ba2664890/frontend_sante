@@ -19,6 +19,7 @@ const SeinPatients: React.FC = () => {
   );
 
   const patients = data?.results || [];
+  const totalPages = Math.ceil((data?.count || 0) / 20);
 
   const getStatusBadge = (status: string) => {
     switch (status?.toLowerCase()) {
@@ -115,6 +116,28 @@ const SeinPatients: React.FC = () => {
               </div>
             ))}
           </div>
+
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-4 py-4">
+              <button
+                disabled={currentPage <= 1}
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                className="px-4 py-2 bg-white border border-pink-200 rounded-xl text-xs font-bold disabled:opacity-50"
+              >
+                Précédent
+              </button>
+              <span className="text-xs font-bold text-[#831843]">
+                Page {currentPage} sur {totalPages}
+              </span>
+              <button
+                disabled={currentPage >= totalPages}
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                className="px-4 py-2 bg-white border border-pink-200 rounded-xl text-xs font-bold disabled:opacity-50"
+              >
+                Suivant
+              </button>
+            </div>
+          )}
         </div>
       )}
 

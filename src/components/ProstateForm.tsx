@@ -12,14 +12,6 @@ const GEO_REGIONS = [
   opt(9, 'Matam'), opt(10, 'Saint-Louis'), opt(11, 'Sédhiou'),
   opt(12, 'Tambacounda'), opt(13, 'Thiès'), opt(14, 'Ziguinchor'),
 ];
-const GEO_TYPE_STRUCTURE = [
-  opt(1, 'Poste de santé'), opt(2, 'Centre de santé'), opt(3, 'Hôpital de district'),
-  opt(4, 'EPS niveau 2'), opt(5, 'EPS niveau 3'), opt(6, 'Caravane mobile'),
-];
-const META_QUALIF = [
-  opt(1, 'Médecin généraliste'), opt(2, 'Urologue'), opt(3, 'Infirmier(ère)'),
-  opt(4, 'Sage-femme'), opt(5, 'Autre'),
-];
 const SOC_PROF = [
   opt(1, 'Salarié'), opt(2, 'Commerçant'), opt(3, 'Cultivateur/Éleveur'),
   opt(4, 'Pêcheur'), opt(5, 'Retraité'), opt(6, 'Sans emploi'), opt(7, 'Autre (préciser)'),
@@ -31,11 +23,6 @@ const SOC_INSTRUCTION = [
 const SOC_STATUT_MATRIM = [
   opt(1, 'Célibataire'), opt(2, 'Marié monogame'), opt(3, 'Marié polygame'),
   opt(4, 'Veuf'), opt(5, 'Divorcé/Séparé'),
-];
-const SOC_MODE_ENTREE = [
-  opt(1, 'Venue spontanée'), opt(2, 'Mobilisation communautaire'),
-  opt(3, 'Orientation par agent de santé'), opt(4, 'Référence inter-structure'),
-  opt(5, 'Caravane'),
 ];
 
 const OUI_NON = [opt(1, 'Oui'), opt(0, 'Non'), opt(9, 'Ne sait pas')];
@@ -82,7 +69,7 @@ export const ProstateFormWizard: React.FC<ProstateFormWizardProps> = ({ patient,
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<Partial<ProstatePatient>>({
+  const { register, handleSubmit } = useForm<Partial<ProstatePatient>>({
     defaultValues: patient || {
       id_patient: Math.floor(1000000 + Math.random() * 9000000),
       age: 50,

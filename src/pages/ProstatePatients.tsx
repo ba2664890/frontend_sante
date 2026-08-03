@@ -5,7 +5,6 @@ import { ProstatePatient } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner.tsx';
 import ProstateFormWizard from '../components/ProstateForm.tsx';
 import Modal from '../components/Modal.tsx';
-import { toast } from 'react-hot-toast';
 
 const ProstatePatients: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
@@ -117,6 +116,28 @@ const ProstatePatients: React.FC = () => {
               </div>
             ))}
           </div>
+
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-4 py-4">
+              <button
+                disabled={currentPage <= 1}
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                className="px-4 py-2 bg-white border border-[#bec9c9]/30 rounded-xl text-xs font-bold disabled:opacity-50"
+              >
+                Précédent
+              </button>
+              <span className="text-xs font-bold text-[#3e4949]">
+                Page {currentPage} sur {totalPages}
+              </span>
+              <button
+                disabled={currentPage >= totalPages}
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                className="px-4 py-2 bg-white border border-[#bec9c9]/30 rounded-xl text-xs font-bold disabled:opacity-50"
+              >
+                Suivant
+              </button>
+            </div>
+          )}
         </div>
       )}
 
