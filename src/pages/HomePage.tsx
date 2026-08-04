@@ -283,10 +283,10 @@ const HomePage: React.FC = () => {
             <div className="lg:col-span-7 space-y-7">
 
               <h1 className="font-display text-[2.75rem] sm:text-6xl lg:text-[4.2rem] font-semibold leading-[1.03] tracking-tight">
-                Chaque campagne
+                Chaque région compte.
                 <br />
-                <span className="italic font-normal">a un pouls.</span>{' '}
-                <span className="text-[#04696C]">Suivez-le.</span>
+                <span className="italic font-normal">Chaque vie</span>{' '}
+                <span className="text-[#04696C]">aussi.</span>
               </h1>
 
               <p className="text-lg text-[#3E4949] leading-relaxed max-w-xl">
