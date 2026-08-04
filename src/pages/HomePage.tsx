@@ -281,10 +281,6 @@ const HomePage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-7 space-y-7">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[#DCE4DE] text-[#04696C] text-[11px] font-semibold uppercase tracking-[0.12em] font-mono">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#E5484D] vital-blip"></span>
-                Plateforme nationale · en ligne
-              </div>
 
               <h1 className="font-display text-[2.75rem] sm:text-6xl lg:text-[4.2rem] font-semibold leading-[1.03] tracking-tight">
                 Chaque campagne
