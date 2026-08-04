@@ -149,6 +149,46 @@ class ScreeningService {
       throw new Error(handleApiError(error));
     }
   }
+
+  // ================= CAMPAIGN REQUESTS (B2B) =================
+  async createCampaignRequest(requestData: any): Promise<any> {
+    try {
+      const response = await api.post('/screening/campaign-requests/', requestData);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async getCampaignRequests(filters?: any, page = 1): Promise<PaginatedResponse<any>> {
+    try {
+      const queryParams = { ...filters, page };
+      const queryString = buildQueryString(queryParams);
+      const response = await api.get(`/screening/campaign-requests/${queryString ? `?${queryString}` : ''}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async approveCampaignRequest(id: number, responseNotes?: string): Promise<any> {
+    try {
+      const response = await api.post(`/screening/campaign-requests/${id}/approve/`, { response_notes: responseNotes });
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  async rejectCampaignRequest(id: number, responseNotes?: string): Promise<any> {
+    try {
+      const response = await api.post(`/screening/campaign-requests/${id}/reject/`, { response_notes: responseNotes });
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
 }
 
 export default new ScreeningService();
+

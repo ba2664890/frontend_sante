@@ -23,6 +23,7 @@ const Sidebar: React.FC = () => {
         { name: 'Statistiques', href: '/statistics', icon: 'analytics' },
         { name: 'Notifications', href: '/notifications', icon: 'notifications' },
         { name: 'Campagnes', href: '/accueil', icon: 'campaign' },
+        { name: 'Demandes B2B', href: '/campaign-requests', icon: 'mark_email_unread' },
         { name: 'Centres de Santé', href: '/centers', icon: 'local_hospital' },
         { name: 'Rapports', href: '/reports', icon: 'summarize' },
         { name: 'Assistant Njariñu', href: '/agent/chatbot', icon: 'robot_2' },

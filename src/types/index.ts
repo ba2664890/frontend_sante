@@ -729,3 +729,35 @@ export interface SeinPatient {
   created_at: string;
   updated_at: string;
 }
+
+// ============================================================
+// Demande de campagne de dépistage (B2B / Partenaires)
+// ============================================================
+export interface CampaignRequest {
+  id?: number;
+  org_name: string;
+  org_type: 'association' | 'ong' | 'health_center' | 'state' | 'other';
+  org_type_display?: string;
+  contact_name: string;
+  contact_email: string;
+  contact_phone: string;
+  preferred_start_date?: string;
+  preferred_end_date?: string;
+  health_center_name?: string;
+  region?: number;
+  region_display?: string;
+  district?: string;
+  expected_patients?: number;
+  covers_col: boolean;
+  covers_sein: boolean;
+  covers_prostate: boolean;
+  notes?: string;
+  status?: 'pending' | 'reviewing' | 'approved' | 'rejected';
+  status_display?: string;
+  created_campaign?: number;
+  response_notes?: string;
+  reviewed_by?: User;
+  created_at?: string;
+  updated_at?: string;
+}
+

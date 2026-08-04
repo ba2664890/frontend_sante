@@ -1,319 +1,692 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext.tsx';
+import screeningService from '../services/screeningService.ts';
 
-const fadeInUp = {
-  initial: { opacity: 0, y: 30 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
-};
+const SENEGAL_REGIONS = [
+  { id: 1, name: 'Dakar' },
+  { id: 2, name: 'Diourbel' },
+  { id: 3, name: 'Fatick' },
+  { id: 4, name: 'Kaffrine' },
+  { id: 5, name: 'Kaolack' },
+  { id: 6, name: 'Kédougou' },
+  { id: 7, name: 'Kolda' },
+  { id: 8, name: 'Louga' },
+  { id: 9, name: 'Matam' },
+  { id: 10, name: 'Saint-Louis' },
+  { id: 11, name: 'Sédhiou' },
+  { id: 12, name: 'Tambacounda' },
+  { id: 13, name: 'Thiès' },
+  { id: 14, name: 'Ziguinchor' },
+];
 
-const stagger = { animate: { transition: { staggerChildren: 0.15 } } };
-
-const cancers = [
+const TARGET_AUDIENCES = [
   {
-    id: 'col-uterus',
-    name: 'Col de l\'Utérus',
-    icon: 'female',
-    available: true,
-    color: '#E28B7A',
-    light: '#FDF0ED',
-    gradient: 'from-[#E28B7A] to-[#C46B5A]',
-    badge: 'Disponible',
-    description: 'Dépistage précoce du cancer cervical grâce au test HPV et à la colposcopie assistée par IA.',
-    stat: '10 000+ femmes dépistées',
-    link: '/patients',
+    id: 'association',
+    icon: 'groups_3',
+    title: 'Associations de Femmes',
+    color: '#9013fe',
+    badge: 'Santé Communautaire',
+    description: 'Organisez des dépistages de masse pour vos membres et communautés. Nous fournissons la technologie, les outils de sensibilisation et le suivi.',
   },
   {
-    id: 'sein',
-    name: 'Cancer du Sein',
-    icon: 'female',
-    available: true,
-    color: '#D97BAE',
-    light: '#FBF0F7',
-    gradient: 'from-[#D97BAE] to-[#B55A8A]',
-    badge: 'Disponible',
-    description: 'Mammographie numérique, examen clinique et suivi personnalisé pour la détection précoce du cancer du sein.',
-    stat: 'Dépistage précoce & BIRADS',
-    link: '/sein',
+    id: 'ong',
+    icon: 'public',
+    title: 'ONG & Partenaires',
+    color: '#006669',
+    badge: 'Projets d\'Impact',
+    description: 'Déployez des caravanes mobiles financées avec tableau de bord d\'impact en temps réel, indicateurs OMS et traçabilité complète des soins.',
   },
   {
-    id: 'prostate',
-    name: 'Cancer de la Prostate',
-    icon: 'male',
-    available: true,
-    color: '#5B8FD4',
-    light: '#EDF3FB',
-    gradient: 'from-[#5B8FD4] to-[#3A6AAE]',
-    badge: 'Disponible',
-    description: 'Dosage du PSA, score IPSS et toucher rectal pour le dépistage ciblé du cancer de la prostate.',
-    stat: 'Dosage PSA & Score IPSS',
-    link: '/prostate',
+    id: 'health_center',
+    icon: 'local_hospital',
+    title: 'Centres de Santé & Hôpitaux',
+    color: '#2a7f82',
+    badge: 'Digitalisation Clés en Main',
+    description: 'Équipez vos prestataires d\'une solution multi-cancer (Col, Sein, Prostate) avec assistance IA et gestion centralisée des dossiers.',
+  },
+  {
+    id: 'state',
+    icon: 'account_balance',
+    title: 'Structures de l\'État (MSAS)',
+    color: '#091e25',
+    badge: 'Stratégie Nationale',
+    description: 'Supervisez la couverture régionale, surveillez les objectifs OMS 90-70-90 et cartographiez les cas sur l\'ensemble du territoire national.',
   },
 ];
 
-const steps = [
-  { icon: 'calendar_month', title: 'Prendre Rendez-vous', text: 'Planifiez votre dépistage en quelques clics auprès de nos centres certifiés.' },
-  { icon: 'biotech', title: 'Dépistage Précis', text: 'Analyses haute précision réalisées par des professionnels formés aux dernières technologies.' },
-  { icon: 'monitor_heart', title: 'Suivi & Accompagnement', text: 'Résultats confidentiels et parcours de soins personnalisé avec nos équipes.' },
-];
-
-const stats = [
-  { value: '1 200+', label: 'Patients dépistés' },
-  { value: '3', label: 'Cancers ciblés' },
-  { value: '14', label: 'Centres partenaires' },
-  { value: '98%', label: 'Satisfaction patients' },
+const CANCERS = [
+  { id: 'col', name: 'Cancer du Col de l\'Utérus', color: '#9013fe', icon: 'female', desc: 'Test HPV, IVA/IVL et IA prédictive' },
+  { id: 'sein', name: 'Cancer du Sein', color: '#e02020', icon: 'female', desc: 'Examen clinique, Mammographie & BIRADS' },
+  { id: 'prostate', name: 'Cancer de la Prostate', color: '#006669', icon: 'male', desc: 'Toucher rectal, Dosage PSA & Score IPSS' },
 ];
 
 const HomePage: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+
+  // Form state
+  const [formData, setFormData] = useState({
+    org_name: '',
+    org_type: 'association',
+    contact_name: '',
+    contact_email: '',
+    contact_phone: '',
+    region: '1',
+    district: '',
+    health_center_name: '',
+    preferred_start_date: '',
+    preferred_end_date: '',
+    expected_patients: '',
+    covers_col: true,
+    covers_sein: false,
+    covers_prostate: false,
+    notes: '',
+  });
+
+  const [submitting, setSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setErrorMessage('');
+
+    try {
+      await screeningService.createCampaignRequest({
+        ...formData,
+        region: Number(formData.region),
+        expected_patients: formData.expected_patients ? Number(formData.expected_patients) : null,
+        preferred_start_date: formData.preferred_start_date || null,
+        preferred_end_date: formData.preferred_end_date || null,
+      });
+
+      setSubmitSuccess(true);
+      setFormData({
+        org_name: '',
+        org_type: 'association',
+        contact_name: '',
+        contact_email: '',
+        contact_phone: '',
+        region: '1',
+        district: '',
+        health_center_name: '',
+        preferred_start_date: '',
+        preferred_end_date: '',
+        expected_patients: '',
+        covers_col: true,
+        covers_sein: false,
+        covers_prostate: false,
+        notes: '',
+      });
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Une erreur est survenue lors de l\'envoi de votre demande.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const scrollToForm = () => {
+    document.getElementById('demande-campagne')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
-    <div style={{ fontFamily: "'Nunito', sans-serif", minHeight: '100vh', background: '#F8F9FB', color: '#1A2340' }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&family=Sora:wght@400;600;700;800&display=swap');
-        .headline { font-family: 'Sora', sans-serif; }
-        .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.9); }
-        .card-hover { transition: all 0.4s cubic-bezier(0.16,1,0.3,1); }
-        .card-hover:hover { transform: translateY(-8px); box-shadow: 0 24px 60px rgba(0,0,0,0.10); }
-        .badge-available { background: linear-gradient(135deg,#22c55e20,#16a34a15); color: #15803d; border: 1px solid #22c55e40; }
-        .badge-soon { background: linear-gradient(135deg,#f59e0b20,#d9770615); color: #b45309; border: 1px solid #f59e0b40; }
-        .hero-bg { background: linear-gradient(135deg, #0F1C3F 0%, #1A2F6B 50%, #0F1C3F 100%); }
-      `}</style>
-
-      {/* NAV */}
-      <header style={{ position: 'fixed', top: 0, width: '100%', zIndex: 50, background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
-        <nav style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px', height: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link
-            to="/"
-            style={{
-              textDecoration: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12
-            }}
-          >
-            <img
-              src="/logo.jpeg"
-              alt="DEPISTEEL"
-              style={{
-                height: 50,
-                width: 'auto',
-                objectFit: 'contain'
-              }}
-            />
-          </Link>
-          <div style={{ display: 'flex', gap: 32, alignItems: 'center' }}>
-            <a href="#cancers" style={{ color: '#4A5568', fontWeight: 600, textDecoration: 'none', fontSize: 15 }}>Nos Programmes</a>
-            <a href="#how" style={{ color: '#4A5568', fontWeight: 600, textDecoration: 'none', fontSize: 15 }}>Comment ça marche</a>
-            <a href="#stats" style={{ color: '#4A5568', fontWeight: 600, textDecoration: 'none', fontSize: 15 }}>Impact</a>
+    <div className="min-h-screen bg-[#f8fcfd] text-[#091e25] font-sans">
+      {/* ── HEADER ───────────────────────────────────────────────────────────── */}
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-[#bec9c9]/20 shadow-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#006669] to-[#2a7f82] flex items-center justify-center text-white font-bold text-xl shadow-md">
+              D
+            </div>
+            <div>
+              <span className="text-2xl font-black text-[#091e25] tracking-tight">DEPISTEEL</span>
+              <span className="block text-[10px] uppercase font-bold text-[#006669] tracking-wider">Santé & Prévention Multi-Cancer</span>
+            </div>
           </div>
 
-          <div style={{ display: 'flex', gap: 12 }}>
+          <nav className="hidden md:flex items-center space-x-8 text-sm font-semibold text-[#3e4949]">
+            <a href="#services" className="hover:text-[#006669] transition-colors">Nos Services</a>
+            <a href="#cancers" className="hover:text-[#006669] transition-colors">Cancers Couverts</a>
+            <a href="#fonctionnement" className="hover:text-[#006669] transition-colors">Comment ça marche</a>
+            <button onClick={scrollToForm} className="hover:text-[#006669] transition-colors font-bold">Organiser une Campagne</button>
+          </nav>
+
+          <div className="flex items-center space-x-4">
             {user ? (
-              <Link to={user.role === 'patient' ? '/acceuil_patient' : '/dashboard'}
-                style={{ background: 'linear-gradient(135deg,#1A2F6B,#3B5BDB)', color: '#fff', padding: '10px 24px', borderRadius: 100, fontWeight: 700, textDecoration: 'none', fontSize: 14 }}>
-                Mon Espace
-              </Link>
+              <button
+                onClick={() => navigate(user.role === 'global_admin' || user.role === 'admin' ? '/admin/dashboard' : '/agent/dashboard')}
+                className="bg-[#006669] text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md hover:bg-[#2a7f82] transition-all flex items-center gap-2"
+              >
+                <span className="material-symbols-outlined text-sm">dashboard</span>
+                Mon Espace ({user.first_name || user.username})
+              </button>
             ) : (
               <>
-                <Link to="/login" style={{ color: '#1A2340', border: '1.5px solid #CBD5E0', padding: '9px 20px', borderRadius: 100, fontWeight: 700, textDecoration: 'none', fontSize: 14 }}>
-                  Connexion
+                <Link
+                  to="/login"
+                  className="text-sm font-bold text-[#006669] hover:text-[#091e25] px-4 py-2 transition-colors"
+                >
+                  Connexion Pro
                 </Link>
-                <Link to="/login" style={{ background: 'linear-gradient(135deg,#1A2F6B,#3B5BDB)', color: '#fff', padding: '10px 24px', borderRadius: 100, fontWeight: 700, textDecoration: 'none', fontSize: 14 }}>
-                  Se dépister
-                </Link>
+                <button
+                  onClick={scrollToForm}
+                  className="bg-gradient-to-r from-[#006669] to-[#2a7f82] text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md hover:shadow-lg transition-all"
+                >
+                  Demander une Campagne
+                </button>
               </>
             )}
           </div>
-        </nav>
+        </div>
       </header>
 
-      <main style={{ paddingTop: 68 }}>
-
-        {/* HERO */}
-        <section className="hero-bg" style={{ minHeight: '88vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', top: '-20%', right: '-10%', width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,91,219,0.3) 0%, transparent 70%)' }} />
-          <div style={{ position: 'absolute', bottom: '-20%', left: '-10%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(226,139,122,0.2) 0%, transparent 70%)' }} />
-
-          <motion.div initial="initial" animate="animate" variants={stagger}
-            style={{ textAlign: 'center', maxWidth: 900, padding: '0 24px', position: 'relative', zIndex: 10 }}>
-
-            <motion.div variants={fadeInUp}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(59,91,219,0.2)', border: '1px solid rgba(59,91,219,0.4)', padding: '6px 18px', borderRadius: 100, marginBottom: 32 }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#4ade80', display: 'inline-block', animation: 'pulse 2s infinite' }} />
-              <span style={{ color: '#93C5FD', fontSize: 12, fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase' }}>Plateforme Nationale de Dépistage</span>
-            </motion.div>
-
-            <motion.h1 variants={fadeInUp} className="headline"
-              style={{ fontSize: 'clamp(44px,7vw,82px)', fontWeight: 800, color: '#fff', lineHeight: 1.1, marginBottom: 24, letterSpacing: '-2px' }}>
-              DEPISTEEL
-              <span style={{ display: 'block', background: 'linear-gradient(135deg, #60A5FA, #E28B7A, #D97BAE)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontSize: '0.75em' }}>
-                FAGARULEEN CI TEEL
-              </span>
-            </motion.h1>
-
-            <motion.p variants={fadeInUp}
-              style={{ fontSize: 20, color: 'rgba(255,255,255,0.7)', maxWidth: 680, margin: '0 auto 48px', lineHeight: 1.7, fontWeight: 300 }}>
-              La première plateforme intégrée de dépistage oncologique au Sénégal. Trois cancers, un seul outil, des milliers de vies sauvées.
-            </motion.p>
-
-            <motion.div variants={fadeInUp} style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link to={user ? (user.role === 'patient' ? '/acceuil_patient' : '/dashboard') : '/login'}
-                style={{ background: 'linear-gradient(135deg,#3B5BDB,#1A2F6B)', color: '#fff', padding: '16px 40px', borderRadius: 100, fontWeight: 800, textDecoration: 'none', fontSize: 17, boxShadow: '0 12px 40px rgba(59,91,219,0.5)' }}>
-                Commencer le dépistage
-              </Link>
-              <a href="#cancers"
-                style={{ background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1.5px solid rgba(255,255,255,0.25)', padding: '16px 40px', borderRadius: 100, fontWeight: 700, textDecoration: 'none', fontSize: 17 }}>
-                Nos programmes →
-              </a>
-            </motion.div>
-          </motion.div>
-        </section>
-
-        {/* STATS */}
-        <section id="stats" style={{ background: '#fff', padding: '60px 24px' }}>
-          <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 32 }}>
-            {stats.map((s, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-                style={{ textAlign: 'center' }}>
-                <div className="headline" style={{ fontSize: 42, fontWeight: 800, color: '#1A2F6B', letterSpacing: '-1px' }}>{s.value}</div>
-                <div style={{ color: '#718096', fontWeight: 600, fontSize: 14, marginTop: 6 }}>{s.label}</div>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-
-        {/* CANCER CARDS */}
-        <section id="cancers" style={{ padding: '100px 24px', background: '#F8F9FB' }}>
-          <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-              style={{ textAlign: 'center', marginBottom: 64 }}>
-              <div style={{ display: 'inline-block', background: '#EEF2FF', color: '#3B5BDB', padding: '6px 18px', borderRadius: 100, fontSize: 13, fontWeight: 700, marginBottom: 20, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                Nos Programmes de Dépistage
+      {/* ── HERO SECTION ─────────────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden pt-16 pb-24 bg-gradient-to-b from-[#eaf6f6]/60 via-[#f8fcfd] to-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid lg:grid-cols-12 gap-12 items-center">
+            <div className="lg:col-span-7 space-y-6">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#dcf1fb] text-[#006669] text-xs font-bold uppercase tracking-wider">
+                <span className="w-2 h-2 rounded-full bg-[#006669] animate-pulse"></span>
+                Plateforme Nationale de Dépistage & Suivi AI
               </div>
-              <h2 className="headline" style={{ fontSize: 46, fontWeight: 800, color: '#1A2340', letterSpacing: '-1px', marginBottom: 16 }}>
-                Trois cancers, une mission
-              </h2>
-              <p style={{ color: '#718096', fontSize: 18, maxWidth: 600, margin: '0 auto', lineHeight: 1.7 }}>
-                DEPISTEEL vous accompagne dans la détection précoce des cancers les plus fréquents au Sénégal.
+
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-[#091e25] leading-tight">
+                Organisez vos Campagnes de Dépistage <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#006669] to-[#9013fe]">Multi-Cancer</span>
+              </h1>
+
+              <p className="text-lg text-[#3e4949] leading-relaxed max-w-2xl">
+                Depisteel met à disposition des <strong>ONG, associations de femmes, structures de l'État et centres de santé</strong> une technologie de pointe pour planifier, exécuter et enrôler les agents de terrain pour les dépistages du <strong>Col de l'utérus, Sein et Prostate</strong>.
               </p>
-            </motion.div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 32 }}>
-              {cancers.map((c, i) => (
-                <motion.div key={c.id} initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }}
-                  className="card-hover"
-                  style={{ background: '#fff', borderRadius: 28, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.06)', position: 'relative' }}>
-
-                  {/* Top colored banner */}
-                  <div style={{ background: `linear-gradient(135deg, ${c.color}22, ${c.color}10)`, padding: '40px 32px 32px', borderBottom: `1px solid ${c.color}20` }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
-                      <div style={{ width: 64, height: 64, borderRadius: 18, background: `linear-gradient(135deg, ${c.color}, ${c.color}CC)`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 8px 24px ${c.color}40` }}>
-                        <span className="material-symbols-outlined" style={{ color: '#fff', fontSize: 32, fontVariationSettings: "'FILL' 1" }}>{c.icon}</span>
-                      </div>
-                      <span className={c.available ? 'badge-available' : 'badge-soon'}
-                        style={{ padding: '5px 14px', borderRadius: 100, fontSize: 12, fontWeight: 700 }}>
-                        {c.badge}
-                      </span>
-                    </div>
-                    <h3 className="headline" style={{ fontSize: 26, fontWeight: 800, color: '#1A2340', marginBottom: 12 }}>{c.name}</h3>
-                    <p style={{ color: '#718096', lineHeight: 1.65, fontSize: 15 }}>{c.description}</p>
-                  </div>
-
-                  <div style={{ padding: '24px 32px 32px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 24 }}>
-                      <span className="material-symbols-outlined" style={{ color: c.color, fontSize: 18 }}>bar_chart</span>
-                      <span style={{ color: '#4A5568', fontWeight: 700, fontSize: 14 }}>{c.stat}</span>
-                    </div>
-
-                    {c.available ? (
-                      <Link to={c.link}
-                        style={{ display: 'block', textAlign: 'center', background: `linear-gradient(135deg, ${c.color}, ${c.color}CC)`, color: '#fff', padding: '14px 24px', borderRadius: 14, fontWeight: 800, textDecoration: 'none', fontSize: 15, boxShadow: `0 8px 24px ${c.color}40` }}>
-                        Accéder au programme →
-                      </Link>
-                    ) : (
-                      <div style={{ textAlign: 'center', background: '#F7F8FA', color: '#A0AEC0', padding: '14px 24px', borderRadius: 14, fontWeight: 700, fontSize: 15, border: '1.5px dashed #E2E8F0' }}>
-                        <span className="material-symbols-outlined" style={{ fontSize: 16, verticalAlign: 'middle', marginRight: 6 }}>schedule</span>
-                        En cours de déploiement
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* HOW IT WORKS */}
-        <section id="how" style={{ background: '#fff', padding: '100px 24px' }}>
-          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-              style={{ textAlign: 'center', marginBottom: 64 }}>
-              <h2 className="headline" style={{ fontSize: 46, fontWeight: 800, color: '#1A2340', letterSpacing: '-1px', marginBottom: 16 }}>Parcours de Soin Simplifié</h2>
-              <p style={{ color: '#718096', fontSize: 18, maxWidth: 500, margin: '0 auto' }}>En 3 étapes, bénéficiez d'un dépistage complet et d'un suivi personnalisé.</p>
-            </motion.div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 32 }}>
-              {steps.map((s, i) => (
-                <motion.div key={i} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }}
-                  className="card-hover"
-                  style={{ background: '#F8F9FB', borderRadius: 24, padding: '40px 32px', border: '1px solid #EDF2F7' }}>
-                  <div style={{ width: 64, height: 64, borderRadius: 18, background: 'linear-gradient(135deg,#EEF2FF,#DBEAFE)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
-                    <span className="material-symbols-outlined" style={{ color: '#3B5BDB', fontSize: 30 }}>{s.icon}</span>
-                  </div>
-                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#1A2F6B', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 14, marginBottom: 16 }}>{i + 1}</div>
-                  <h3 className="headline" style={{ fontSize: 20, fontWeight: 800, color: '#1A2340', marginBottom: 12 }}>{s.title}</h3>
-                  <p style={{ color: '#718096', lineHeight: 1.7, fontSize: 15 }}>{s.text}</p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* CTA */}
-        <section style={{ padding: '100px 24px', background: '#F8F9FB' }}>
-          <div style={{ maxWidth: 900, margin: '0 auto' }}>
-            <motion.div initial={{ opacity: 0, scale: 0.96 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}
-              style={{ background: 'linear-gradient(135deg, #0F1C3F, #1A2F6B)', borderRadius: 40, padding: '80px 60px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: -60, right: -60, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,91,219,0.4), transparent)' }} />
-              <div style={{ position: 'absolute', bottom: -60, left: -60, width: 250, height: 250, borderRadius: '50%', background: 'radial-gradient(circle, rgba(226,139,122,0.3), transparent)' }} />
-              <div style={{ position: 'relative', zIndex: 2 }}>
-                <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 32px' }}>
-                  <span className="material-symbols-outlined" style={{ color: '#fff', fontSize: 40, fontVariationSettings: "'FILL' 1" }}>health_and_safety</span>
-                </div>
-                <h2 className="headline" style={{ fontSize: 'clamp(32px,5vw,54px)', fontWeight: 800, color: '#fff', marginBottom: 20, letterSpacing: '-1px' }}>
-                  Votre santé, notre priorité
-                </h2>
-                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 18, maxWidth: 560, margin: '0 auto 48px', lineHeight: 1.7 }}>
-                  Ne laissez pas la maladie prendre de l'avance. Avec DEPISTEEL, chaque dépistage est un acte de courage qui sauve des vies.
-                </p>
-                <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-                  <Link to="/login" style={{ background: '#fff', color: '#1A2F6B', padding: '16px 40px', borderRadius: 100, fontWeight: 800, textDecoration: 'none', fontSize: 16 }}>
-                    Se dépister maintenant
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4">
+                <button
+                  onClick={scrollToForm}
+                  className="bg-[#006669] hover:bg-[#2a7f82] text-white font-bold px-8 py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-3 text-base"
+                >
+                  <span className="material-symbols-outlined">campaign</span>
+                  Demander une campagne clé en main
+                </button>
+                {user ? (
+                  <Link
+                    to="/admin/dashboard"
+                    className="bg-white text-[#006669] border-2 border-[#006669]/20 hover:border-[#006669] font-bold px-6 py-4 rounded-2xl transition-all text-center text-base"
+                  >
+                    Accéder à mon tableau de bord
                   </Link>
-                  <a href="tel:+221338234567" style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1.5px solid rgba(255,255,255,0.25)', padding: '16px 40px', borderRadius: 100, fontWeight: 700, textDecoration: 'none', fontSize: 16 }}>
-                    Nous appeler
-                  </a>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="bg-white text-[#091e25] border border-[#bec9c9] hover:border-[#006669] font-bold px-6 py-4 rounded-2xl transition-all text-center text-base"
+                  >
+                    Espace Professionnel Santé
+                  </Link>
+                )}
+              </div>
+
+              {/* Trust Badges */}
+              <div className="pt-8 border-t border-[#bec9c9]/20 grid grid-cols-3 gap-6">
+                <div>
+                  <div className="text-2xl font-black text-[#006669]">10 000+</div>
+                  <div className="text-xs text-[#3e4949] font-medium">Patients dépistés</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-black text-[#9013fe]">14 Régions</div>
+                  <div className="text-xs text-[#3e4949] font-medium">Couverture Sénégal</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-black text-[#2a7f82]">OMS 90-70-90</div>
+                  <div className="text-xs text-[#3e4949] font-medium">Conformité sanitaire</div>
                 </div>
               </div>
-            </motion.div>
-          </div>
-        </section>
-      </main>
+            </div>
 
-      {/* FOOTER */}
-      <footer style={{ background: '#0F1C3F', color: 'rgba(255,255,255,0.6)', padding: '60px 24px 40px', textAlign: 'center' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div className="headline" style={{ fontSize: 28, fontWeight: 800, color: '#fff', marginBottom: 8 }}>DEPISTEEL</div>
-          <p style={{ fontSize: 14, marginBottom: 32 }}>Plateforme nationale de dépistage oncologique Sénégal</p>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 32, marginBottom: 32, flexWrap: 'wrap' }}>
-            {['Politique de confidentialité', "Conditions d'utilisation", 'Ministère de la Santé', 'Support'].map(l => (
-              <Link key={l} to="/" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: 600, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{l}</Link>
+            {/* Illustration / Card preview */}
+            <div className="lg:col-span-5 relative">
+              <div className="relative bg-white rounded-3xl p-6 shadow-2xl border border-[#bec9c9]/20 space-y-6">
+                <div className="flex items-center justify-between border-b border-[#f2fbff] pb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-3 h-3 rounded-full bg-[#e02020]"></div>
+                    <div className="w-3 h-3 rounded-full bg-[#795500]"></div>
+                    <div className="w-3 h-3 rounded-full bg-[#006669]"></div>
+                  </div>
+                  <span className="text-xs font-bold text-[#006669] bg-[#dcf1fb] px-3 py-1 rounded-full">
+                    Aperçu Campagne Active
+                  </span>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="bg-[#f8fcfd] p-4 rounded-2xl border border-[#006669]/10">
+                    <div className="flex justify-between text-xs font-bold text-[#3e4949] mb-1">
+                      <span>Campagne Octobre Rose — Thiès</span>
+                      <span className="text-[#006669]">85% réalisé</span>
+                    </div>
+                    <div className="w-full bg-[#bec9c9]/20 h-2.5 rounded-full overflow-hidden">
+                      <div className="bg-gradient-to-r from-[#006669] to-[#9013fe] h-full rounded-full" style={{ width: '85%' }}></div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-3 text-center">
+                    <div className="p-3 bg-[#9013fe]/5 rounded-xl border border-[#9013fe]/10">
+                      <span className="block text-xs text-[#9013fe] font-bold">Col</span>
+                      <span className="text-lg font-bold text-[#091e25]">1 240</span>
+                    </div>
+                    <div className="p-3 bg-[#e02020]/5 rounded-xl border border-[#e02020]/10">
+                      <span className="block text-xs text-[#e02020] font-bold">Sein</span>
+                      <span className="text-lg font-bold text-[#091e25]">980</span>
+                    </div>
+                    <div className="p-3 bg-[#006669]/5 rounded-xl border border-[#006669]/10">
+                      <span className="block text-xs text-[#006669] font-bold">Prostate</span>
+                      <span className="text-lg font-bold text-[#091e25]">450</span>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-[#f2fbff] rounded-2xl flex items-center gap-3">
+                    <span className="material-symbols-outlined text-[#006669]">group_add</span>
+                    <div className="text-xs">
+                      <strong className="block text-[#091e25]">Enrôlement des agents instantané</strong>
+                      <span className="text-[#3e4949]">Invitation par lien & affectation par structure</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── SEGMENTS CIBLES B2B ──────────────────────────────────────────────── */}
+      <section id="services" className="py-20 bg-white border-y border-[#bec9c9]/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+            <span className="text-xs font-bold text-[#006669] uppercase tracking-widest bg-[#dcf1fb] px-3 py-1 rounded-full">
+              Partenaires & Institutions
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black text-[#091e25]">
+              Une solution adaptée à chaque acteur de santé
+            </h2>
+            <p className="text-[#3e4949] text-base">
+              Que vous soyez une association locale ou un ministère, Depisteel adapte son infrastructure pour déployer vos campagnes sur le terrain.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {TARGET_AUDIENCES.map((target) => (
+              <div
+                key={target.id}
+                className="bg-[#f8fcfd] rounded-3xl p-6 border border-[#bec9c9]/20 hover:border-[#006669]/40 hover:shadow-xl transition-all flex flex-col justify-between"
+              >
+                <div className="space-y-4">
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white" style={{ background: target.color }}>
+                    <span className="material-symbols-outlined text-2xl">{target.icon}</span>
+                  </div>
+
+                  <span className="inline-block text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md" style={{ color: target.color, background: `${target.color}15` }}>
+                    {target.badge}
+                  </span>
+
+                  <h3 className="text-xl font-bold text-[#091e25]">{target.title}</h3>
+                  <p className="text-xs text-[#3e4949] leading-relaxed">{target.description}</p>
+                </div>
+
+                <button
+                  onClick={scrollToForm}
+                  className="mt-6 text-xs font-bold flex items-center gap-1 hover:gap-2 transition-all"
+                  style={{ color: target.color }}
+                >
+                  Demander pour ce secteur <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                </button>
+              </div>
             ))}
           </div>
-          <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 28, fontSize: 13 }}>
-            ©  DEPISTEEL Sénégal Cancer du Col de l'Utérus · Cancer du Sein · Cancer de la Prostate
+        </div>
+      </section>
+
+      {/* ── CANCERS COUVERTS ─────────────────────────────────────────────────── */}
+      <section id="cancers" className="py-20 bg-[#f8fcfd]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+            <span className="text-xs font-bold text-[#9013fe] uppercase tracking-widest bg-[#9013fe]/10 px-3 py-1 rounded-full">
+              Dépistage Tri-Cancer
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black text-[#091e25]">
+              Trois modules spécialisés sur une seule plateforme
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {CANCERS.map((c) => (
+              <div key={c.id} className="bg-white rounded-3xl p-8 border-t-4 shadow-sm hover:shadow-md transition-all" style={{ borderTopColor: c.color }}>
+                <div className="w-10 h-10 rounded-xl mb-4 flex items-center justify-center text-white" style={{ background: c.color }}>
+                  <span className="material-symbols-outlined">{c.icon}</span>
+                </div>
+                <h3 className="text-2xl font-bold text-[#091e25] mb-2">{c.name}</h3>
+                <p className="text-sm text-[#3e4949] mb-4">{c.desc}</p>
+                <div className="text-xs font-semibold text-[#006669] bg-[#dcf1fb] inline-block px-3 py-1 rounded-full">
+                  Fiche de collecte conforme MSAS
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── COMMENT ÇA MARCHE ───────────────────────────────────────────────── */}
+      <section id="fonctionnement" className="py-20 bg-white border-t border-[#bec9c9]/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+            <h2 className="text-3xl sm:text-4xl font-black text-[#091e25]">
+              Comment mettre en place votre campagne ?
+            </h2>
+            <p className="text-[#3e4949]">Du premier contact à l'enrôlement des agents de santé sur le terrain.</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 relative">
+            <div className="p-8 bg-[#f8fcfd] rounded-3xl border border-[#bec9c9]/20 relative">
+              <span className="w-10 h-10 rounded-2xl bg-[#006669] text-white font-bold flex items-center justify-center mb-6">1</span>
+              <h3 className="text-xl font-bold text-[#091e25] mb-2">Soumettez votre demande</h3>
+              <p className="text-xs text-[#3e4949]">Remplissez le formulaire ci-dessous avec vos dates, lieu, type de structure et nombre de patients ciblés.</p>
+            </div>
+
+            <div className="p-8 bg-[#f8fcfd] rounded-3xl border border-[#bec9c9]/20 relative">
+              <span className="w-10 h-10 rounded-2xl bg-[#2a7f82] text-white font-bold flex items-center justify-center mb-6">2</span>
+              <h3 className="text-xl font-bold text-[#091e25] mb-2">Validation & Configuration</h3>
+              <p className="text-xs text-[#3e4949]">Notre équipe valide la campagne et configure l'espace dédié à votre organisation.</p>
+            </div>
+
+            <div className="p-8 bg-[#f8fcfd] rounded-3xl border border-[#bec9c9]/20 relative">
+              <span className="w-10 h-10 rounded-2xl bg-[#9013fe] text-white font-bold flex items-center justify-center mb-6">3</span>
+              <h3 className="text-xl font-bold text-[#091e25] mb-2">Enrôlement & Déploiement</h3>
+              <p className="text-xs text-[#3e4949]">Inscrivez vos agents de santé sur la plateforme et commencez la collecte des données sur le terrain.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FORMULAIRE DE DEMANDE DE CAMPAGNE ───────────────────────────────── */}
+      <section id="demande-campagne" className="py-24 bg-gradient-to-b from-[#eaf6f6]/40 to-[#f8fcfd]">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-3xl p-8 sm:p-12 shadow-2xl border border-[#006669]/20">
+            <div className="text-center max-w-2xl mx-auto mb-10 space-y-3">
+              <span className="text-xs font-bold text-[#006669] uppercase tracking-widest bg-[#dcf1fb] px-3 py-1 rounded-full">
+                Formulaire Partenaire
+              </span>
+              <h2 className="text-3xl font-black text-[#091e25]">
+                Demande d'organisation de Campagne
+              </h2>
+              <p className="text-xs sm:text-sm text-[#3e4949]">
+                Transmettez-nous les caractéristiques de votre projet. Notre équipe vous recontactera sous 24h pour finaliser la mise en place.
+              </p>
+            </div>
+
+            {submitSuccess ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-[#dcf1fb] border border-[#006669]/30 p-8 rounded-2xl text-center space-y-4"
+              >
+                <div className="w-16 h-16 bg-[#006669] text-white rounded-full flex items-center justify-center mx-auto text-3xl">
+                  ✓
+                </div>
+                <h3 className="text-2xl font-bold text-[#091e25]">Demande enregistrée avec succès !</h3>
+                <p className="text-sm text-[#3e4949] max-w-md mx-auto">
+                  Merci pour votre engagement. Un responsable de la plateforme Depisteel prendra contact avec vous rapidement à l'adresse <strong>{formData.contact_email}</strong>.
+                </p>
+                <button
+                  onClick={() => setSubmitSuccess(false)}
+                  className="bg-[#006669] text-white font-bold px-6 py-2.5 rounded-xl text-xs hover:bg-[#2a7f82] transition-colors"
+                >
+                  Soumettre une autre demande
+                </button>
+              </motion.div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {errorMessage && (
+                  <div className="p-4 bg-[#e02020]/10 border border-[#e02020]/30 text-[#e02020] rounded-xl text-xs font-bold">
+                    {errorMessage}
+                  </div>
+                )}
+
+                {/* Section 1 : Organisation */}
+                <div className="space-y-4">
+                  <h3 className="text-sm font-bold text-[#006669] uppercase tracking-wider border-b border-[#bec9c9]/20 pb-2">
+                    1. Votre Organisation & Contact
+                  </h3>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-[#3e4949] mb-1">Nom de l'organisation *</label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.org_name}
+                        onChange={(e) => setFormData({ ...formData, org_name: e.target.value })}
+                        placeholder="Ex: Association Siggil Jigeen / ONG Sante"
+                        className="w-full px-4 py-3 rounded-xl border border-[#bec9c9]/50 focus:border-[#006669] focus:outline-hidden text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[#3e4949] mb-1">Type de structure *</label>
+                      <select
+                        value={formData.org_type}
+                        onChange={(e) => setFormData({ ...formData, org_type: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl border border-[#bec9c9]/50 focus:border-[#006669] focus:outline-hidden text-sm bg-white"
+                      >
+                        <option value="association">Association de femmes</option>
+                        <option value="ong">ONG / Organisation non gouvernementale</option>
+                        <option value="health_center">Centre de santé / Hôpital</option>
+                        <option value="state">Structure de l'État / MSAS</option>
+                        <option value="other">Autre organisation</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid sm:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-[#3e4949] mb-1">Nom du contact *</label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.contact_name}
+                        onChange={(e) => setFormData({ ...formData, contact_name: e.target.value })}
+                        placeholder="Prénom & Nom"
+                        className="w-full px-4 py-3 rounded-xl border border-[#bec9c9]/50 focus:border-[#006669] focus:outline-hidden text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[#3e4949] mb-1">Email de contact *</label>
+                      <input
+                        type="email"
+                        required
+                        value={formData.contact_email}
+                        onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })}
+                        placeholder="contact@ong.org"
+                        className="w-full px-4 py-3 rounded-xl border border-[#bec9c9]/50 focus:border-[#006669] focus:outline-hidden text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[#3e4949] mb-1">Téléphone *</label>
+                      <input
+                        type="tel"
+                        required
+                        value={formData.contact_phone}
+                        onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
+                        placeholder="+221 77 000 00 00"
+                        className="w-full px-4 py-3 rounded-xl border border-[#bec9c9]/50 focus:border-[#006669] focus:outline-hidden text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 2 : Détails de la Campagne */}
+                <div className="space-y-4 pt-4">
+                  <h3 className="text-sm font-bold text-[#006669] uppercase tracking-wider border-b border-[#bec9c9]/20 pb-2">
+                    2. Localisation & Dates Souhaitées
+                  </h3>
+                  <div className="grid sm:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-[#3e4949] mb-1">Région principale *</label>
+                      <select
+                        value={formData.region}
+                        onChange={(e) => setFormData({ ...formData, region: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl border border-[#bec9c9]/50 focus:border-[#006669] focus:outline-hidden text-sm bg-white"
+                      >
+                        {SENEGAL_REGIONS.map((r) => (
+                          <option key={r.id} value={r.id}>{r.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[#3e4949] mb-1">District Sanitaire</label>
+                      <input
+                        type="text"
+                        value={formData.district}
+                        onChange={(e) => setFormData({ ...formData, district: e.target.value })}
+                        placeholder="Ex: District de Mbour"
+                        className="w-full px-4 py-3 rounded-xl border border-[#bec9c9]/50 focus:border-[#006669] focus:outline-hidden text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[#3e4949] mb-1">Centre / Lieu proposé</label>
+                      <input
+                        type="text"
+                        value={formData.health_center_name}
+                        onChange={(e) => setFormData({ ...formData, health_center_name: e.target.value })}
+                        placeholder="Ex: Centre de Santé de Popenguine"
+                        className="w-full px-4 py-3 rounded-xl border border-[#bec9c9]/50 focus:border-[#006669] focus:outline-hidden text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid sm:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-[#3e4949] mb-1">Date de début souhaitée</label>
+                      <input
+                        type="date"
+                        value={formData.preferred_start_date}
+                        onChange={(e) => setFormData({ ...formData, preferred_start_date: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl border border-[#bec9c9]/50 focus:border-[#006669] focus:outline-hidden text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[#3e4949] mb-1">Date de fin souhaitée</label>
+                      <input
+                        type="date"
+                        value={formData.preferred_end_date}
+                        onChange={(e) => setFormData({ ...formData, preferred_end_date: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl border border-[#bec9c9]/50 focus:border-[#006669] focus:outline-hidden text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[#3e4949] mb-1">Nombre d'usagers estimé</label>
+                      <input
+                        type="number"
+                        value={formData.expected_patients}
+                        onChange={(e) => setFormData({ ...formData, expected_patients: e.target.value })}
+                        placeholder="Ex: 500"
+                        className="w-full px-4 py-3 rounded-xl border border-[#bec9c9]/50 focus:border-[#006669] focus:outline-hidden text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 3 : Types de Dépistage */}
+                <div className="space-y-4 pt-4">
+                  <h3 className="text-sm font-bold text-[#006669] uppercase tracking-wider border-b border-[#bec9c9]/20 pb-2">
+                    3. Type(s) de Dépistage Souhaité(s) *
+                  </h3>
+                  <div className="grid sm:grid-cols-3 gap-4">
+                    <label className={`p-4 rounded-2xl border-2 flex items-center gap-3 cursor-pointer transition-all ${formData.covers_col ? 'border-[#9013fe] bg-[#9013fe]/5' : 'border-[#bec9c9]/30 bg-white'}`}>
+                      <input
+                        type="checkbox"
+                        checked={formData.covers_col}
+                        onChange={(e) => setFormData({ ...formData, covers_col: e.target.checked })}
+                        className="w-5 h-5 accent-[#9013fe]"
+                      />
+                      <div>
+                        <strong className="block text-xs text-[#091e25]">Col de l'Utérus</strong>
+                        <span className="text-[10px] text-[#3e4949]">Test HPV / IVL / IA</span>
+                      </div>
+                    </label>
+
+                    <label className={`p-4 rounded-2xl border-2 flex items-center gap-3 cursor-pointer transition-all ${formData.covers_sein ? 'border-[#e02020] bg-[#e02020]/5' : 'border-[#bec9c9]/30 bg-white'}`}>
+                      <input
+                        type="checkbox"
+                        checked={formData.covers_sein}
+                        onChange={(e) => setFormData({ ...formData, covers_sein: e.target.checked })}
+                        className="w-5 h-5 accent-[#e02020]"
+                      />
+                      <div>
+                        <strong className="block text-xs text-[#091e25]">Cancer du Sein</strong>
+                        <span className="text-[10px] text-[#3e4949]">Palpation & Mammo</span>
+                      </div>
+                    </label>
+
+                    <label className={`p-4 rounded-2xl border-2 flex items-center gap-3 cursor-pointer transition-all ${formData.covers_prostate ? 'border-[#006669] bg-[#006669]/5' : 'border-[#bec9c9]/30 bg-white'}`}>
+                      <input
+                        type="checkbox"
+                        checked={formData.covers_prostate}
+                        onChange={(e) => setFormData({ ...formData, covers_prostate: e.target.checked })}
+                        className="w-5 h-5 accent-[#006669]"
+                      />
+                      <div>
+                        <strong className="block text-xs text-[#091e25]">Prostate</strong>
+                        <span className="text-[10px] text-[#3e4949]">PSA & TR</span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Section 4 : Notes */}
+                <div>
+                  <label className="block text-xs font-bold text-[#3e4949] mb-1">Informations complémentaires / Besoins spécifiques</label>
+                  <textarea
+                    rows={3}
+                    value={formData.notes}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    placeholder="Besoins en matériel, logistique caravane, agents formés sur place..."
+                    className="w-full px-4 py-3 rounded-xl border border-[#bec9c9]/50 focus:border-[#006669] focus:outline-hidden text-sm"
+                  ></textarea>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full bg-gradient-to-r from-[#006669] to-[#2a7f82] hover:from-[#2a7f82] hover:to-[#006669] text-white font-bold py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all text-base flex items-center justify-center gap-3"
+                >
+                  {submitting ? (
+                    <span>Envoi de votre demande en cours...</span>
+                  ) : (
+                    <>
+                      <span className="material-symbols-outlined">send</span>
+                      Envoyer ma demande d'organisation de campagne
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* ── FOOTER ───────────────────────────────────────────────────────────── */}
+      <footer className="bg-[#091e25] text-white py-12 border-t border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 rounded-lg bg-[#006669] flex items-center justify-center font-bold text-white">
+              D
+            </div>
+            <span className="text-xl font-black tracking-tight">DEPISTEEL</span>
+          </div>
+
+          <p className="text-xs text-[#bec9c9] text-center md:text-left">
+            Depisteel © 2026 — Plateforme Nationale de Dépistage Multi-Cancer & Prévention Sanitaire.
+          </p>
+
+          <div className="flex items-center space-x-6 text-xs text-[#bec9c9]">
+            <Link to="/login" className="hover:text-white transition-colors">Espace Professionnel</Link>
+            <a href="#demande-campagne" className="hover:text-white transition-colors">Demander une campagne</a>
           </div>
         </div>
       </footer>

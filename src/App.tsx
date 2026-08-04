@@ -28,6 +28,7 @@ import PatientNoRecord from './pages/patient/PatientNoRecord.tsx';
 import ProstatePatients from './pages/ProstatePatients.tsx';
 import SeinPatients from './pages/SeinPatients.tsx';
 import HealthCenters from './pages/HealthCenters.tsx';
+import CampaignRequestsPage from './pages/CampaignRequests.tsx';
 
 console.log('Public route - /login')
 const App: React.FC = () => (
@@ -63,6 +64,7 @@ const App: React.FC = () => (
             <Route path="/sein" element={<SeinPatients />} />
             <Route path="/accueil" element={<Campaigns />} />
             <Route path="/centers" element={<HealthCenters />} />
+            <Route path="/campaign-requests" element={<CampaignRequestsPage />} />
             <Route path="/appointments/:id" element={<Appointments />} />
             <Route path="/admin" element={<AdminRedirect />} />
             <Route path="/patients/:id" element={<PatientDetail />} />
