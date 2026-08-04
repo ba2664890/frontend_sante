@@ -7,10 +7,13 @@ export interface User {
   email: string;
   first_name: string;
   last_name: string;
-  role: 'admin' | 'supervisor' | 'health_agent' | 'patient';
+  role: 'global_admin' | 'campaign_admin' | 'center_admin' | 'health_agent' | 'patient' | 'admin' | 'supervisor';
   phone?: string;
   region?: string;
   center?: string;
+  campaign?: number;
+  health_center?: number;
+  structure_name?: string;
   is_active: boolean;
   created_at: string;
 }
@@ -334,21 +337,62 @@ export interface DashboardStats {
 }
 
 // ============================================================
+// Centres de santé permanents
+// ============================================================
+export interface HealthCenter {
+  id: number;
+  name: string;
+  code?: string;
+  admin?: User;
+  admin_id?: number;
+  region?: number;
+  region_display?: string;
+  district?: string;
+  type_structure?: number;
+  type_structure_display?: string;
+  adresse?: string;
+  telephone?: string;
+  covers_col: boolean;
+  covers_sein: boolean;
+  covers_prostate: boolean;
+  cancers_couverts: string[];
+  is_active: boolean;
+  agents_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+// ============================================================
 // Campagnes de dépistage
 // ============================================================
 export interface ScreeningCampaign {
   id: number;
   name: string;
+  description?: string;
   campaign_type: 'routine' | 'outreach' | 'special';
   status: 'planned' | 'active' | 'completed' | 'cancelled';
+  admin?: User;
+  admin_id?: number;
   start_date: string;
   end_date: string;
-  region: string;
+  region: number;
+  region_display?: string;
   district?: string;
   location_details?: string;
+  districts_couverts?: string[];
+  covers_col: boolean;
+  covers_sein: boolean;
+  covers_prostate: boolean;
+  cancers_couverts: string[];
   target_population?: number;
   expected_screenings?: number;
+  objectif_col?: number;
+  objectif_sein?: number;
+  objectif_prostate?: number;
   actual_screenings: number;
+  actual_col: number;
+  actual_sein: number;
+  actual_prostate: number;
   team_leader?: User;
   team_members: User[];
   created_by?: User;

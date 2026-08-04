@@ -3,6 +3,16 @@ import api, { buildQueryString, handleApiError } from './api.ts';
 import { PaginatedResponse } from '../types';
 
 // Typesss
+export interface CancerModuleStats {
+  total: number;
+  screened: number;
+  abnormal: number;
+  coverage_rate: number;
+  trend: { month: string; label: string; total: number; abnormal: number }[];
+  by_region: Record<string, number>;
+  age_distribution: Record<string, number>;
+}
+
 export interface DashboardStats {
   total_patients: number;
   active_patients: number;
@@ -12,16 +22,35 @@ export interface DashboardStats {
   pending_followups: number;
   coverage_rate: number;
   follow_up_rate: number;
+  normal_results: number;
+  pending_alerts: number;
   screening_trend: any[];
   age_distribution: any;
+  age_distributions?: Record<string, Record<string, number>>;
   geographic_data: any[];
-  patients_by_region: any;
+  patients_by_region: Record<string, number>;
+  patients_by_region_detail?: Record<string, { col: number; sein: number; prostate: number; total: number }>;
   recent_patients: any[];
   recent_alerts: any[];
   active_campaigns: any[];
   pending_actions: any[];
-  pending_alerts: number;
+  cancer_stats?: {
+    col: CancerModuleStats;
+    sein: CancerModuleStats;
+    prostate: CancerModuleStats;
+  };
+  oms_90_70_90?: {
+    screened_percentage: number;
+    treated_percentage: number;
+    suppressed_percentage: number;
+  };
+  structure_context?: {
+    type: 'campaign' | 'center';
+    id: number;
+    name: string;
+  } | null;
 }
+
 
 export interface Report {
   id: number;
@@ -104,9 +133,13 @@ export interface PatientDashboardData {
 
 class AnalyticsService {
   // ================= DASHBOARD =================
-  async getDashboardData(): Promise<DashboardStats> {
+  async getDashboardData(params?: { campaign_id?: number; health_center_id?: number }): Promise<DashboardStats> {
     try {
-      const endpoint = '/analytics/dashboard-metrics/dashboard-data/';
+      const queryParts: string[] = [];
+      if (params?.campaign_id) queryParts.push(`campaign_id=${params.campaign_id}`);
+      if (params?.health_center_id) queryParts.push(`health_center_id=${params.health_center_id}`);
+      const qs = queryParts.length ? `?${queryParts.join('&')}` : '';
+      const endpoint = `/analytics/dashboard-metrics/dashboard-data/${qs}`;
       const response = await api.get(endpoint);
       const data = response.data;
 

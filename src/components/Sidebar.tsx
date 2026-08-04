@@ -13,55 +13,67 @@ const Sidebar: React.FC = () => {
 
   /* ---- NAVIGATION PAR RÔLE ---- */
   const getNavItems = () => {
-    switch (user?.role) {
-      case 'admin':
-        return [
-          { name: 'Dashboard', href: '/dashboard', icon: 'dashboard' },
-          { name: 'Col de l\'utérus', href: '/patients', icon: 'group' },
-          { name: 'Prostate', href: '/prostate', icon: 'male' },
-          { name: 'Cancer du Sein', href: '/sein', icon: 'female' },
-          { name: 'Statistiques', href: '/statistics', icon: 'analytics' },
-          { name: 'Notifications', href: '/notifications', icon: 'notifications' },
-          { name: 'Campagnes', href: '/accueil', icon: 'campaign' },
-          { name: 'Rapports', href: '/reports', icon: 'summarize' },
-          { name: 'Assistant Njariñu', href: '/agent/chatbot', icon: 'robot_2' },
-          { name: 'Administration', href: '/admin', icon: 'admin_panel_settings' },
-        ];
-      case 'supervisor':
-        return [
-          { name: 'Dashboard', href: '/dashboard', icon: 'dashboard' },
-          { name: 'Col de l\'utérus', href: '/patients', icon: 'group' },
-          { name: 'Prostate', href: '/prostate', icon: 'male' },
-          { name: 'Cancer du Sein', href: '/sein', icon: 'female' },
-          { name: 'Statistiques', href: '/statistics', icon: 'analytics' },
-          { name: 'Notifications', href: '/notifications', icon: 'notifications' },
-          { name: 'Rapports', href: '/reports', icon: 'summarize' },
-        ];
-      case 'health_agent':
-        return [
-          { name: 'Dashboard', href: '/dashboard', icon: 'dashboard' },
-          { name: 'Col de l\'utérus', href: '/patients', icon: 'group' },
-          { name: 'Prostate', href: '/prostate', icon: 'male' },
-          { name: 'Cancer du Sein', href: '/sein', icon: 'female' },
-          { name: 'Mes Notifications', href: '/notifications', icon: 'notifications' },
-          { name: 'Campagnes locales', href: '/accueil', icon: 'campaign' },
-          { name: 'Assistant Njariñu', href: '/agent/chatbot', icon: 'robot_2' },
-        ];
-      case 'patient':
-        return [
-          { name: 'Accueil', href: '/acceuil_patient', icon: 'home' },
-          { name: 'Mon dossier', href: '/patient/records', icon: 'folder_open' },
-          { name: 'Rendez-vous', href: '/patient/appointments', icon: 'calendar_today' },
-          { name: 'Notifications', href: '/notifications', icon: 'notifications' },
-          { name: 'Assistant Njariñu', href: '/chatbot', icon: 'robot_2' },
-        ];
-      default:
-        return [];
+    const role = user?.role;
+    if (role === 'global_admin' || role === 'admin') {
+      return [
+        { name: 'Dashboard', href: '/dashboard', icon: 'dashboard' },
+        { name: 'Col de l\'utérus', href: '/patients', icon: 'group' },
+        { name: 'Prostate', href: '/prostate', icon: 'male' },
+        { name: 'Cancer du Sein', href: '/sein', icon: 'female' },
+        { name: 'Statistiques', href: '/statistics', icon: 'analytics' },
+        { name: 'Notifications', href: '/notifications', icon: 'notifications' },
+        { name: 'Campagnes', href: '/accueil', icon: 'campaign' },
+        { name: 'Centres de Santé', href: '/centers', icon: 'local_hospital' },
+        { name: 'Rapports', href: '/reports', icon: 'summarize' },
+        { name: 'Assistant Njariñu', href: '/agent/chatbot', icon: 'robot_2' },
+        { name: 'Administration', href: '/admin', icon: 'admin_panel_settings' },
+      ];
+    } else if (role === 'campaign_admin' || role === 'center_admin') {
+      return [
+        { name: 'Dashboard', href: '/dashboard', icon: 'dashboard' },
+        { name: 'Col de l\'utérus', href: '/patients', icon: 'group' },
+        { name: 'Prostate', href: '/prostate', icon: 'male' },
+        { name: 'Cancer du Sein', href: '/sein', icon: 'female' },
+        { name: 'Statistiques', href: '/statistics', icon: 'analytics' },
+        { name: 'Notifications', href: '/notifications', icon: 'notifications' },
+        { name: 'Campagnes', href: '/accueil', icon: 'campaign' },
+        { name: 'Centres de Santé', href: '/centers', icon: 'local_hospital' },
+        { name: 'Assistant Njariñu', href: '/agent/chatbot', icon: 'robot_2' },
+      ];
+    } else if (role === 'supervisor') {
+      return [
+        { name: 'Dashboard', href: '/dashboard', icon: 'dashboard' },
+        { name: 'Col de l\'utérus', href: '/patients', icon: 'group' },
+        { name: 'Prostate', href: '/prostate', icon: 'male' },
+        { name: 'Cancer du Sein', href: '/sein', icon: 'female' },
+        { name: 'Statistiques', href: '/statistics', icon: 'analytics' },
+        { name: 'Notifications', href: '/notifications', icon: 'notifications' },
+        { name: 'Rapports', href: '/reports', icon: 'summarize' },
+      ];
+    } else if (role === 'health_agent') {
+      return [
+        { name: 'Dashboard', href: '/dashboard', icon: 'dashboard' },
+        { name: 'Col de l\'utérus', href: '/patients', icon: 'group' },
+        { name: 'Prostate', href: '/prostate', icon: 'male' },
+        { name: 'Cancer du Sein', href: '/sein', icon: 'female' },
+        { name: 'Mes Notifications', href: '/notifications', icon: 'notifications' },
+        { name: 'Campagnes locales', href: '/accueil', icon: 'campaign' },
+        { name: 'Assistant Njariñu', href: '/agent/chatbot', icon: 'robot_2' },
+      ];
+    } else if (role === 'patient') {
+      return [
+        { name: 'Accueil', href: '/acceuil_patient', icon: 'home' },
+        { name: 'Mon dossier', href: '/patient/records', icon: 'folder_open' },
+        { name: 'Rendez-vous', href: '/patient/appointments', icon: 'calendar_today' },
+        { name: 'Notifications', href: '/notifications', icon: 'notifications' },
+        { name: 'Assistant Njariñu', href: '/chatbot', icon: 'robot_2' },
+      ];
     }
+    return [];
   };
 
   const navItems = getNavItems();
-  const isAgent = user?.role === 'health_agent' || user?.role === 'admin' || user?.role === 'supervisor';
+  const isAgent = user?.role === 'health_agent' || user?.role === 'global_admin' || user?.role === 'admin' || user?.role === 'supervisor' || user?.role === 'campaign_admin' || user?.role === 'center_admin';
 
   const handleNewScreening = () => {
     navigate('/patients');

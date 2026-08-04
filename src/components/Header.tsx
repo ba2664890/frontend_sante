@@ -26,7 +26,7 @@ const Header: React.FC = () => {
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#6f7979] text-[18px]">search</span>
           <input
             type="text"
-            placeholder="Rechercher une patiente, un résultat..."
+            placeholder="Rechercher un patient, un résultat..."
             className="w-full pl-10 pr-4 py-2 bg-[#dcf1fb] border border-[#bec9c9]/30 rounded-full text-sm font-medium placeholder-[#6f7979] focus:outline-none focus:ring-2 focus:ring-[#006669]/20 transition-all"
           />
         </div>
