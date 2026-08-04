@@ -383,7 +383,6 @@ const HomePage: React.FC = () => {
           {/* Trust vitals strip */}
           <div className="mt-14 grid grid-cols-3 gap-6 border-t border-[#DCE4DE] pt-8">
             {[
-              { v: '10 000+', l: 'Patients dépistés', c: '#04696C' },
               { v: '14 Régions', l: 'Couverture Sénégal', c: '#7C2FE0' },
               { v: 'OMS 90-70-90', l: 'Conformité sanitaire', c: '#0B1F24' },
             ].map((s) => (
