@@ -4,30 +4,6 @@ import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion
 import { useAuth } from '../contexts/AuthContext.tsx';
 import screeningService from '../services/screeningService.ts';
 
-/**
- * ── DESIGN SYSTEM ─────────────────────────────────────────────────────────
- * Signature idea: the EKG pulse line from the Depisteel mark isn't just a
- * logo detail — it becomes the spine of the page. It runs through the hero,
- * separates every section, and turns the "how it works" steps into
- * checkpoints along a single continuous trace. Stats read like vitals on a
- * monitor. Cards read like patient dossiers (colored tab, folded corner).
- *
- * Palette
- *   --ink        #0B1F24  deep teal-black — text, dark panels
- *   --teal       #04696C  primary brand teal (deepened for contrast)
- *   --teal-deep  #053638  darkest teal — footer / monitor panel
- *   --purple     #7C2FE0  ribbon purple — cervical / accent
- *   --coral      #E5484D  pulse-line red from the mark — used sparingly
- *   --paper      #FAF8F4  warm off-white background
- *   --mist       #EAF3F1  pale teal card tint
- *   --line       #DCE4DE  hairline borders
- *
- * Type
- *   Display — Fraunces (warm serif, institutional but human)
- *   Body/UI — Inter
- *   Data    — IBM Plex Mono (stats, badges, vitals — reads like a readout)
- * ─────────────────────────────────────────────────────────────────────────
- */
 
 const SENEGAL_REGIONS = [
   { id: 1, name: 'Dakar' },
@@ -253,7 +229,7 @@ const HomePage: React.FC = () => {
           <div className="flex items-center space-x-4">
             {user ? (
               <button
-                onClick={() => navigate(user.role === 'global_admin' || user.role === 'admin' ? '/admin/dashboard' : '/agent/dashboard')}
+                onClick={() => navigate(user.role === 'global_admin' || user.role === 'admin' ? '/dashboard' : '/dashboard')}
                 className="bg-[#04696C] text-white px-5 py-2.5 rounded-full font-semibold text-sm shadow-sm hover:bg-[#053638] transition-all flex items-center gap-2"
               >
                 <span className="material-symbols-outlined text-sm">dashboard</span>
