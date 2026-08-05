@@ -117,7 +117,7 @@ const Patients: React.FC = () => {
           </button>
           <button
             onClick={() => {
-              setSelectedPatient(null);
+              setSelectedPatientList(null);
               setShowForm(true);
             }}
             className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#006669] text-white font-bold shadow-lg shadow-[#006669]/20 hover:bg-[#2a7f82] transition-all active:scale-95"

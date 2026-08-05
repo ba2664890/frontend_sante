@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { seinService } from '../services/seinService.ts';
+import { patientService } from '../services/patientService.ts';
+import ClinicalAiSummary from '../components/ClinicalAiSummary.tsx';
 import type { SeinPatient } from '../types';
 import { CheckCard, ClinicalShell, F, NavigationActions, Notice, Sel, StepHeader, cls, opt } from './ClinicalFormUI.tsx';
 
@@ -261,6 +263,31 @@ export const SeinFormWizard: React.FC<SeinFormWizardProps> = ({ patient, onSubmi
   useEffect(() => {
     reset(defaultValues);
   }, [defaultValues, reset]);
+
+  // AI summary state
+  const [aiSummary, setAiSummary] = useState<string>(patient?.ai_synthese || '');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [summaryMode, setSummaryMode] = useState<'preview' | 'edit'>('preview');
+
+  useEffect(() => {
+    if (patient) setAiSummary(patient.ai_synthese || '');
+  }, [patient]);
+
+  const generateAISummary = async () => {
+    const data = watch();
+    setAiLoading(true);
+    try {
+      const result = await patientService.getAiSummary(data);
+      setAiSummary(result.synthese);
+      setValue('ai_synthese', result.synthese);
+      toast.success('Synthèse IA générée avec succès');
+    } catch (err) {
+      toast.error('Échec de la génération de la synthèse');
+      console.error(err);
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   const w = {
     metaQualif: watch('meta_agent_qualif'),
@@ -833,7 +860,30 @@ export const SeinFormWizard: React.FC<SeinFormWizardProps> = ({ patient, onSubmi
                     <textarea rows={3} {...register('res_traitement_note')} className={cls()} />
                   </F>
                   <F label="Synthese clinique" col2>
-                    <textarea rows={4} {...register('ai_synthese')} className={cls()} placeholder="Synthese ou decision clinique..." />
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <button type="button" onClick={generateAISummary} disabled={aiLoading} className="px-4 py-2 bg-[#006669] text-white rounded-xl font-bold shadow-sm hover:bg-[#2a7f82] transition-all disabled:opacity-50">
+                            {aiLoading ? 'Génération...' : 'Générer la synthèse IA'}
+                          </button>
+                          <button type="button" onClick={() => setSummaryMode('preview')} className={`px-3 py-2 rounded-lg border ${summaryMode === 'preview' ? 'bg-white text-[#006669] border-[#006669]' : 'bg-transparent text-[#3e4949]'}`}>Aperçu</button>
+                          <button type="button" onClick={() => setSummaryMode('edit')} className={`px-3 py-2 rounded-lg border ${summaryMode === 'edit' ? 'bg-white text-[#006669] border-[#006669]' : 'bg-transparent text-[#3e4949]'}`}>Éditer</button>
+                        </div>
+                        <div className="text-xs text-[#6f7979]">Dernière mise à jour: {patient?.ai_synthese_date ? new Date(patient.ai_synthese_date).toLocaleString() : '—'}</div>
+                      </div>
+
+                      {summaryMode === 'preview' ? (
+                        aiSummary ? (
+                          <div className="p-4 bg-white rounded-2xl border border-[#bec9c9]/10 max-h-56 overflow-y-auto">
+                            <ClinicalAiSummary text={watch('ai_synthese') || aiSummary} />
+                          </div>
+                        ) : (
+                          <textarea rows={4} {...register('ai_synthese')} className={cls()} placeholder="Synthese ou decision clinique..." />
+                        )
+                      ) : (
+                        <textarea rows={4} {...register('ai_synthese')} onChange={(e) => { setValue('ai_synthese', e.target.value); setAiSummary(e.target.value); }} className={cls()} placeholder="Synthese ou decision clinique..." />
+                      )}
+                    </div>
                   </F>
                 </div>
               </div>
