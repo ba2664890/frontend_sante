@@ -29,6 +29,7 @@ import ProstatePatients from './pages/ProstatePatients.tsx';
 import SeinPatients from './pages/SeinPatients.tsx';
 import HealthCenters from './pages/HealthCenters.tsx';
 import CampaignRequestsPage from './pages/CampaignRequests.tsx';
+import NotFoundPage from './pages/NotFoundPage.tsx';
 
 console.log('Public route - /login')
 const App: React.FC = () => (
@@ -75,7 +76,7 @@ const App: React.FC = () => (
         </Route>
 
         {/* 404 fallback */}
-        <Route path="*" element={<div className="text-center mt-20 text-xl">Page non trouvée</div>} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </AuthProvider>
   </ThemeProvider>

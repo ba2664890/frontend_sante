@@ -517,7 +517,7 @@ const HomePage: React.FC = () => {
                 <div className="w-14 h-14 bg-[#04696C] text-white rounded-full flex items-center justify-center mx-auto text-2xl">✓</div>
                 <h3 className="text-2xl font-display font-semibold">Demande enregistrée avec succès !</h3>
                 <p className="text-sm text-[#3E4949] max-w-md mx-auto">
-                  Merci pour votre engagement. Un responsable de la plateforme Depisteel prendra contact avec vous rapidement à l'adresse <strong>{formData.contact_email}</strong>.
+                  Merci pour votre engagement. Un responsable de la plateforme Depisteel prendra contact avec vous rapidement à l'adresse <strong>{formData.contact_email}</strong>. Un e-mail vous sera transmis après réception et approbation de votre demande.
                 </p>
                 <button onClick={() => setSubmitSuccess(false)} className="bg-[#04696C] text-white font-semibold px-6 py-2.5 rounded-full text-xs hover:bg-[#053638] transition-colors">
                   Soumettre une autre demande
