@@ -9,7 +9,7 @@ import PatientForm from '../components/PatientForm.tsx';
 import FollowUpForm from '../components/FollowUpForm.tsx';
 import MedicalDocumentsModal from '../components/MedicalDocumentsModal.tsx';
 import { toast } from 'react-hot-toast';
-import { ClinicalAiSummary } from './Patients.tsx';
+import ClinicalAiSummary from '../components/ClinicalAiSummary.tsx';
 
 const PatientDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();

@@ -3,7 +3,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { patientService } from '../services/patientService.ts';
 import type { PatientFormData } from '../types';
-import { ClinicalAiSummary } from '../pages/Patients.tsx';
+import ClinicalAiSummary from '../components/ClinicalAiSummary.tsx';
 
 // ─── Option helpers ────────────────────────────────────────────────────────
 const opt = (value: number | string, label: string) => ({ value, label });
