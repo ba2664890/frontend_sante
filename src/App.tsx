@@ -28,6 +28,7 @@ import PatientNoRecord from './pages/patient/PatientNoRecord.tsx';
 import ProstatePatients from './pages/ProstatePatients.tsx';
 import SeinPatients from './pages/SeinPatients.tsx';
 import HealthCenters from './pages/HealthCenters.tsx';
+import Agents from './pages/Agents.tsx';
 import CampaignRequestsPage from './pages/CampaignRequests.tsx';
 import NotFoundPage from './pages/NotFoundPage.tsx';
 
@@ -65,6 +66,7 @@ const App: React.FC = () => (
             <Route path="/sein" element={<SeinPatients />} />
             <Route path="/accueil" element={<Campaigns />} />
             <Route path="/centers" element={<HealthCenters />} />
+            <Route path="/agents" element={<Agents />} />
             <Route path="/campaign-requests" element={<CampaignRequestsPage />} />
             <Route path="/appointments/:id" element={<Appointments />} />
             <Route path="/admin" element={<AdminRedirect />} />
