@@ -281,8 +281,8 @@ export const SeinFormWizard: React.FC<SeinFormWizardProps> = ({ patient, onSubmi
       setAiSummary(result.synthese);
       setValue('ai_synthese', result.synthese);
       toast.success('Synthèse IA générée avec succès');
-    } catch (err) {
-      toast.error('Échec de la génération de la synthèse');
+    } catch (err: any) {
+      toast.error(err?.message || 'Échec de la génération de la synthèse');
       console.error(err);
     } finally {
       setAiLoading(false);

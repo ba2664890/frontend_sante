@@ -402,8 +402,8 @@ const PatientFormWizard: React.FC<Props> = ({ patient, onCancel, onSubmit }) => 
       setAiSummary(result.synthese);
       setValue('ai_synthese', result.synthese);
       toast.success('Synthèse IA générée avec succès');
-    } catch (error) {
-      toast.error('Échec de la génération de la synthèse');
+    } catch (error: any) {
+      toast.error(error?.message || 'Échec de la génération de la synthèse');
       console.error(error);
     } finally {
       setAiLoading(false);

@@ -43,30 +43,46 @@ api.interceptors.response.use(
 
 // Gestion des erreurs
 export const handleApiError = (error: any): string => {
-  // si backend renvoie un objet d'erreurs par champ
-  if (error.response?.data && typeof error.response.data === 'object') {
-    // concaténation des messages par champ
-    return Object.entries(error.response.data)
-      .map(([field, msgs]) => {
-        if (Array.isArray(msgs)) return `${field}: ${msgs.join(', ')}`;
-        return `${field}: ${msgs}`;
-      })
-      .join('\n');
-  }
-
-  if (error.response?.data?.detail) return error.response.data.detail;
-  if (error.response?.data?.message) return error.response.data.message;
-  if (error.response?.data?.error) return error.response.data.error;
-  if (error.response?.status === 400) return error.response.data || 'Requête invalide.';
-  if (error.response?.status === 404) return 'Ressource non trouvée.';
-  if (error.response?.status === 500) {
-    console.error('Erreur Serveur 500:', error.response?.data);
-    return 'Le serveur rencontre une difficulté technique (base de données). Les données affichées peuvent être incomplètes.';
-  }
   if (error.code === 'ECONNABORTED') return 'Le délai de réponse a été dépassé. Veuillez réessayer.';
   if (!error.response) return 'Impossible de contacter le serveur. Vérifiez votre connexion.';
-  
-  return 'Une erreur inattendue est survenue.';
+
+  const { status, data } = error.response;
+
+  // Messages simples renvoyés tels quels par le backend (detail/message/error)
+  if (data && typeof data === 'object') {
+    if (typeof data.detail === 'string') return data.detail;
+    if (typeof data.message === 'string') return data.message;
+    if (typeof data.error === 'string') return data.error;
+  }
+
+  switch (status) {
+    case 400:
+      if (data && typeof data === 'object') {
+        // Erreurs de validation par champ (DRF)
+        return Object.entries(data)
+          .map(([field, msgs]) => {
+            const text = Array.isArray(msgs) ? msgs.join(', ') : String(msgs);
+            return `${field} : ${text}`;
+          })
+          .join('\n');
+      }
+      return typeof data === 'string' ? data : 'Requête invalide.';
+    case 401:
+      return 'Votre session a expiré. Veuillez vous reconnecter.';
+    case 403:
+      return "Vous n'avez pas les droits nécessaires pour effectuer cette action.";
+    case 404:
+      return 'Ressource introuvable.';
+    case 429:
+      return 'Trop de requêtes envoyées. Veuillez patienter un instant avant de réessayer.';
+    case 500:
+      console.error('Erreur Serveur 500:', data);
+      return 'Le serveur rencontre une difficulté technique. Veuillez réessayer dans quelques instants.';
+    case 503:
+      return 'Le service est momentanément indisponible. Veuillez réessayer dans quelques instants.';
+    default:
+      return 'Une erreur inattendue est survenue.';
+  }
 };
 
 
