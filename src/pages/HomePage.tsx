@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext.tsx';
 import screeningService from '../services/screeningService.ts';
+import api from '../services/api.ts';
 
 
 const SENEGAL_REGIONS = [
@@ -118,6 +119,12 @@ const HomePage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const reduce = useReducedMotion();
+
+  // Réveille silencieusement le backend (Render se met en veille après inactivité) dès
+  // l'arrivée sur l'accueil, pour éviter le cold-start au premier vrai appel de l'utilisateur.
+  useEffect(() => {
+    api.get('/health/').catch(() => {});
+  }, []);
 
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
