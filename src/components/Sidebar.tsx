@@ -39,7 +39,6 @@ const Sidebar: React.FC = () => {
         { name: 'Statistiques', href: '/statistics', icon: 'analytics' },
         { name: 'Notifications', href: '/notifications', icon: 'notifications' },
         { name: 'Campagnes', href: '/accueil', icon: 'campaign' },
-        { name: 'Centres de Santé', href: '/centers', icon: 'local_hospital' },
         { name: 'Agents de Santé', href: '/agents', icon: 'groups' },
         { name: 'Assistant Njariñu', href: '/agent/chatbot', icon: 'robot_2' },
       ];
