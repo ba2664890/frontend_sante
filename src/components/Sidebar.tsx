@@ -111,7 +111,7 @@ const Sidebar: React.FC = () => {
             className="text-[#006669] text-xl font-semibold"
             style={{ fontFamily: 'Literata, serif' }}
           >
-            CerviCare+
+            Depisteel
           </span>
         </div>
 
